@@ -1,6 +1,8 @@
 # Ansible Matomo
 
-Currently this repository contains an Ansible role for upgrading Matomo servers, at some point in the future the ability to install Matomo will probably be added.
+Currently this repository contains an Ansible role for upgrading [Matomo](https://matomo.org/l) servers, based on the [manual upgrade steps](https://matomo.org/docs/update/#the-manual-three-step-update). 
+
+At some point in the future the ability to [install Matomo](https://matomo.org/docs/installation/) might be added.
 
 To use this role you need to use Ansible Galaxy to install it into another repository by adding a `requirements.yml` file in that repo that contains:
 
