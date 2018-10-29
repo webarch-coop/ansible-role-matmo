@@ -1,0 +1,144 @@
+---
+# https://matomo.org/docs/update/#the-manual-three-step-update
+- name: The ~/.ansible directory exists
+  file:
+    path: "{{ matomo_home }}/.ansible"
+    state: directory
+    owner: "{{ matomo_user }}"
+    group: "{{ matomo_user }}"
+    mode: 0700
+
+- name: The ~/.gnupg directory exists
+  file:
+    path: "{{ matomo_home }}/.gnupg"
+    state: directory
+    owner: "{{ matomo_user }}"
+    group: "{{ matomo_user }}"
+    mode: 0700
+
+- name: The Matomo GPG public key is present
+  get_url:
+    url: https://builds.piwik.org/signature.asc
+    dest: "{{ matomo_private }}/signature.asc"
+  become: yes
+  become_user: "{{ matomo_user }}"
+
+- name: The Matomo GPG public key is imported
+  command: "gpg --import {{ matomo_private }}/signature.asc" 
+  become: yes
+  become_user: "{{ matomo_user }}"
+
+- name: Get the latest Matomo version number file
+  get_url:
+    url: https://builds.piwik.org/LATEST
+    dest: "{{ matomo_private }}/LATEST"
+  become: yes
+  become_user: "{{ matomo_user }}"
+
+- name: Set a variable for the base64 encoded latest Matomo version
+  slurp:
+    src: "{{ matomo_private }}/LATEST"
+  register: matomo_latest_b64encoded
+
+- name: Set a variable for the latest Matomo version
+  set_fact:
+    matomo_latest: "{{ matomo_latest_b64encoded['content'] | b64decode | trim }}"
+
+- name: Print the latest version
+  debug:
+    msg: "The latest version of Matomo is {{ matomo_latest }}"
+    verbosity: 1
+
+- name: Get the installed Matomo version number
+  shell: "php console core:update --version | awk '{ print $3 }'"
+  args:
+    executable: /bin/bash
+    chdir: "{{ matomo_html }}"
+  become: yes
+  become_user: "{{ matomo_user }}"
+  register: matomo_installed
+
+- name: Print the installed version
+  debug:
+    msg: "The installed version of Matomo is {{ matomo_installed.stdout }}"
+    verbosity: 1
+
+- block:
+  
+  - name: Latest Matomo GPG signature downloaded
+    get_url:
+      url: "https://builds.piwik.org/matomo-{{ matomo_latest }}.tar.gz.asc"
+      dest: "{{ matomo_private }}/matomo-{{ matomo_latest }}.tar.gz.asc"
+    become: yes
+    become_user: "{{ matomo_user }}"
+  
+  - name: Latest Matomo downloaded
+    get_url:
+      url: https://builds.piwik.org/matomo-{{ matomo_latest }}.tar.gz
+      dest: "{{ matomo_private }}/matomo-{{ matomo_latest }}.tar.gz"
+    become: yes
+    become_user: "{{ matomo_user }}"
+  
+  - name: Matomo GPG signature checked
+    shell: "gpg --verify --logger-fd 1 {{ matomo_private }}/matomo-{{ matomo_latest }}.tar.gz.asc | grep 'Good signature'"
+    args:
+      executable: /bin/bash    
+    register: matomo_signature_check
+    failed_when: "'Good signature' not in matomo_signature_check.stdout"
+    become: yes
+    become_user: "{{ matomo_user }}"
+  
+  - name: Private directory for Matomo to be unarchived into absent
+    file:
+      path: "{{ matomo_private }}/matomo"
+      state: absent
+    become: yes
+    become_user: "{{ matomo_user }}"
+  
+  - name: Latest Matomo unarchived into private directory
+    unarchive:
+      remote_src: True
+      src: "{{ matomo_private }}/matomo-{{ matomo_latest }}.tar.gz"
+      dest: "{{ matomo_private }}"
+    become: yes
+    become_user: "{{ matomo_user }}"
+  
+  - name: Backup up the Matomo config file
+    copy:
+      remote_src: yes
+      src: "{{ matomo_html }}/config/config.ini.php"
+      dest: "{{ matomo_private }}/config.ini.php.{{ ansible_date_time.date }}.{{ ansible_date_time.time }}.bak"
+    become: yes
+    become_user: "{{ matomo_user }}"
+  
+  - name: Latest Matomo rsynced over last version
+    shell: "rsync -aq {{ matomo_private }}/matomo/ {{ matomo_html }}/"
+    args:
+      executable: /bin/bash
+    become: yes
+    become_user: "{{ matomo_user }}"
+  
+  - name: Matomo database upgraded
+    shell: "php console core:update -n --yes"
+    args:
+      executable: /bin/bash
+      chdir: "{{ matomo_html }}"
+    become: yes
+    become_user: "{{ matomo_user }}"
+
+  when: matomo_installed.stdout != matomo_latest 
+  
+- name: Matomo version checked
+  shell: "php console core:update --version"
+  args:
+    executable: /bin/bash
+    chdir: "{{ matomo_html }}"
+  become: yes
+  become_user: "{{ matomo_user }}"
+  register: matomo_updated
+
+- name: The latest version of Matomo is already installed
+  debug:
+    msg: "The latest version of Matomo available is {{ matomo_latest }} and {{ matomo_installed.stdout }} is installed"
+  when: matomo_installed.stdout == matomo_latest 
+
