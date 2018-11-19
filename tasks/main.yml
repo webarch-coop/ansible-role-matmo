@@ -24,7 +24,7 @@
   become_user: "{{ matomo_user }}"
 
 - name: The Matomo GPG public key is imported
-  command: "gpg --import {{ matomo_private }}/signature.asc" 
+  command: "gpg --batch --no-tty --import {{ matomo_private }}/signature.asc" 
   become: yes
   become_user: "{{ matomo_user }}"
 
@@ -80,7 +80,7 @@
     become_user: "{{ matomo_user }}"
   
   - name: Matomo GPG signature checked
-    shell: "gpg --verify --logger-fd 1 {{ matomo_private }}/matomo-{{ matomo_latest }}.tar.gz.asc | grep 'Good signature'"
+    shell: "gpg --batch --no-tty --verify --logger-fd 1 {{ matomo_private }}/matomo-{{ matomo_latest }}.tar.gz.asc | grep 'Good signature'"
     args:
       executable: /bin/bash    
     register: matomo_signature_check
