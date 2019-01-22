@@ -34,6 +34,7 @@
   get_url:
     url: https://builds.piwik.org/LATEST
     dest: "{{ matomo_private }}/LATEST"
+    force: yes
   become: yes
   become_user: "{{ matomo_user }}"
 
