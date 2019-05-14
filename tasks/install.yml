@@ -73,8 +73,7 @@
 
 - name: Composer run to install dependancies
   command: composer install
-    args:
-    executable: /bin/bash
+  args:
     chdir: "{{ matomo_html }}/"
   become: true
   become_user: "{{ matomo_user }}"
