@@ -3,6 +3,21 @@
 - name: Matomo download tasks included
   include_tasks: download.yml
 
+- name: Modified composer.json for Matomo ExtraTools present
+  copy:
+    src: files/composer.json
+    dest: "{{ matomo_html }}/composer.json"
+    owner: "{{ matomo_user }}"
+    group: "{{ matomo_user }}"
+    mode: 0644
+
+- name: Composer run to install dependancies
+  command: composer install
+  args:
+    chdir: "{{ matomo_html }}/"
+  become: true
+  become_user: "{{ matomo_user }}"
+
 - name: Matomo files rsynced into place
   shell: "rsync -aq {{ matomo_private }}/matomo/ {{ matomo_html }}/"
   args:
@@ -16,14 +31,6 @@
     dest: "{{ matomo_html }}/plugins/ExtraTools"
   become: true
   become_user: "{{ matomo_user }}"
-
-- name: composer.json for Matomo ExtraTools present
-  copy:
-    src: files/composer.json
-    dest: "{{ matomo_html }}/composer.json"
-    owner: "{{ matomo_user }}"
-    group: "{{ matomo_user }}"
-    mode: 0644
 
 - name: ExtraTools plugin activated
   shell: "php console plugin:activate ExtraTools"
@@ -65,18 +72,6 @@
   set_fact:
     matomo_first_user_pass: "{{ matomo_first_user_pass_gen.stdout | trim | quote }}"
   when: ( matomo_first_user_pass_gen is defined ) and ( matomo_first_user_pass_gen != "" )
-
-- name: Remove composer.lock file
-  file:
-    path: "{{ matomo_html }}/composer.lock"
-    state: absent
-
-- name: Composer run to install dependancies
-  command: composer install
-  args:
-    chdir: "{{ matomo_html }}/"
-  become: true
-  become_user: "{{ matomo_user }}"
 
 - name: Motomo installed
   shell: "php console matomo:install --db-username={{ matomo_db_username }} --db-pass={{ matomo_db_pass }} --db-host={{ matomo_db_host }} --db-name={{ matomo_db_name }} --first-site-name='{{ matomo_first_site_name }}' --first-site-url='{{ matomo_first_site_url }}' --first-user='{{ matomo_first_user }}' --first-user-email='{{ matomo_first_user_email }}' --first-user-pass='{{ matomo_first_user_pass }}' --force"
