@@ -66,20 +66,14 @@
     matomo_first_user_pass: "{{ matomo_first_user_pass_gen.stdout | trim | quote }}"
   when: ( matomo_first_user_pass_gen is defined ) and ( matomo_first_user_pass_gen != "" )
 
-- debug:
-    msg: "matomo_first_user_pass set to: {{ matomo_first_user_pass }}"
-
 - name: Motomo installed
-  shell: "echo php console matomo:install --db-username={{ matomo_db_username }} --db-pass={{ matomo_db_pass }} --db-host={{ matomo_db_host }} --db-name={{ matomo_db_name }} --first-site-name='{{ matomo_first_site_name }}' --first-site-url='{{ matomo_first_site_url }}' --first-user='{{ matomo_first_user }}' --first-user-email='{{ matomo_first_user_email }}' --first-user-pass='{{ matomo_first_user_pass }}'"
+  shell: "php console matomo:install --db-username={{ matomo_db_username }} --db-pass={{ matomo_db_pass }} --db-host={{ matomo_db_host }} --db-name={{ matomo_db_name }} --first-site-name='{{ matomo_first_site_name }}' --first-site-url='{{ matomo_first_site_url }}' --first-user='{{ matomo_first_user }}' --first-user-email='{{ matomo_first_user_email }}' --first-user-pass='{{ matomo_first_user_pass }}'"
   # ' vim syntax highlighting buxfix
   args:
     executable: /bin/bash
     chdir: "{{ matomo_html }}/"
   become: true
   become_user: "{{ matomo_user }}"
-
-- fail:
-    msg: stop
 
 - name: "Password notification email sent to {{ matomo_first_user_email }}"
   mail:
