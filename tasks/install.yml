@@ -33,27 +33,28 @@
   become: true
   become_user: "{{ matomo_user }}"
 
-- name: "Check for {{ matomo_home }}/.my.cnf"
-  stat:
-    path: "{{ matomo_home }}/.my.cnf"
-  register: matomo_mycnf_check
+- block:
+
+    - name: "Check for {{ matomo_home }}/.my.cnf"
+      stat:
+        path: "{{ matomo_home }}/.my.cnf"
+      register: matomo_mycnf_check
+
+    - name: "MariaDB password read from {{ matomo_home }}/.my.cnf"
+      shell: "my_print_defaults --defaults-file='.my.cnf' client | grep '^--password' | sed -e 's/--password=//'"
+      args:
+        executable: /bin/bash
+        chdir: "{{ matomo_html }}/"
+      register: matomo_db_pass_read
+      become: true
+      become_user: "{{ matomo_user }}"
+      changed_when: false
+
+    - name: Set a fact for the MariaDB password
+      set_fact:
+        matomo_db_pass: "{{ matomo_db_pass_read.stdout }}"
+
   when: ( matomo_db_pass is not defined ) or ( matomo_db_pass == "" )
-
-- name: "MariaDB password read from {{ matomo_home }}/.my.cnf"
-  shell: "my_print_defaults --defaults-file='.my.cnf' client | grep '^--password' | sed -e 's/--password=//'"
-  args:
-    executable: /bin/bash
-    chdir: "{{ matomo_html }}/"
-  register: matomo_db_pass_read
-  become: true
-  become_user: "{{ matomo_user }}"
-  changed_when: false
-  when: ( matomo_mycnf_check is defined ) and ( matomo_mycnf_check.stat.exists  == True )
-
-- name: Set a fact for the MariaDB password
-  set_fact:
-    matomo_db_pass: "{{ matomo_db_pass_read.stdout }}"
-  when: ( matomo_db_pass_read is defined ) and ( matomo_db_pass_read.stdout != "" )
 
 - name: Random passwd for Matomo admin generated
   command: pwgen -n 20 1
