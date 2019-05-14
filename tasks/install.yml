@@ -3,6 +3,18 @@
 - name: Matomo download tasks included
   include_tasks: download.yml
 
+- name: Matomo files rsynced into place
+  shell: "rsync -aq {{ matomo_private }}/matomo/ {{ matomo_html }}/"
+  args:
+    executable: /bin/bash
+  become: true
+  become_user: "{{ matomo_user }}"
+
+- name: Composer lock file removed
+  file:
+    path: "{{ matomo_html }}/composer.lock"
+    state: absent
+
 - name: Modified composer.json for Matomo ExtraTools present
   copy:
     src: files/composer.json
@@ -15,13 +27,6 @@
   command: composer install
   args:
     chdir: "{{ matomo_html }}/"
-  become: true
-  become_user: "{{ matomo_user }}"
-
-- name: Matomo files rsynced into place
-  shell: "rsync -aq {{ matomo_private }}/matomo/ {{ matomo_html }}/"
-  args:
-    executable: /bin/bash
   become: true
   become_user: "{{ matomo_user }}"
 
