@@ -3,8 +3,8 @@
   get_url:
     url: https://builds.piwik.org/LATEST
     dest: "{{ matomo_private }}/LATEST"
-    force: yes
-  become: yes
+    force: true
+  become: true
   become_user: "{{ matomo_user }}"
 
 - name: Set a variable for the base64 encoded latest Matomo version
@@ -34,7 +34,7 @@
       args:
         executable: /bin/bash
         chdir: "{{ matomo_html }}"
-      become: yes
+      become: true
       become_user: "{{ matomo_user }}"
       register: matomo_installed
 

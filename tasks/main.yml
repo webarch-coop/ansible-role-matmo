@@ -20,14 +20,14 @@
   get_url:
     url: https://builds.piwik.org/signature.asc
     dest: "{{ matomo_private }}/matomo.pub"
-  become: yes
+  become: true
   become_user: "{{ matomo_user }}"
 
 - name: The Matomo GPG public key is imported
   command: "gpg --no-tty --import {{ matomo_private }}/matomo.pub"
   register: matomo_gpg_key_import
   changed_when: "'not changed' not in matomo_gpg_key_import.stderr"
-  become: yes
+  become: true
   become_user: "{{ matomo_user }}"
 
 - name: Include version check tasks
