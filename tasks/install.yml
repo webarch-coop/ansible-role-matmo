@@ -1,6 +1,6 @@
 ---
 # https://github.com/digitalist-se/extratools
-- name: Matomo download tasks included 
+- name: Matomo download tasks included
   include_tasks: download.yml
 
 - name: Matomo files rsynced into place
@@ -20,7 +20,7 @@
 - name: composer.json for Matomo ExtraTools present
   copy:
     src: files/composer.json
-    dest: {{ matomo_html }}/composer.json
+    dest: "{{ matomo_html }}/composer.json"
     owner: "{{ matomo_user }}"
     group: "{{ matomo_user }}"
     mode: 0644

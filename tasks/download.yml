@@ -31,7 +31,7 @@
 
 - name: Latest Matomo unarchived into private directory
   unarchive:
-    remote_src: True
+    remote_src: true
     src: "{{ matomo_private }}/matomo-{{ matomo_latest }}.tar.gz"
     dest: "{{ matomo_private }}"
   become: true
