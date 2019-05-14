@@ -37,6 +37,7 @@
   stat:
     path: "{{ matomo_home }}/.my.cnf"
   register: matomo_mycnf_check
+  when: ( matomo_db_pass is not defined ) or ( matomo_db_pass == "" )
 
 - name: "MariaDB password read from {{ matomo_home }}/.my.cnf"
   shell: "my_print_defaults --defaults-file='.my.cnf' client | grep '^--password' | sed -e 's/--password=//'"
@@ -47,12 +48,22 @@
   become: true
   become_user: "{{ matomo_user }}"
   changed_when: false
-  when: matomo_mycnf_check.stat.exists
+  when: ( matomo_mycnf_check is defined ) and ( matomo_mycnf_check.stat.exists  == True )
 
 - name: Set a fact for the MariaDB password
   set_fact:
     matomo_db_pass: "{{ matomo_db_pass_read.stdout }}"
   when: ( matomo_db_pass_read is defined ) and ( matomo_db_pass_read.stdout != "" )
+
+- name: Random passwd for Matomo admin generated
+  command: pwgen -n 20 1
+  register: matomo_first_user_pass_gen
+  when: ( matomo_first_user_pass is not defined ) or ( matomo_first_user_pass == "" )
+
+- name: Fact set for Matomo admin password
+  set_fact:
+    matomo_first_user_pass: "{{ matomo_first_user_pass_gen.stdout }}"
+  when: ( matomo_first_user_pass_gen is defined ) and ( matomo_first_user_pass_gen != "" )
 
 - name: Motomo installed
   shell: console matomo:install --db-username={{ matomo_db_username }} --db-pass={{ matomo_db_pass }} --db-host={{ matomo_db_host }} --db-name={{ matomo_db_name }} --first-site-name='{{ matomo_first_site_name }}' --first-site-url='{{ matomo_first_site_url }}' --first-user='{{ matomo_first_user }}' --first-user-email='{{ matomo_first_user_email }}' --first-user-pass='{{ matomo_first_user_pass }}'"
@@ -61,3 +72,25 @@
     executable: /bin/bash
   become: true
   become_user: "{{ matomo_user }}"
+
+- name: "Password notification email sent to {{ matomo_first_user_email }}"
+  mail:
+    from: "{{ matomo_notify_passwd_from | default('Webarchitects') }} <root@{{ ansible_fqdn }}>"
+    to: "{{ matomo_first_user }} <{{ matomo_first_user_email }}>"
+    subject: "[{{ matomo_passwd_notify_subject_tag | default('webarchitects') }}] Matomo admin password for {{ matomo_first_user }} on {{ vhost.value.users_apache_server_name }}"
+    body: "{{ lookup('template', 'templates/notify_matomo_passwd.j2') }}"
+    host: localhost
+    port: 25
+    secure: never
+
+- name: "Notification date recorded in {{ item.value.users_home | default('/home/' + item.key) }}/.notify_matomo_passwd file"
+  lineinfile:
+    path: "{{ item.value.users_home | default('/home/' + item.key) }}/.notify_passwd"
+    line: "{{ lookup('pipe', 'date +%Y-%m-%d-%H-%M-%S')}} : {{ item.value.users_name | default(item.key) }} <{{ item.value.users_email }}>"
+    create: true
+    state: present
+    insertafter: EOF
+    owner: root
+    group: root
+    mode: 0640
+

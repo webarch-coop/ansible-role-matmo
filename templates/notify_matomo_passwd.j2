@@ -1,0 +1,13 @@
+Hi
+
+Your Matomo account details for {{ vhost.value.users_apache_server_name }}
+
+  Username:	{{ matomo_first_user }}
+  Password:	{{ matomo_first_user_pass }}
+
+All the best
+
+{{ matomo_notify_passwd_from | default('Webarchitects') }}
+
+-- 
+{{ matomo_email_signature | default('Webarch Co-operative Limited\nhttps://www.webarch.coop/') }}
