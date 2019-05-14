@@ -1,0 +1,38 @@
+---
+- name: Latest Matomo GPG signature downloaded
+  get_url:
+    url: "https://builds.piwik.org/matomo-{{ matomo_latest }}.tar.gz.asc"
+    dest: "{{ matomo_private }}/matomo-{{ matomo_latest }}.tar.gz.asc"
+  become: yes
+  become_user: "{{ matomo_user }}"
+
+- name: Latest Matomo downloaded
+  get_url:
+    url: "https://builds.piwik.org/matomo-{{ matomo_latest }}.tar.gz"
+    dest: "{{ matomo_private }}/matomo-{{ matomo_latest }}.tar.gz"
+  become: yes
+  become_user: "{{ matomo_user }}"
+
+- name: Matomo GPG signature checked
+  shell: "gpg --no-tty --verify --logger-fd 1 {{ matomo_private }}/matomo-{{ matomo_latest }}.tar.gz.asc | grep 'Good signature'"
+  args:
+    executable: /bin/bash
+  register: matomo_signature_check
+  failed_when: "'Good signature' not in matomo_signature_check.stdout"
+  become: yes
+  become_user: "{{ matomo_user }}"
+
+- name: Private directory for Matomo to be unarchived into absent
+  file:
+    path: "{{ matomo_private }}/matomo"
+    state: absent
+  become: yes
+  become_user: "{{ matomo_user }}"
+
+- name: Latest Matomo unarchived into private directory
+  unarchive:
+    remote_src: True
+    src: "{{ matomo_private }}/matomo-{{ matomo_latest }}.tar.gz"
+    dest: "{{ matomo_private }}"
+  become: yes
+  become_user: "{{ matomo_user }}"

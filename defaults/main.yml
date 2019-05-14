@@ -1,0 +1,14 @@
+---
+matomo_user: stats
+matomo_home: "/home/{{ matomo_user }}"
+matomo_html: "{{ matomo_home }}/sites/default"
+matomo_private: "{{ matomo_home }}/private"
+matomo_db_username: "{{ matomo_user }}"
+matomo_db_pass: ""
+matomo_db_host: localhost
+matomo_db_name: "{{ matomo_user }}"
+matomo_first_site_name: "{{ inventory_hostname }}"
+matomo_first_site_url: "https://{{ inventory_hostname }}/"
+matomo_first_user: "Webarchitects"
+matomo_first_user_email: "root@{{ inventory_hostname }}"
+matomo_first_user_pass: ""
