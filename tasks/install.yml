@@ -10,25 +10,17 @@
   become: true
   become_user: "{{ matomo_user }}"
 
-- name: Composer lock file removed
-  file:
-    path: "{{ matomo_html }}/composer.lock"
-    state: absent
-
-- name: Modified composer.json for Matomo ExtraTools present
-  copy:
-    src: files/composer.json
-    dest: "{{ matomo_html }}/composer.json"
-    owner: "{{ matomo_user }}"
-    group: "{{ matomo_user }}"
-    mode: 0644
-
 - name: Composer run to install dependancies
-  command: composer install
+  command: "{{ cmd }}" 
   args:
     chdir: "{{ matomo_html }}/"
   become: true
   become_user: "{{ matomo_user }}"
+  loop:
+    - composer require symfony/yaml:~2.6.0
+    - composer require symfony/process:^3.4
+  loop_control:
+    loop_var: cmd
 
 - name: Matomo ExtraTools present
   git:
