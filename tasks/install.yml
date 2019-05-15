@@ -11,7 +11,7 @@
   become_user: "{{ matomo_user }}"
 
 - name: Composer run to install dependancies
-  command: "{{ cmd }}" 
+  command: "{{ cmd }}"
   args:
     chdir: "{{ matomo_html }}/"
   become: true
