@@ -5,6 +5,8 @@
     dest: "{{ matomo_private }}/matomo-{{ matomo_latest }}.tar.gz.asc"
   become: true
   become_user: "{{ matomo_user }}"
+  tags:
+    - matomo
 
 - name: Latest Matomo downloaded
   get_url:
@@ -12,6 +14,8 @@
     dest: "{{ matomo_private }}/matomo-{{ matomo_latest }}.tar.gz"
   become: true
   become_user: "{{ matomo_user }}"
+  tags:
+    - matomo
 
 - name: Matomo GPG signature checked
   shell: "gpg --no-tty --verify --logger-fd 1 {{ matomo_private }}/matomo-{{ matomo_latest }}.tar.gz.asc | grep 'Good signature'"
@@ -21,6 +25,8 @@
   failed_when: "'Good signature' not in matomo_signature_check.stdout"
   become: true
   become_user: "{{ matomo_user }}"
+  tags:
+    - matomo
 
 - name: Private directory for Matomo to be unarchived into absent
   file:
@@ -28,6 +34,8 @@
     state: absent
   become: true
   become_user: "{{ matomo_user }}"
+  tags:
+    - matomo
 
 - name: Latest Matomo unarchived into private directory
   unarchive:
@@ -36,3 +44,5 @@
     dest: "{{ matomo_private }}"
   become: true
   become_user: "{{ matomo_user }}"
+  tags:
+    - matomo

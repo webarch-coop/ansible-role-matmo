@@ -1,6 +1,8 @@
 ---
 - name: Matomo download tasks included
   include_tasks: download.yml
+  tags:
+    - matomo
 
 - name: Matomo files rsynced into place
   shell: "rsync -aq {{ matomo_private }}/matomo/ {{ matomo_html }}/"
@@ -8,12 +10,18 @@
     executable: /bin/bash
   become: true
   become_user: "{{ matomo_user }}"
+  tags:
+    - matomo
 
 - name: Matomo extratools tasks included
   include_tasks: extratools.yml
+  tags:
+    - matomo
 
 - name: Matomo userconsole tasks included
   include_tasks: userconsole.yml
+  tags:
+    - matomo
 
 - block:
 
@@ -21,6 +29,8 @@
       stat:
         path: "{{ matomo_home }}/.my.cnf"
       register: matomo_mycnf_check
+      tags:
+        - matomo
 
     - name: "MariaDB password read from {{ matomo_home }}/.my.cnf"
       shell: "my_print_defaults --defaults-file='.my.cnf' client | grep '^--password' | sed -e 's/--password=//'"
@@ -31,10 +41,14 @@
       become: true
       become_user: "{{ matomo_user }}"
       changed_when: false
+      tags:
+        - matomo
 
     - name: Set a fact for the MariaDB password
       set_fact:
         matomo_db_pass: "{{ matomo_db_pass_read.stdout }}"
+      tags:
+        - matomo
 
   when: ( matomo_db_pass is not defined ) or ( matomo_db_pass == "" )
 
@@ -42,11 +56,15 @@
   command: pwgen -n 20 1
   register: matomo_first_user_pass_gen
   when: ( matomo_first_user_pass is not defined ) or ( matomo_first_user_pass == "" )
+  tags:
+    - matomo
 
 - name: Fact set for Matomo admin password
   set_fact:
     matomo_first_user_pass: "{{ matomo_first_user_pass_gen.stdout | trim | quote }}"
   when: ( matomo_first_user_pass_gen is defined ) and ( matomo_first_user_pass_gen != "" )
+  tags:
+    - matomo
 
 - name: Motomo installed
   shell: "php console matomo:install --db-username={{ matomo_db_username }} --db-pass={{ matomo_db_pass }} --db-host={{ matomo_db_host }} --db-name={{ matomo_db_name }} --first-site-name='{{ matomo_first_site_name }}' --first-site-url='{{ matomo_first_site_url }}' --first-user='{{ matomo_first_user }}' --first-user-email='{{ matomo_first_user_email }}' --first-user-pass='{{ matomo_first_user_pass }}' --force"
@@ -56,6 +74,8 @@
     chdir: "{{ matomo_html }}/"
   become: true
   become_user: "{{ matomo_user }}"
+  tags:
+    - matomo
 
 - name: "Password notification email sent to {{ matomo_first_user_email }}"
   mail:
@@ -66,6 +86,8 @@
     host: localhost
     port: 25
     secure: never
+  tags:
+    - matomo
 
 - name: "Notification date recorded in {{ item.value.users_home | default('/home/' + item.key) }}/.notify_matomo_passwd file"
   lineinfile:
@@ -77,3 +99,5 @@
     owner: root
     group: root
     mode: 0640
+  tags:
+    - matomo

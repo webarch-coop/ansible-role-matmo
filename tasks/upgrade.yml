@@ -1,6 +1,8 @@
 ---
 - name: Matomo download tasks included
   include_tasks: download.yml
+  tags:
+    - matomo
 
 - name: Backup up the Matomo config file
   copy:
@@ -9,6 +11,8 @@
     dest: "{{ matomo_private }}/config.ini.php.{{ ansible_date_time.date }}.{{ ansible_date_time.time }}.bak"
   become: true
   become_user: "{{ matomo_user }}"
+  tags:
+    - matomo
 
 - name: Latest Matomo rsynced over last version
   shell: "rsync -aq {{ matomo_private }}/matomo/ {{ matomo_html }}/"
@@ -16,12 +20,18 @@
     executable: /bin/bash
   become: true
   become_user: "{{ matomo_user }}"
+  tags:
+    - matomo
 
 - name: Matomo extratools tasks included
   include_tasks: extratools.yml
+  tags:
+    - matomo
 
 - name: Matomo userconsole tasks included
   include_tasks: userconsole.yml
+  tags:
+    - matomo
 
 - name: Matomo database upgraded
   shell: "php console core:update -n --yes"
@@ -30,6 +40,8 @@
     chdir: "{{ matomo_html }}"
   become: true
   become_user: "{{ matomo_user }}"
+  tags:
+    - matomo
 
 - name: Matomo version checked
   shell: "php console core:update --version"
@@ -39,8 +51,12 @@
   become: true
   become_user: "{{ matomo_user }}"
   register: matomo_updated
+  tags:
+    - matomo
 
 - name: Matomo version check
   debug:
     msg: "The latest version of Matomo available is {{ matomo_latest }} and {{ matomo_installed.stdout }} is installed"
   when: matomo_installed.stdout == matomo_latest
+  tags:
+    - matomo

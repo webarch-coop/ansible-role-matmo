@@ -8,6 +8,8 @@
     update: true
   become: true
   become_user: "{{ matomo_user }}"
+  tags:
+    - matomo
 
 - name: UserConsole plugin activated
   shell: "php console plugin:activate UserConsole"
@@ -16,3 +18,5 @@
     chdir: "{{ matomo_html }}/"
   become: true
   become_user: "{{ matomo_user }}"
+  tags:
+    - matomo
