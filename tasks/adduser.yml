@@ -1,0 +1,16 @@
+---
+# check if the user already exists?
+# check that we have the variables we need
+# - login
+# - email
+# generate password
+
+- name: Add user account
+  shell: "php console add:user --login='{{ matomo_login }' --email='{{ matomo_login_email }}' --password='{{ matomo_login_password }}"
+  args:
+    executable: /bin/bash
+    chdir: "{{ matomo_home }}"
+  become: true
+  become_user: "{{ matomo_user }}"
+  tags:
+    - matomo
