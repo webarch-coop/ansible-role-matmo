@@ -19,7 +19,7 @@
 
 - name: Matomo extratools tasks included
   include_tasks: extratools.yml
-  
+
 - name: Matomo userconsole tasks included
   include_tasks: userconsole.yml
 

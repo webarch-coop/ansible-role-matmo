@@ -9,10 +9,10 @@
   become: true
   become_user: "{{ matomo_user }}"
 
-- name: Matomo extratools tasks included 
+- name: Matomo extratools tasks included
   include_tasks: extratools.yml
 
-- name: Matomo userconsole tasks included 
+- name: Matomo userconsole tasks included
   include_tasks: userconsole.yml
 
 - block:
