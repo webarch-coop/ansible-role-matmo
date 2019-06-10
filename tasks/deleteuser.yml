@@ -1,0 +1,14 @@
+---
+# check if the user already exists?
+# check that we have the variables we need
+# - login
+
+- name: Delete Matomo user account
+  shell: "php console delete:user --login='{{ matomo_login }'"
+  args:
+    executable: /bin/bash
+    chdir: "{{ matomo_home }}"
+  become: true
+  become_user: "{{ matomo_user }}"
+  tags:
+    - matomo
