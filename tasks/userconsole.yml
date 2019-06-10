@@ -1,0 +1,18 @@
+---
+# https://github.com/digitalist-se/userconsole
+- name: Matomo UserConsole present
+  git:
+    repo: https://github.com/digitalist-se/userconsole.git
+    dest: "{{ matomo_html }}/plugins/UserConsole"
+    clone: true
+    update: true
+  become: true
+  become_user: "{{ matomo_user }}"
+
+- name: UserConsole plugin activated
+  shell: "php console plugin:activate UserConsole"
+  args:
+    executable: /bin/bash
+    chdir: "{{ matomo_html }}/"
+  become: true
+  become_user: "{{ matomo_user }}"

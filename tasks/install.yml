@@ -1,5 +1,4 @@
 ---
-# https://github.com/digitalist-se/extratools
 - name: Matomo download tasks included
   include_tasks: download.yml
 
@@ -10,32 +9,11 @@
   become: true
   become_user: "{{ matomo_user }}"
 
-- name: Composer run to install dependancies
-  command: "{{ cmd }}"
-  args:
-    chdir: "{{ matomo_html }}/"
-  become: true
-  become_user: "{{ matomo_user }}"
-  loop:
-    - composer require symfony/yaml:~2.6.0
-    - composer require symfony/process:^3.4
-  loop_control:
-    loop_var: cmd
+- name: Matomo extratools tasks included 
+  include_tasks: extratools.yml
 
-- name: Matomo ExtraTools present
-  git:
-    repo: https://github.com/digitalist-se/extratools.git
-    dest: "{{ matomo_html }}/plugins/ExtraTools"
-  become: true
-  become_user: "{{ matomo_user }}"
-
-- name: ExtraTools plugin activated
-  shell: "php console plugin:activate ExtraTools"
-  args:
-    executable: /bin/bash
-    chdir: "{{ matomo_html }}/"
-  become: true
-  become_user: "{{ matomo_user }}"
+- name: Matomo userconsole tasks included 
+  include_tasks: userconsole.yml
 
 - block:
 
