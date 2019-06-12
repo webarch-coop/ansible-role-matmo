@@ -1,40 +1,96 @@
 ---
-# check if the user already exists?
-
 - name: Fail if the Matomo user login is not present
   fail:
     msg: "A value for matomo_login needs to be provided"
   when: ( matomo_login is not defined ) or ( matomo_login == "" )
+  tags:
+    - matomo
 
 - name: Fail if the Matomo user email address is not present
   fail:
     msg: "A value for matomo_login_email needs to be provided"
   when: ( matomo_login_email is not defined ) or ( matomo_login_email == "" )
+  tags:
+    - matomo
 
-- name: Fail if the Matomo user password is not present
-  fail:
-    msg: "A value for matomo_login_password needs to be provided"
-  when: ( matomo_login_password is not defined ) or ( matomo_login_password == "" )
-
-- name: Generate a random password for the Matomo user
-- block:
-
-    - name: Generate a random string for Matomo password
-      command: pwgen -n 20 1
-      register: matomo_login_password_gen
-
-    - name: Set a variable with the random password
-      set_fact:
-        matomo_login_password: "{{ matomo_login_password.stdout }}"
-
-  when: matomo_login_password is not defined ) or ( matomo_login_password == "" )
-
-- name: Add user account
-  shell: "php console add:user --login='{{ matomo_login }' --email='{{ matomo_login_email }}' --password='{{ matomo_login_password }}"
+- name: Get the existing usernames
+  shell: for u in $(php console user:list --no-ansi -n); do echo $u | awk '{ print $2 }' ; done
   args:
     executable: /bin/bash
     chdir: "{{ matomo_home }}"
+  environment:
+    IFS: '\n'
+  register: matomo_logins
   become: true
   become_user: "{{ matomo_user }}"
   tags:
     - matomo
+
+- name: Set a variable based on the existance of the user
+  set_fact:
+    matomo_login_absent: True
+  when: '"matomo_login" not in matomo_logins.stdout_lines' 
+  tags:
+    - matomo
+
+- name: Get the existing email addresses
+  shell: for u in $(php console user:list --no-ansi -n); do echo $u | awk '{ print $3 }' | sed 's/(//' | sed 's/)//'
+  args:
+    executable: /bin/bash
+    chdir: "{{ matomo_home }}"
+  environment:
+    IFS: '\n'
+  register: matomo_login_emails
+  become: true
+  become_user: "{{ matomo_user }}"
+  tags:
+    - matomo
+
+- name: Set a variable based on the existance of the user email address
+  set_fact:
+    matomo_login_email_absent: True
+  when: '"matomo_login_emails" not in matomo_login_emails.stdout_lines'
+  tags:
+    - matomo
+
+- name: Add Matomo user
+  block:
+
+    - name: Generate a random password for the Matomo user
+    - block:
+
+        - name: Generate a random string for Matomo password
+          command: pwgen -n 20 1
+          register: matomo_login_password_gen
+          tags:
+            - matomo
+
+        - name: Set a variable with the random password
+          set_fact:
+            matomo_login_password: "{{ matomo_login_password.stdout }}"
+          tags:
+            - matomo
+
+      when: ( matomo_login_password is not defined ) or ( matomo_login_password == "" )
+
+    - name: Add user account
+      shell: "php console add:user --login='{{ matomo_login }' --email='{{ matomo_login_email }}' --password='{{ matomo_login_password }}"
+      args:
+        executable: /bin/bash
+        chdir: "{{ matomo_home }}"
+      become: true
+      become_user: "{{ matomo_user }}"
+      tags:
+        - matomo
+
+    - name: "Password notification email sent to {{ matomo_login_email }}"
+      mail:
+        from: "{{ matomo_email_from | default('Webarchitects') }} <root@{{ ansible_fqdn }}>"
+        to: "{{ wordpress_admin_email }}"
+        subject: "[{{ wordpress_email_subject_tag | default('webarchitects') }}] WordPress admin login for {{ wordpress_url }}"
+        body: "{{ lookup('template', 'templates/install_email.j2') }}"
+        host: localhost
+        port: 25
+        secure: never
+
+  when: ( matomo_login_absent == True ) and ( matomo_login_email_absent == True )

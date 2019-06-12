@@ -12,6 +12,6 @@ matomo_first_site_url: "https://{{ inventory_hostname }}/"
 matomo_first_user: "Webarchitects"
 matomo_first_user_email: "root@{{ inventory_hostname }}"
 matomo_first_user_pass: ""
-matomo_notify_passwd_from: "Webarchitects <root@{{ ansible_fqdn }}>"
-matomo_passwd_notify_subject_tag: webarchitects
+matomo_notify_from: "Webarchitects <root@{{ ansible_fqdn }}>"
+matomo_notify_subject_tag: webarchitects
 matomo_notify_passwd_signature: Webarch Co-operative Limited\nhttps://www.webarch.coop/
