@@ -1,9 +1,20 @@
 ---
 # check if the user already exists?
-# check that we have the variables we need
-# - login
-# - email
-# generate password
+
+- name: Fail if the Matomo user login is not present
+  fail:
+    msg: "A value for matomo_login needs to be provided"
+  when: ( matomo_login is not defined ) or ( matomo_login == "" )
+
+- name: Fail if the Matomo user email address is not present
+  fail:
+    msg: "A value for matomo_login_email needs to be provided"
+  when: ( matomo_login_email is not defined ) or ( matomo_login_email == "" )
+
+- name: Fail if the Matomo user password is not present
+  fail:
+    msg: "A value for matomo_login_password needs to be provided"
+  when: ( matomo_login_password is not defined ) or ( matomo_login_password == "" )
 
 - name: Add user account
   shell: "php console add:user --login='{{ matomo_login }' --email='{{ matomo_login_email }}' --password='{{ matomo_login_password }}"
