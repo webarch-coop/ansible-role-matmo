@@ -16,6 +16,19 @@
     msg: "A value for matomo_login_password needs to be provided"
   when: ( matomo_login_password is not defined ) or ( matomo_login_password == "" )
 
+- name: Generate a random password for the Matomo user
+- block:
+
+    - name: Generate a random string for Matomo password
+      command: pwgen -n 20 1
+      register: matomo_login_password_gen
+
+    - name: Set a variable with the random password
+      set_fact:
+        matomo_login_password: "{{ matomo_login_password.stdout }}"
+
+  when: matomo_login_password is not defined ) or ( matomo_login_password == "" )
+
 - name: Add user account
   shell: "php console add:user --login='{{ matomo_login }' --email='{{ matomo_login_email }}' --password='{{ matomo_login_password }}"
   args:

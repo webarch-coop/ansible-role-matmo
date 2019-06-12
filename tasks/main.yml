@@ -49,6 +49,18 @@
   tags:
     - matomo
 
+- name: Matomo extratools tasks included
+  include_tasks: extratools.yml
+  when: matomo_config_check.stat.exists == True
+  tags:
+    - matomo
+
+- name: Matomo userconsole tasks included
+  include_tasks: userconsole.yml
+  when: matomo_config_check.stat.exists == True
+  tags:
+    - matomo
+
 - name: Include upgrade tasks
   include_tasks: upgrade.yml
   when: ( matomo_config_check.stat.exists ) and ( matomo_installed.stdout != matomo_latest )
