@@ -30,8 +30,8 @@
 
 - name: Set a variable based on the existance of the user
   set_fact:
-    matomo_login_absent: True
-  when: '"matomo_login" not in matomo_logins.stdout_lines' 
+    matomo_login_absent: true
+  when: '"matomo_login" not in matomo_logins.stdout_lines'
   tags:
     - matomo
 
@@ -52,7 +52,7 @@
 
 - name: Set a variable based on the existance of the user email address
   set_fact:
-    matomo_login_email_absent: True
+    matomo_login_email_absent: true
   when: '"matomo_login_emails" not in matomo_login_emails.stdout_lines'
   tags:
     - matomo
@@ -78,7 +78,7 @@
       when: ( matomo_login_password is not defined ) or ( matomo_login_password == "" )
 
     - name: Add user account
-      shell: "php console add:user --login='{{ matomo_login }' --email='{{ matomo_login_email }}' --password='{{ matomo_login_password }}"
+      shell: "php console add:user --login='{{ matomo_login }}' --email='{{ matomo_login_email }}' --password='{{ matomo_login_password }}"
       args:
         executable: /bin/bash
         chdir: "{{ matomo_home }}"
