@@ -30,6 +30,8 @@
   args:
     executable: /bin/bash
     chdir: "{{ matomo_html }}/"
+  register: matomo_extratools
+  changed_when: '"Activated plugin ExtraTools" in matomo_extratools.stdout'
   become: true
   become_user: "{{ matomo_user }}"
   tags:

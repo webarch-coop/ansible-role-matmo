@@ -16,6 +16,8 @@
   args:
     executable: /bin/bash
     chdir: "{{ matomo_html }}/"
+  register: matomo_userconsole
+  changed_when: '"Activated plugin UserConsole" in matomo_userconsole.stdout'
   become: true
   become_user: "{{ matomo_user }}"
   tags:
