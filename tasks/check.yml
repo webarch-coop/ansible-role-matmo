@@ -4,6 +4,7 @@
     url: https://builds.piwik.org/LATEST
     dest: "{{ matomo_private }}/LATEST"
     force: true
+  changed_when: false
   become: true
   become_user: "{{ matomo_user }}"
   tags:
