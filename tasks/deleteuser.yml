@@ -7,7 +7,7 @@
   when: ( matomo_login is not defined ) or ( matomo_login == "" )
 
 - name: Delete Matomo user account
-  shell: "php console delete:user --login='{{ matomo_login }'"
+  shell: "php console delete:user --login='{{ matomo_login }}'"
   args:
     executable: /bin/bash
     chdir: "{{ matomo_home }}"
