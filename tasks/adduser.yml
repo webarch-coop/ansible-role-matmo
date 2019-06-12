@@ -1,12 +1,12 @@
 ---
-- name: Fail if the Matomo user login is not present
+- name: Fail if the Matomo user login is not provided
   fail:
     msg: "A value for matomo_login needs to be provided"
   when: ( matomo_login is not defined ) or ( matomo_login == "" )
   tags:
     - matomo
 
-- name: Fail if the Matomo user email address is not present
+- name: Fail if the Matomo user email address is not provided
   fail:
     msg: "A value for matomo_login_email needs to be provided"
   when: ( matomo_login_email is not defined ) or ( matomo_login_email == "" )
@@ -21,6 +21,8 @@
   environment:
     IFS: '\n'
   register: matomo_logins
+  changed_when: false
+  check_mode: false
   become: true
   become_user: "{{ matomo_user }}"
   tags:
@@ -41,6 +43,8 @@
   environment:
     IFS: '\n'
   register: matomo_login_emails
+  changed_when: false
+  check_mode: false
   become: true
   become_user: "{{ matomo_user }}"
   tags:
@@ -86,9 +90,9 @@
     - name: "Password notification email sent to {{ matomo_login_email }}"
       mail:
         from: "{{ matomo_email_from | default('Webarchitects') }} <root@{{ ansible_fqdn }}>"
-        to: "{{ wordpress_admin_email }}"
-        subject: "[{{ wordpress_email_subject_tag | default('webarchitects') }}] WordPress admin login for {{ wordpress_url }}"
-        body: "{{ lookup('template', 'templates/install_email.j2') }}"
+        to: "{{ matomo_admin_email }}"
+        subject: "[{{ matomo_email_subject_tag | default('webarchitects') }}] Matomo admin login for {{ matomo_url }}"
+        body: "{{ lookup('template', 'templates/notify_matomo_passwd.j2') }}"
         host: localhost
         port: 25
         secure: never
