@@ -3,14 +3,37 @@
   fail:
     msg: "A value for matomo_login needs to be provided"
   when: ( matomo_login is not defined ) or ( matomo_login == "" )
+  tags:
+    - matomo
 
-# check if the user exists
+- name: Get the existing usernames
+  shell: for u in $(php console user:list --no-ansi -n); do echo $u | awk '{ print $2 }' ; done
+  args:
+    executable: /bin/bash
+    chdir: "{{ matomo_home }}"
+  environment:
+    IFS: '\n'
+  register: matomo_logins
+  changed_when: false
+  check_mode: false
+  become: true
+  become_user: "{{ matomo_user }}"
+  tags:
+    - matomo
+
+- name: Set a variable based on the existance of the user
+  set_fact:
+    matomo_login_present: true
+  when: '"matomo_login" in matomo_logins.stdout_lines'
+  tags:
+    - matomo
 
 - name: Delete Matomo user account
   shell: "php console user:delete --login='{{ matomo_login }}'"
   args:
     executable: /bin/bash
     chdir: "{{ matomo_home }}"
+  when: matomo_login_present == True
   become: true
   become_user: "{{ matomo_user }}"
   tags:
