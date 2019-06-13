@@ -5,7 +5,7 @@
   args:
     chdir: "{{ matomo_html }}/"
   register: matomo_symfony_yaml
-  changed_when: '"Nothing to install or update" not in matomo_symfony_yaml.stdout'
+  changed_when: '"Nothing to install or update" not in matomo_symfony_yaml.stderr'
   become: true
   become_user: "{{ matomo_user }}"
   tags:
@@ -16,7 +16,7 @@
   args:
     chdir: "{{ matomo_html }}/"
   register: matomo_symfony_process
-  changed_when: '"Nothing to install or update" not in matomo_symfony_process.stdout'
+  changed_when: '"Nothing to install or update" not in matomo_symfony_process.stderr'
   become: true
   become_user: "{{ matomo_user }}"
   tags:
