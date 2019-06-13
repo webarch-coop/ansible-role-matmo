@@ -49,6 +49,7 @@
     executable: /bin/bash
     chdir: "{{ matomo_html }}"
   changed_when: false
+  check_mode: false
   become: true
   become_user: "{{ matomo_user }}"
   register: matomo_updated

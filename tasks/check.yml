@@ -4,7 +4,7 @@
     url: https://builds.piwik.org/LATEST
     dest: "{{ matomo_private }}/LATEST"
     force: true
-  changed_when: false
+  check_mode: false
   become: true
   become_user: "{{ matomo_user }}"
   tags:
@@ -45,6 +45,8 @@
       args:
         executable: /bin/bash
         chdir: "{{ matomo_html }}"
+      changed_when: false
+      check_mode: false
       become: true
       become_user: "{{ matomo_user }}"
       register: matomo_installed
