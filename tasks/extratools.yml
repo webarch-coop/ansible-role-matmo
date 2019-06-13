@@ -1,16 +1,24 @@
 ---
 # https://github.com/digitalist-se/extratools
 - name: Composer run to install dependancies
-  command: "{{ cmd }}"
+  command: composer require symfony/yaml:~2.6.0
   args:
     chdir: "{{ matomo_html }}/"
+  register: matomo_symfony_yaml
+  changed_when: '"Nothing to install or update" not in matomo_symfony_yaml.stdout'
   become: true
   become_user: "{{ matomo_user }}"
-  loop:
-    - composer require symfony/yaml:~2.6.0
-    - composer require symfony/process:^3.4
-  loop_control:
-    loop_var: cmd
+  tags:
+    - matomo
+
+- name: Composer run to install dependancies
+  command: composer require symfony/process:^3.4
+  args:
+    chdir: "{{ matomo_html }}/"
+  register: matomo_symfony_process
+  changed_when: '"Nothing to install or update" not in matomo_symfony_process.stdout'
+  become: true
+  become_user: "{{ matomo_user }}"
   tags:
     - matomo
 
