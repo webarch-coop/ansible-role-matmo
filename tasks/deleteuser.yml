@@ -10,7 +10,7 @@
   shell: for u in $(php console user:list --no-ansi -n); do echo $u | awk '{ print $2 }' ; done
   args:
     executable: /bin/bash
-    chdir: "{{ matomo_home }}"
+    chdir: "{{ matomo_html }}"
   environment:
     IFS: '\n'
   register: matomo_logins
@@ -32,7 +32,7 @@
   shell: "php console user:delete --login='{{ matomo_login }}'"
   args:
     executable: /bin/bash
-    chdir: "{{ matomo_home }}"
+    chdir: "{{ matomo_html }}"
   when: ( matomo_login_present is defined ) and ( matomo_login_present == True )
   become: true
   become_user: "{{ matomo_user }}"

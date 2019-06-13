@@ -17,7 +17,7 @@
   shell: for u in $(php console user:list --no-ansi -n); do echo $u | awk '{ print $2 }' ; done
   args:
     executable: /bin/bash
-    chdir: "{{ matomo_home }}"
+    chdir: "{{ matomo_html }}"
   environment:
     IFS: '\n'
   register: matomo_logins
@@ -39,7 +39,7 @@
   shell: for u in $(php console user:list --no-ansi -n); do echo $u | awk '{ print $3 }' | sed 's/(//' | sed 's/)//'
   args:
     executable: /bin/bash
-    chdir: "{{ matomo_home }}"
+    chdir: "{{ matomo_html }}"
   environment:
     IFS: '\n'
   register: matomo_login_emails
@@ -78,10 +78,10 @@
       when: ( matomo_login_password is not defined ) or ( matomo_login_password == "" )
 
     - name: Add user account
-      shell: "php console user:create --login='{{ matomo_login }}' --email='{{ matomo_login_email }}' --password='{{ matomo_login_password }}"
+      shell: "php console user:create --no-ansi -n --login='{{ matomo_login }}' --email='{{ matomo_login_email }}' --password='{{ matomo_login_password }}"
       args:
         executable: /bin/bash
-        chdir: "{{ matomo_home }}"
+        chdir: "{{ matomo_html }}"
       become: true
       become_user: "{{ matomo_user }}"
       tags:
