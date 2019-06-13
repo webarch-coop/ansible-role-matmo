@@ -40,6 +40,8 @@
   args:
     executable: /bin/bash
     chdir: "{{ matomo_html }}"
+  register: matomo_addsite_result
+  changed_when: '"Site added" in matomo_addsite_result.stdout'
   become: true
   become_user: "{{ matomo_user }}"
   tags:
