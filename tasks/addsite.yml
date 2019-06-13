@@ -5,14 +5,14 @@
 - name: Fail if a matomo_site_name is not provided
   fail:
     msg: "A value for matomo_site_name needs to be provided"
-  when: ( matomo_site_name is not defined ) or ( matomo_site_name == "" ) 
+  when: ( matomo_site_name is not defined ) or ( matomo_site_name == "" )
   tags:
     - matomo
 
 - name: Fail if a matomo_site_urls is not provided
   fail:
     msg: "A value for matomo_site_urls needs to be provided"
-  when: ( matomo_site_urls is not defined ) or ( matomo_site_urls == "" ) 
+  when: ( matomo_site_urls is not defined ) or ( matomo_site_urls == "" )
   tags:
     - matomo
 
