@@ -1,9 +1,23 @@
 ---
 # Get a list of sites to start with?
 # URL's is comer seperated
-#
+
+- name: Fail if a matomo_site_name is not provided
+  fail:
+    msg: "A value for matomo_site_name needs to be provided"
+  when: ( matomo_site_name is not defined ) or ( matomo_site_name == "" ) 
+  tags:
+    - matomo
+
+- name: Fail if a matomo_site_urls is not provided
+  fail:
+    msg: "A value for matomo_site_urls needs to be provided"
+  when: ( matomo_site_urls is not defined ) or ( matomo_site_urls == "" ) 
+  tags:
+    - matomo
+
 - name: Add Matomo site
-  shell: "php console site:add --name='' urls=''"
+  shell: "php console site:add --no-ansi -n --name='{{ matomo_site_name }}' urls='{{ matomo_site_urls }}'"
   args:
     executable: /bin/bash
     chdir: "{{ matomo_home }}"
