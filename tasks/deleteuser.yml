@@ -33,7 +33,7 @@
   args:
     executable: /bin/bash
     chdir: "{{ matomo_home }}"
-  when: matomo_login_present == True
+  when: ( matomo_login_present is defined ) and ( matomo_login_present == True )
   become: true
   become_user: "{{ matomo_user }}"
   tags:
