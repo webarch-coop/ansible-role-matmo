@@ -1,13 +1,13 @@
 ---
-# check if the user exists?
-
 - name: Fail if the Matomo user login is not present
   fail:
     msg: "A value for matomo_login needs to be provided"
   when: ( matomo_login is not defined ) or ( matomo_login == "" )
 
+# check if the user exists
+
 - name: Delete Matomo user account
-  shell: "php console delete:user --login='{{ matomo_login }}'"
+  shell: "php console user:delete --login='{{ matomo_login }}'"
   args:
     executable: /bin/bash
     chdir: "{{ matomo_home }}"
