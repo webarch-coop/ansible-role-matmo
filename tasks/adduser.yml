@@ -72,13 +72,15 @@
         - name: Generate a random string for Matomo password
           command: pwgen -n 20 1
           register: matomo_login_password_gen
+          no_log: true
           tags:
             - matomo
             - users-update
 
         - name: Set a variable with the random password
           set_fact:
-            matomo_login_password: "{{ matomo_login_password.stdout }}"
+            matomo_login_password: "{{ matomo_login_password_gen.stdout }}"
+          no_log: true
           tags:
             - matomo
             - users-update
