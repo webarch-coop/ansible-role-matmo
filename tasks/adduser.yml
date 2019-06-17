@@ -61,7 +61,7 @@
   block:
 
     - name: Generate a random password for the Matomo user
-    - block:
+      block:
 
         - name: Generate a random string for Matomo password
           command: pwgen -n 20 1
