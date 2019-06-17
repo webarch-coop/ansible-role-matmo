@@ -5,6 +5,7 @@
   when: ( matomo_login is not defined ) or ( matomo_login == "" )
   tags:
     - matomo
+    - users-update
 
 - name: Fail if the Matomo user email address is not provided
   fail:
@@ -12,6 +13,7 @@
   when: ( matomo_login_email is not defined ) or ( matomo_login_email == "" )
   tags:
     - matomo
+    - users-update
 
 - name: Get the existing usernames
   shell: for u in $(php console user:list --no-ansi -n); do echo $u | awk '{ print $2 }' ; done
@@ -27,6 +29,7 @@
   become_user: "{{ matomo_user }}"
   tags:
     - matomo
+    - users-update
 
 - name: Set a variable based on the existance of the user
   set_fact:
@@ -34,6 +37,7 @@
   when: '"matomo_login" not in matomo_logins.stdout_lines'
   tags:
     - matomo
+    - users-update
 
 - name: Get the existing email addresses
   shell: for u in $(php console user:list --no-ansi -n); do echo $u | awk '{ print $3 }' | sed 's/(//' | sed 's/)//'
@@ -49,6 +53,7 @@
   become_user: "{{ matomo_user }}"
   tags:
     - matomo
+    - users-update
 
 - name: Set a variable based on the existance of the user email address
   set_fact:
@@ -56,6 +61,7 @@
   when: '"matomo_login_emails" not in matomo_login_emails.stdout_lines'
   tags:
     - matomo
+    - users-update
 
 - name: Add Matomo user
   block:
@@ -66,26 +72,32 @@
         - name: Generate a random string for Matomo password
           command: pwgen -n 20 1
           register: matomo_login_password_gen
+          no_log: true
           tags:
             - matomo
+            - users-update
 
         - name: Set a variable with the random password
           set_fact:
             matomo_login_password: "{{ matomo_login_password.stdout }}"
+          no_log: true
           tags:
             - matomo
+            - users-update
 
       when: ( matomo_login_password is not defined ) or ( matomo_login_password == "" )
 
     - name: Add user account
-      shell: "php console user:create --no-ansi -n --login='{{ matomo_login }}' --email='{{ matomo_login_email }}' --password='{{ matomo_login_password }}"
+      shell: "php console user:create --no-ansi -n --login='{{ matomo_login }}' --email='{{ matomo_login_email }}' --password='{{ matomo_login_password }}'"
       args:
         executable: /bin/bash
         chdir: "{{ matomo_html }}"
       become: true
       become_user: "{{ matomo_user }}"
+      no_log: true
       tags:
         - matomo
+        - users-update
 
     - name: "Password notification email sent to {{ matomo_login_email }}"
       mail:
@@ -96,5 +108,8 @@
         host: localhost
         port: 25
         secure: never
+        tags:
+          - matomo
+          - users-update
 
   when: ( matomo_login_absent == True ) and ( matomo_login_email_absent == True )
