@@ -1,10 +1,10 @@
 Hi
 
-Your Matomo account details for {{ vhost.value.users_apache_server_name }}
+Your Matomo account details for {{ vhost.value.users_apache_server_name | default(ansible_fqdn) }}
 
   Username:	{{ matomo_first_user }}
   Password:	{{ matomo_first_user_pass }}
-  URL:          https://{{ vhost.value.users_apache_server_name }}/
+  URL:          https://{{ vhost.value.users_apache_server_name | default(ansible_fqdn) }}/
 
 All the best
 
