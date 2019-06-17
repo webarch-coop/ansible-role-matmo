@@ -62,6 +62,21 @@ Only the first four variables above are needed for upgrades, the other variables
 
 Then it can be run as follows:
 
-```bash
+```
+bash
 ansible-playbook matomo.yml -i hosts.yml
 ``` 
+
+The `adduser.yml`i and `deleteusers.yml` tasks can be called from other roles, for example:
+
+```yml
+- name: Include adduser tasks from Matomo role
+  include_role:
+    name: matomo
+    tasks_from: deleteuser.yml
+  vars:
+    matomo_login: "{{ item.key }}"
+    matomo_login_email: "{{ item.value.users_email }}"
+```
+
+The `addsite.yml` tasks are not ready for production use due to the [site:add allows duplicates](https://github.com/digitalist-se/extratools/issues/9) issue.
