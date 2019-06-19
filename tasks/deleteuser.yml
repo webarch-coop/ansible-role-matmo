@@ -7,38 +7,50 @@
     - matomo
     - users-update
 
-- name: Get the existing usernames
-  shell: for u in $(php console user:list --no-ansi -n); do echo $u | awk '{ print $2 }' ; done
-  args:
-    executable: /bin/bash
-    chdir: "{{ matomo_html }}"
-  environment:
-    IFS: '\n'
-  register: matomo_logins
-  changed_when: false
-  check_mode: false
-  become: true
-  become_user: "{{ matomo_user }}"
+- name: "Check if the Matomo {{ matomo_login }} exists"
+  command: "id {{ matomo_login }}"
+  register: matomo_login_check
   tags:
     - matomo
     - users-update
 
-- name: Set a variable based on the existance of the user
-  set_fact:
-    matomo_login_present: true
-  when: '"matomo_login" in matomo_logins.stdout_lines'
-  tags:
-    - matomo
-    - users-update
+- name: "Delete Matomo users if {{ {{ matomo_user }} exists"
+  block:
 
-- name: Delete Matomo user account
-  shell: "php console user:delete --login='{{ matomo_login }}'"
-  args:
-    executable: /bin/bash
-    chdir: "{{ matomo_html }}"
-  when: ( matomo_login_present is defined ) and ( matomo_login_present == True )
-  become: true
-  become_user: "{{ matomo_user }}"
-  tags:
-    - matomo
-    - users-update
+    - name: Get the existing usernames
+      shell: for u in $(php console user:list --no-ansi -n); do echo $u | awk '{ print $2 }' ; done
+      args:
+        executable: /bin/bash
+        chdir: "{{ matomo_html }}"
+      environment:
+        IFS: '\n'
+      register: matomo_logins
+      changed_when: false
+      check_mode: false
+      become: true
+      become_user: "{{ matomo_user }}"
+      tags:
+        - matomo
+        - users-update
+    
+    - name: Set a variable based on the existance of the user
+      set_fact:
+        matomo_login_present: true
+      when: '"matomo_login" in matomo_logins.stdout_lines'
+      tags:
+        - matomo
+        - users-update
+    
+    - name: Delete Matomo user account
+      shell: "php console user:delete --login='{{ matomo_login }}'"
+      args:
+        executable: /bin/bash
+        chdir: "{{ matomo_html }}"
+      when: ( matomo_login_present is defined ) and ( matomo_login_present == True )
+      become: true
+      become_user: "{{ matomo_user }}"
+      tags:
+        - matomo
+        - users-update
+
+  when: '"no such user" not in matomo_login_check.stdout'
