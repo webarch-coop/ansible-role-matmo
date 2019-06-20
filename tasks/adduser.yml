@@ -17,7 +17,10 @@
 
 - name: "Check if the Matomo {{ matomo_user }} exists"
   command: "id {{ matomo_user }}"
+  ignore_errors: yes
+  check_mode: false
   register: matomo_user_check
+  changed_when: '"no such user" in matomo_user_check.stderr'
   tags:
     - matomo
     - users-update
@@ -124,4 +127,4 @@
 
       when: ( matomo_login_absent == True ) and ( matomo_login_email_absent == True )
 
-  when: '"no such user" not in matomo_user_check.stdout'
+  when: '"no such user" not in matomo_user_check.stderr'

@@ -9,7 +9,10 @@
 
 - name: "Check if the Matomo {{ matomo_user }} exists"
   command: "id {{ matomo_user }}"
+  ignore_errors: yes
+  check_mode: false
   register: matomo_user_check
+  changed_when: '"no such user" in matomo_user_check.stderr'
   tags:
     - matomo
     - users-update
@@ -32,7 +35,7 @@
       tags:
         - matomo
         - users-update
-    
+
     - name: Set a variable based on the existance of the user
       set_fact:
         matomo_login_present: true
@@ -40,7 +43,7 @@
       tags:
         - matomo
         - users-update
-    
+
     - name: Delete Matomo user account
       shell: "php console user:delete --login='{{ matomo_login }}'"
       args:
@@ -53,4 +56,4 @@
         - matomo
         - users-update
 
-  when: '"no such user" not in matomo_user_check.stdout'
+  when: '"no such user" not in matomo_user_check.stderr'
