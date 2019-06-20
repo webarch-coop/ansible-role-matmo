@@ -130,9 +130,9 @@
             host: localhost
             port: 25
             secure: never
-            tags:
-              - matomo
-              - users-update
+          tags:
+            - matomo
+            - users-update
 
       when: ( matomo_login_absent == True ) and ( matomo_login_email_absent == True )
 
