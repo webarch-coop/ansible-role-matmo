@@ -25,6 +25,15 @@
     - matomo
     - users-update
 
+- name: "Check if {{ matomo_html }}/config/config.ini.php exists"
+  stat:
+    path: "{{ matomo_html }}/config/config.ini.php"
+  check_mode: false
+  register: matomo_config
+  tags:
+    - matomo
+    - users-update
+
 - name: "Add Matomo users if {{ {{ matomo_user }} exists"
   block:
 
@@ -127,4 +136,4 @@
 
       when: ( matomo_login_absent == True ) and ( matomo_login_email_absent == True )
 
-  when: '"no such user" not in matomo_user_check.stderr'
+  when: ( "no such user" not in matomo_user_check.stderr ) and ( matomo_config.stat.exists )
