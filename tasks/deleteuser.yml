@@ -7,9 +7,9 @@
     - matomo
     - users-update
 
-- name: "Check if the Matomo {{ matomo_login }} exists"
-  command: "id {{ matomo_login }}"
-  register: matomo_login_check
+- name: "Check if the Matomo {{ matomo_user }} exists"
+  command: "id {{ matomo_user }}"
+  register: matomo_user_check
   tags:
     - matomo
     - users-update
@@ -53,4 +53,4 @@
         - matomo
         - users-update
 
-  when: '"no such user" not in matomo_login_check.stdout'
+  when: '"no such user" not in matomo_user_check.stdout'
