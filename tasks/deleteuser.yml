@@ -9,7 +9,7 @@
 
 - name: "Check if the Matomo {{ matomo_user }} exists"
   command: "id {{ matomo_user }}"
-  ignore_errors: yes
+  ignore_errors: true
   check_mode: false
   register: matomo_user_check
   changed_when: '"no such user" in matomo_user_check.stderr'
