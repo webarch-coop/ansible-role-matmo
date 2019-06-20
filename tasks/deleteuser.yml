@@ -21,7 +21,7 @@
   block:
 
     - name: Get the existing usernames
-      shell: for u in $(php console user:list --no-ansi -n); do echo $u | awk '{ print $2 }' ; done
+      shell: "for u in $(php console user:list --no-ansi -n); do echo $u | awk '{ print $2 }' ; done"
       args:
         executable: /bin/bash
         chdir: "{{ matomo_html }}"

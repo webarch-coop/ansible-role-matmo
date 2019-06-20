@@ -29,7 +29,7 @@
   block:
 
     - name: Get the existing usernames
-      shell: for u in $(php console user:list --no-ansi -n); do echo $u | awk '{ print $2 }' ; done
+      shell: "for u in $(php console user:list --no-ansi -n); do echo $u | awk '{ print $2 }' ; done"
       args:
         executable: /bin/bash
         chdir: "{{ matomo_html }}"
@@ -53,7 +53,7 @@
         - users-update
 
     - name: Get the existing email addresses
-      shell: for u in $(php console user:list --no-ansi -n); do echo $u | awk '{ print $3 }' | sed 's/(//' | sed 's/)//' ; done
+      shell: "for u in $(php console user:list --no-ansi -n); do echo $u | awk '{ print $3 }' | sed 's/(//' | sed 's/)//' ; done"
       args:
         executable: /bin/bash
         chdir: "{{ matomo_html }}"
