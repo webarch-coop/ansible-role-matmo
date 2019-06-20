@@ -34,7 +34,7 @@
     - matomo
     - users-update
 
-- name: "Add Matomo users if {{ {{ matomo_user }} exists"
+- name: "Add Matomo users if {{ matomo_user }} exists"
   block:
 
     - name: Get the existing usernames

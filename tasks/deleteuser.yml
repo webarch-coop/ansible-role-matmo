@@ -26,7 +26,7 @@
     - matomo
     - users-update
 
-- name: "Delete Matomo users if {{ {{ matomo_user }} exists"
+- name: "Delete Matomo users if {{ matomo_user }} exists"
   block:
 
     - name: Get the existing usernames
