@@ -38,14 +38,14 @@
   tags:
     - matomo
 
-- name: Include version check tasks
+- name: Include checks
   include_tasks: check.yml
   tags:
     - matomo
 
 - name: Include install tasks
   include_tasks: install.yml
-  when: matomo_config_check.stat.exists == False
+  when: ( matomo_config_check is defined ) and ( matomo_config_check.stat.exists == False )
   tags:
     - matomo
 
