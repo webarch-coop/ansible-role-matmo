@@ -58,7 +58,7 @@ all:
         host2.example.org:
 ```
 
-Only the first four variables above are needed for upgrades, the other variables are only needed for the install, if a `~/.my.cnf` exists the database passwd is taken from there, the database name and user defaults to `matomo_user`, if the first user password is not set a rendom one is generated and sent via SMTP, port 25 on the server to the user.
+Only the first four variables above are needed for upgrades, the other variables are only needed for the install, if a `~/.my.cnf` exists the database passwd is taken from there, the database name and user defaults to `matomo_user`, if the first user password is not set a random one is generated and sent via SMTP, port 25 on the server to the user.
 
 Then it can be run as follows:
 
@@ -67,10 +67,10 @@ bash
 ansible-playbook matomo.yml -i hosts.yml
 ``` 
 
-The `adduser.yml`i and `deleteusers.yml` tasks can be called from other roles, for example:
+The `adduser.yml` and `deleteusers.yml` tasks can be called from other roles, for example:
 
 ```yml
-- name: Include adduser tasks from Matomo role
+- name: Include delete user tasks from Matomo role
   include_role:
     name: matomo
     tasks_from: deleteuser.yml
