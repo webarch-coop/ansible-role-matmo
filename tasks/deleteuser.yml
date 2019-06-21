@@ -29,7 +29,7 @@
 - name: "Delete Matomo users if {{ matomo_user }} exists"
   block:
 
-    - name: "Check if the Matomo {{ matomo_login }} exists" 
+    - name: "Check if the Matomo {{ matomo_login }} exists"
       shell: "IFS=$'\n' ; for u in $(php console user:list --no-ansi -n); do echo $u | awk '{ print $2 }' ; done | grep ^{{ matomo_login }}$"
       args:
         executable: /bin/bash
