@@ -32,7 +32,7 @@
 - name: "Set a variable based on the existance of the Matomo {{ matomo_login }} account"
   set_fact:
     matomo_login_absent: true
-  when: matomo_login != matomo_login_check.stdout
+  when: ( matomo_login_check is defined ) and ( matomo_login != matomo_login_check.stdout )
   tags:
     - matomo
     - users-update
@@ -54,7 +54,7 @@
 - name: Set a variable based on the existance of the user email address
   set_fact:
     matomo_login_email_absent: true
-  when: matomo_login_email != matomo_login_email_check.stdout
+  when: ( matomo_login_email_check is defined ) and ( matomo_login_email != matomo_login_email_check.stdout )
   tags:
     - matomo
     - users-update
@@ -108,7 +108,7 @@
         - matomo
         - users-update
 
-  when: 
+  when:
     - matomo_login_absent is defined
     - matomo_login_absent == True
     - matomo_login_email_absent is defined
