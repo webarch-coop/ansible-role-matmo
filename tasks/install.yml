@@ -91,7 +91,7 @@
 
 - name: "Notification date recorded in {{ item.value.users_home | default('/home/' + item.key) }}/.notify_matomo_passwd file"
   lineinfile:
-    path: "{{ item.value.users_home | default('/home/' + item.key) }}/.notify_passwd"
+    path: "{{ item.value.users_home | default('/home/' + item.key) }}/.notify_matomo_passwd"
     line: "{{ lookup('pipe', 'date +%Y-%m-%d-%H-%M-%S')}} : {{ item.value.users_name | default(item.key) }} <{{ item.value.users_email }}>"
     create: true
     state: present
