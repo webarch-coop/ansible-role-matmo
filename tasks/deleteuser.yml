@@ -30,12 +30,12 @@
   block:
 
     - name: Get the existing usernames
-      shell: "for u in $(php console user:list --no-ansi -n); do echo $u | awk '{ print $2 }' ; done"
+      shell: "IFS=$'\n' ; for u in $(php console user:list --no-ansi -n); do echo $u | awk '{ print $2 }' ; done"
       args:
         executable: /bin/bash
         chdir: "{{ matomo_html }}"
-      environment:
-        IFS: '\n'
+      # environment:
+      #   IFS: '\n'
       register: matomo_logins
       changed_when: false
       check_mode: false
