@@ -50,6 +50,10 @@
       - "matomo_config_check.stat.exists: {{ matomo_config_check.stat.exists }}"
       - "matomo_installed.stdout: {{ matomo_installed.stdout }}"
     verbosity: 1
+  when:
+    - matomo_latest is defined
+    - matomo_config_check is defined
+    - matomo_installed is defined
   tags:
     - matomo
 
