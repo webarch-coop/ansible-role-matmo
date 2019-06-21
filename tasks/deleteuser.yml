@@ -48,7 +48,7 @@
     - name: "Set a variable based on the existance of the {{ matomo_login }}"
       set_fact:
         matomo_login_present: true
-      when: '"{{ matomo_login }}" in matomo_logins.stdout_lines'
+      when: matomo_login in matomo_logins.stdout_lines
       tags:
         - matomo
         - users-update
