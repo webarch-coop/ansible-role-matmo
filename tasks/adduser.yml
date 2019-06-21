@@ -108,4 +108,8 @@
         - matomo
         - users-update
 
-  when: ( matomo_login_absent == True ) and ( matomo_login_email_absent == True )
+  when: 
+    - matomo_login_absent is defined
+    - matomo_login_absent == True
+    - matomo_login_email_absent is defined
+    - matomo_login_email_absent == True
