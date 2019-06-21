@@ -50,24 +50,14 @@
       - "matomo_config_check.stat.exists: {{ matomo_config_check.stat.exists }}"
       - "matomo_installed.stdout: {{ matomo_installed.stdout }}"
     verbosity: 1
+  tags:
+    - matomo
 
 - name: Include install tasks
   include_tasks: install.yml
   when: ( matomo_config_check is defined ) and ( matomo_config_check.stat.exists == False )
   tags:
     - matomo
-
-#- name: Matomo extratools tasks included
-#  include_tasks: extratools.yml
-#  when: matomo_config_check.stat.exists == True
-#  tags:
-#    - matomo
-#
-#- name: Matomo userconsole tasks included
-#  include_tasks: userconsole.yml
-#  when: matomo_config_check.stat.exists == True
-#  tags:
-#    - matomo
 
 - name: Include upgrade tasks
   include_tasks: upgrade.yml
