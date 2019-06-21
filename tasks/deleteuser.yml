@@ -29,14 +29,12 @@
 - name: "Delete Matomo users if {{ matomo_user }} exists"
   block:
 
-    - name: Get the existing usernames
-      shell: "IFS=$'\n' ; for u in $(php console user:list --no-ansi -n); do echo $u | awk '{ print $2 }' ; done"
+    - name: "Check if the Matomo {{ matomo_login }} exists" 
+      shell: "IFS=$'\n' ; for u in $(php console user:list --no-ansi -n); do echo $u | awk '{ print $2 }' ; done | grep ^{{ matomo_login }}$"
       args:
         executable: /bin/bash
         chdir: "{{ matomo_html }}"
-      # environment:
-      #   IFS: '\n'
-      register: matomo_logins
+      register: matomo_login_check
       changed_when: false
       check_mode: false
       become: true
@@ -45,10 +43,10 @@
         - matomo
         - users-update
 
-    - name: "Set a variable based on the existance of the {{ matomo_login }}"
+    - name: "Set a variable based on the existance of Matomo {{ matomo_login }} account"
       set_fact:
         matomo_login_present: true
-      when: matomo_login in matomo_logins.stdout_lines
+      when: matomo_login == matomo_login_check.stdout
       tags:
         - matomo
         - users-update
