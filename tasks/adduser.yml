@@ -15,14 +15,12 @@
     - matomo
     - users-update
 
-- name: Get the existing usernames
-  shell: "IFS=$'\n' ; for u in $(php console user:list --no-ansi -n); do echo $u | awk '{ print $2 }' ; done"
+- name: "Check the {{ matomo_login }} exists"
+  shell: "IFS=$'\n' ; for u in $(php console user:list --no-ansi -n); do echo $u | awk '{ print $2 }' | grep ^{{ matomo_login }}$ ; done"
   args:
     executable: /bin/bash
     chdir: "{{ matomo_html }}"
-  # environment:
-  #   IFS: '\n'
-  register: matomo_logins
+  register: matomo_login_check
   changed_when: false
   check_mode: false
   become: true
@@ -31,21 +29,45 @@
     - matomo
     - users-update
 
-- name: Print the existing Matmo usernames
-  debug:
-    msg: "matomo_logins.stdout_lines: {{ matomo_logins.stdout_lines }}"
-    verbosity: 1
+- name: "Set a variable based on the existance of the {{ matomo_login }}"
+  set_fact:
+    matomo_login_absent: true
+  when: matomo_login != matomo_login_check.stdout 
   tags:
     - matomo
     - users-update
 
-- name: "Set a variable based on the existance of the {{ matomo_login }}"
-  set_fact:
-    matomo_login_absent: true
-  when: matomo_login not in matomo_logins.stdout_lines
-  tags:
-    - matomo
-    - users-update
+# - name: Get the existing usernames
+#   shell: "IFS=$'\n' ; for u in $(php console user:list --no-ansi -n); do echo $u | awk '{ print $2 }' ; done"
+#   args:
+#     executable: /bin/bash
+#     chdir: "{{ matomo_html }}"
+#   # environment:
+#   #   IFS: '\n'
+#   register: matomo_logins
+#   changed_when: false
+#   check_mode: false
+#   become: true
+#   become_user: "{{ matomo_user }}"
+#   tags:
+#     - matomo
+#     - users-update
+# 
+# - name: Print the existing Matmo usernames
+#   debug:
+#     msg: "matomo_logins.stdout_lines: {{ matomo_logins.stdout_lines }}"
+#     verbosity: 1
+#   tags:
+#     - matomo
+#     - users-update
+# 
+# - name: "Set a variable based on the existance of the {{ matomo_login }}"
+#   set_fact:
+#     matomo_login_absent: true
+#   when: matomo_login not in matomo_logins.stdout_lines
+#   tags:
+#     - matomo
+#     - users-update
 
 - name: Get the existing email addresses
   shell: "IFS=$'\n' ; for u in $(php console user:list --no-ansi -n); do echo $u | awk '{ print $3 }' | sed 's/(//' | sed 's/)//' ; done"
