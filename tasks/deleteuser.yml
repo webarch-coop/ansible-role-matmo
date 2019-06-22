@@ -46,7 +46,7 @@
     - name: "Set a variable based on the existance of Matomo {{ matomo_login }} account"
       set_fact:
         matomo_login_present: true
-      when: ( when matomo_login_check is defined ) and ( matomo_login_check.stdout == "false" )
+      when: ( when matomo_login_check is defined ) and ( matomo_login_check.stdout == "true" )
       tags:
         - matomo
         - users-update
