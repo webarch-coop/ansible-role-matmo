@@ -34,7 +34,7 @@
     - matomo
 
 - name: ExtraTools plugin activated
-  shell: "php console plugin:activate ExtraTools"
+  shell: "php console --no-ansi -n plugin:activate ExtraTools"
   args:
     executable: /bin/bash
     chdir: "{{ matomo_html }}/"
@@ -46,7 +46,7 @@
     - matomo
 
 - name: ExtraTools db backup path set
-  shell: "php console config:set 'ExtraTools.db_backup_path=\"{{ matomo_private }}\"'"
+  shell: "php console --no-ansi -n config:set 'ExtraTools.db_backup_path=\"{{ matomo_private }}\"'"
   args:
     executable: /bin/bash
     chdir: "{{ matomo_html }}/"

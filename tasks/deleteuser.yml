@@ -52,7 +52,7 @@
         - users-update
 
     - name: Delete Matomo user account
-      shell: "php console user:delete --login='{{ matomo_login }}'"
+      shell: "php console user:delete --no-ansi -n --login='{{ matomo_login }}'"
       args:
         executable: /bin/bash
         chdir: "{{ matomo_html }}"

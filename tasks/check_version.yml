@@ -41,7 +41,7 @@
   block:
 
     - name: Get the installed Matomo version number
-      shell: "php console core:update --version | awk '{ print $3 }'"
+      shell: "php console core:update --no-ansi -n --version | awk '{ print $3 }'"
       args:
         executable: /bin/bash
         chdir: "{{ matomo_html }}"

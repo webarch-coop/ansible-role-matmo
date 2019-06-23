@@ -38,8 +38,8 @@
   tags:
     - matomo
 
-- name: Include checks
-  include_tasks: check.yml
+- name: Include version checks
+  include_tasks: check_version.yml
   tags:
     - matomo
 

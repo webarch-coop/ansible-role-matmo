@@ -34,7 +34,7 @@
     - matomo
 
 - name: Matomo database upgraded
-  shell: "php console core:update -n --yes"
+  shell: "php console --no-ansi -n core:update --yes"
   args:
     executable: /bin/bash
     chdir: "{{ matomo_html }}"
@@ -44,7 +44,7 @@
     - matomo
 
 - name: Matomo version checked
-  shell: "php console core:update --version"
+  shell: "php console --no-ansi -n core:update --version"
   args:
     executable: /bin/bash
     chdir: "{{ matomo_html }}"

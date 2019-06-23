@@ -12,7 +12,7 @@
     - matomo
 
 - name: UserConsole plugin activated
-  shell: "php console plugin:activate UserConsole"
+  shell: "php console --no-ansi -n plugin:activate UserConsole"
   args:
     executable: /bin/bash
     chdir: "{{ matomo_html }}/"

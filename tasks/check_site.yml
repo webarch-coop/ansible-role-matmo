@@ -1,0 +1,59 @@
+---
+# Run some commands directly using MySQL due to this issue
+# https://github.com/digitalist-se/extratools/issues/9
+# This asssumes there is a ~/.my.cnf with the username and 
+# password 
+
+- name: Get the Matomo database prefix
+  shell: "IFS=$'\n' ; php console config:get --no-ansi -n -s database -f text | grep ^tables_prefix | awk '{ print $2 }'"
+  args:
+    executable: /bin/bash
+    chdir: "{{ matomo_html }}"
+  register: matomo_table_prefix_check
+  changed_when: false
+  check_mode: false
+  become: true
+  become_user: "{{ matomo_user }}"
+  tags:
+    - matomo
+    - users-update
+
+- name: Set a variable for the Matomo database prefix
+  set_fact:
+    matomo_table_prefix: "{{ matomo_table_prefix_check.stdout }}"
+  tags:
+    - matomo
+    - users-update
+
+- name: Get the Matomo site main_url's
+  command: "mysql {{ matomo_db_name: }} --skip-column-names --batch -e 'SELECT {{ matomo_table_prefix }}main_url from site'"
+  args:
+    executable: /bin/bash
+    chdir: "{{ matomo_html }}/"
+  changed_when: false
+  check_mode: false
+  become: true
+  become_user: "{{ matomo_user }}"
+  register: matomo_main_urls_check
+  tags:
+    - matomo
+    - users-update
+
+- name: Set an array for the Matomo site main_url's
+  set_fact:
+    matomo_main_urls: "{{ matomo_main_urls }} + [ {{ item }} ]"
+  loop: "{{ matomo_main_urls_check.stdout_lines }}"
+
+- name: Get the Matomo site name's
+  command: "mysql {{ matomo_db_name: }} --skip-column-names --batch -e 'SELECT {{ matomo_table_prefix.stdout }}name from site'"
+  args:
+    executable: /bin/bash
+    chdir: "{{ matomo_html }}/"
+  changed_when: false
+  check_mode: false
+  become: true
+  become_user: "{{ matomo_user }}"
+  register: matomo_names
+  tags:
+    - matomo
+    - users-update
