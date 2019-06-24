@@ -1,8 +1,8 @@
 ---
 # Run some commands directly using MySQL due to this issue
 # https://github.com/digitalist-se/extratools/issues/9
-# This asssumes there is a ~/.my.cnf with the username and 
-# password 
+# This asssumes there is a ~/.my.cnf with the username and
+# password
 
 - name: Get the Matomo database prefix
   shell: "IFS=$'\n' ; php console config:get --no-ansi -n -s database -f text | grep ^tables_prefix | awk '{ print $2 }'"
