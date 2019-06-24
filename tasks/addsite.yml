@@ -28,7 +28,7 @@
 - name: Print the matomo_site_urls
   debug:
     msg: "matomo_site_urls: {{ matomo_site_urls }}"
-  when: ( matomo_site_urls is defined ) and ( matomo_site_urls != [] )
+  when: ( matomo_site_urls is defined ) and ( matomo_site_urls != [] or matomo_site_urls != "" )
   tags:
     - matomo
     - users-update
