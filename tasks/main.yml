@@ -66,4 +66,4 @@
       tags:
         - matomo
 
-  when: "no such user" not in matomo_user_check.stderr
+  when: '"no such user" not in matomo_user_check.stderr'
