@@ -26,7 +26,7 @@
     - users-update
 
 - name: Get the Matomo site main_url's
-  command: "mysql {{ matomo_db_name: }} --skip-column-names --batch -e 'SELECT {{ matomo_table_prefix }}main_url from site'"
+  command: "mysql {{ matomo_db_name }} --skip-column-names --batch -e 'SELECT {{ matomo_table_prefix }}main_url from site'"
   args:
     executable: /bin/bash
     chdir: "{{ matomo_html }}/"
@@ -48,7 +48,7 @@
     - users-update
 
 - name: Get the Matomo sites name's
-  command: "mysql {{ matomo_db_name: }} --skip-column-names --batch -e 'SELECT {{ matomo_table_prefix.stdout }}name from site'"
+  command: "mysql {{ matomo_db_name }} --skip-column-names --batch -e 'SELECT {{ matomo_table_prefix.stdout }}name from site'"
   args:
     executable: /bin/bash
     chdir: "{{ matomo_html }}/"
