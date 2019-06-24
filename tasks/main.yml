@@ -8,14 +8,6 @@
   tags:
     - matomo
 
-- name: "Check if {{ matomo_html }}/config/config.ini.php exists"
-  stat:
-    path: "{{ matomo_html }}/config/config.ini.php"
-  check_mode: false
-  register: matomo_config
-  tags:
-    - matomo
-
 - name: Only install or upgrade Matomo if the user account exists
   block:
 
@@ -74,4 +66,4 @@
       tags:
         - matomo
 
-  when: ( "no such user" not in matomo_user_check.stderr ) and ( matomo_config.stat.exists )
+  when: "no such user" not in matomo_user_check.stderr
