@@ -1,115 +1,126 @@
 ---
-- name: Fail if the Matomo user login is not provided
-  fail:
-    msg: "A value for matomo_login needs to be provided"
-  when: ( matomo_login is not defined ) or ( matomo_login == "" )
+- name: Include version checks
+  include_tasks: check_version.yml
   tags:
     - matomo
     - users-update
 
-- name: Fail if the Matomo user email address is not provided
-  fail:
-    msg: "A value for matomo_login_email needs to be provided"
-  when: ( matomo_login_email is not defined ) or ( matomo_login_email == "" )
-  tags:
-    - matomo
-    - users-update
-
-- name: "Check the if the Matomo {{ matomo_login }} account exists"
-  shell: "IFS=$'\n' ; for u in $(php console user:list --no-ansi -n); do echo $u | awk '{ print $2 }' ; done | grep ^{{ matomo_login }}$ && echo true || echo false"
-  args:
-    executable: /bin/bash
-    chdir: "{{ matomo_html }}"
-  register: matomo_login_check
-  changed_when: false
-  check_mode: false
-  become: true
-  become_user: "{{ matomo_user }}"
-  tags:
-    - matomo
-    - users-update
-
-- name: "Set a variable based on the existance of the Matomo {{ matomo_login }} account"
-  set_fact:
-    matomo_login_absent: true
-  when: ( matomo_login_check is defined ) and ( matomo_login_check.stdout == "false" )
-  tags:
-    - matomo
-    - users-update
-
-- name: "Check if a Matomo account uses the {{ matomo_login_email }} email address"
-  shell: "IFS=$'\n' ; for u in $(php console user:list --no-ansi -n); do echo $u | awk '{ print $3 }' | sed 's/(//' | sed 's/)//' ; done | grep ^{{ matomo_login_email }}$ && echo true || echo false"
-  args:
-    executable: /bin/bash
-    chdir: "{{ matomo_html }}"
-  register: matomo_login_email_check
-  changed_when: false
-  check_mode: false
-  become: true
-  become_user: "{{ matomo_user }}"
-  tags:
-    - matomo
-    - users-update
-
-- name: Set a variable based on the existance of the user email address
-  set_fact:
-    matomo_login_email_absent: true
-  when: ( matomo_login_email_check is defined ) and ( matomo_login_email_check.stdout == "false" )
-  tags:
-    - matomo
-    - users-update
-
-- name: Add Matomo user
+- name: Add user account when Matomo is installed
   block:
 
-    - name: Generate a random password for the Matomo user
-      block:
+    - name: Fail if the Matomo user login is not provided
+      fail:
+        msg: "A value for matomo_login needs to be provided"
+      when: ( matomo_login is not defined ) or ( matomo_login == "" )
+      tags:
+        - matomo
+        - users-update
 
-        - name: Generate a random string for Matomo password
-          command: pwgen -n 20 1
-          register: matomo_login_password_gen
-          no_log: true
-          tags:
-            - matomo
-            - users-update
+    - name: Fail if the Matomo user email address is not provided
+      fail:
+        msg: "A value for matomo_login_email needs to be provided"
+      when: ( matomo_login_email is not defined ) or ( matomo_login_email == "" )
+      tags:
+        - matomo
+        - users-update
 
-        - name: Set a variable with the random password
-          set_fact:
-            matomo_login_password: "{{ matomo_login_password_gen.stdout }}"
-          no_log: true
-          tags:
-            - matomo
-            - users-update
-
-      when: ( matomo_login_password is not defined ) or ( matomo_login_password == "" )
-
-    - name: Add user account
-      shell: "php console user:create --no-ansi -n --login='{{ matomo_login }}' --email='{{ matomo_login_email }}' --password='{{ matomo_login_password }}'"
+    - name: "Check the if the Matomo {{ matomo_login }} account exists"
+      shell: "IFS=$'\n' ; for u in $(php console user:list --no-ansi -n); do echo $u | awk '{ print $2 }' ; done | grep ^{{ matomo_login }}$ && echo true || echo false"
       args:
         executable: /bin/bash
         chdir: "{{ matomo_html }}"
+      register: matomo_login_check
+      changed_when: false
+      check_mode: false
       become: true
       become_user: "{{ matomo_user }}"
-      no_log: true
       tags:
         - matomo
         - users-update
 
-    - name: "Password notification email sent to {{ matomo_login_email }}"
-      mail:
-        from: "{{ matomo_email_from | default('Webarchitects') }} <root@{{ ansible_fqdn }}>"
-        to: "{{ matomo_login_email }}"
-        subject: "[{{ matomo_email_subject_tag | default('webarchitects') }}] Matomo {{ matomo_login }} account details for {{ matomo_url }}"
-        body: "{{ lookup('template', 'templates/notify_matomo_passwd.j2') }}"
-        host: localhost
-        port: 25
-        secure: never
+    - name: "Set a variable based on the existance of the Matomo {{ matomo_login }} account"
+      set_fact:
+        matomo_login_absent: true
+      when: ( matomo_login_check is defined ) and ( matomo_login_check.stdout == "false" )
       tags:
         - matomo
         - users-update
 
-  when:
-    - matomo_login_absent is defined
-    - matomo_login_absent == True
-    - matomo_login_email_absent is defined
-    - matomo_login_email_absent == True
+    - name: "Check if a Matomo account uses the {{ matomo_login_email }} email address"
+      shell: "IFS=$'\n' ; for u in $(php console user:list --no-ansi -n); do echo $u | awk '{ print $3 }' | sed 's/(//' | sed 's/)//' ; done | grep ^{{ matomo_login_email }}$ && echo true || echo false"
+      args:
+        executable: /bin/bash
+        chdir: "{{ matomo_html }}"
+      register: matomo_login_email_check
+      changed_when: false
+      check_mode: false
+      become: true
+      become_user: "{{ matomo_user }}"
+      tags:
+        - matomo
+        - users-update
+
+    - name: Set a variable based on the existance of the user email address
+      set_fact:
+        matomo_login_email_absent: true
+      when: ( matomo_login_email_check is defined ) and ( matomo_login_email_check.stdout == "false" )
+      tags:
+        - matomo
+        - users-update
+
+    - name: Add Matomo user
+      block:
+
+        - name: Generate a random password for the Matomo user
+          block:
+
+            - name: Generate a random string for Matomo password
+              command: pwgen -n 20 1
+              register: matomo_login_password_gen
+              no_log: true
+              tags:
+                - matomo
+                - users-update
+
+            - name: Set a variable with the random password
+              set_fact:
+                matomo_login_password: "{{ matomo_login_password_gen.stdout }}"
+              no_log: true
+              tags:
+                - matomo
+                - users-update
+
+          when: ( matomo_login_password is not defined ) or ( matomo_login_password == "" )
+
+        - name: Add user account
+          shell: "php console user:create --no-ansi -n --login='{{ matomo_login }}' --email='{{ matomo_login_email }}' --password='{{ matomo_login_password }}'"
+          args:
+            executable: /bin/bash
+            chdir: "{{ matomo_html }}"
+          become: true
+          become_user: "{{ matomo_user }}"
+          no_log: true
+          tags:
+            - matomo
+            - users-update
+
+        - name: "Password notification email sent to {{ matomo_login_email }}"
+          mail:
+            from: "{{ matomo_email_from | default('Webarchitects') }} <root@{{ ansible_fqdn }}>"
+            to: "{{ matomo_login_email }}"
+            subject: "[{{ matomo_email_subject_tag | default('webarchitects') }}] Matomo {{ matomo_login }} account details for {{ matomo_url }}"
+            body: "{{ lookup('template', 'templates/notify_matomo_passwd.j2') }}"
+            host: localhost
+            port: 25
+            secure: never
+          tags:
+            - matomo
+            - users-update
+
+      when:
+        - matomo_login_absent is defined
+        - matomo_login_absent == True
+        - matomo_login_email_absent is defined
+        - matomo_login_email_absent == True
+
+  when: ( matomo_config_check is defined ) and ( matomo_config_check.stat.exists == True )
