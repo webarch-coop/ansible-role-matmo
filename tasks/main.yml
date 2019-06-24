@@ -1,56 +1,78 @@
 ---
-# https://matomo.org/docs/update/#the-manual-three-step-update
-- name: The ~/.ansible directory exists
-  file:
-    path: "{{ matomo_home }}/.ansible"
-    state: directory
-    owner: "{{ matomo_user }}"
-    group: "{{ matomo_user }}"
-    mode: 0700
+- name: "Check if the Matomo {{ matomo_user }} exists"
+  command: "id {{ matomo_user }}"
+  ignore_errors: true
+  check_mode: false
+  register: matomo_user_check
+  changed_when: '"no such user" in matomo_user_check.stderr'
   tags:
     - matomo
 
-- name: The ~/.gnupg directory exists
-  file:
-    path: "{{ matomo_home }}/.gnupg"
-    state: directory
-    owner: "{{ matomo_user }}"
-    group: "{{ matomo_user }}"
-    mode: 0700
+- name: "Check if {{ matomo_html }}/config/config.ini.php exists"
+  stat:
+    path: "{{ matomo_html }}/config/config.ini.php"
+  check_mode: false
+  register: matomo_config
   tags:
     - matomo
 
-- name: The Matomo GPG public key is present
-  get_url:
-    url: https://builds.piwik.org/signature.asc
-    dest: "{{ matomo_private }}/matomo.pub"
-  become: true
-  become_user: "{{ matomo_user }}"
-  tags:
-    - matomo
+- name: Only install or upgrade Matomo if the user account exists
+  block:
 
-- name: The Matomo GPG public key is imported
-  command: "gpg --no-tty --import {{ matomo_private }}/matomo.pub"
-  register: matomo_gpg_key_import
-  changed_when: "'not changed' not in matomo_gpg_key_import.stderr"
-  become: true
-  become_user: "{{ matomo_user }}"
-  tags:
-    - matomo
+    - name: The ~/.ansible directory exists
+      file:
+        path: "{{ matomo_home }}/.ansible"
+        state: directory
+        owner: "{{ matomo_user }}"
+        group: "{{ matomo_user }}"
+        mode: 0700
+      tags:
+        - matomo
 
-- name: Include version checks
-  include_tasks: check_version.yml
-  tags:
-    - matomo
+    - name: The ~/.gnupg directory exists
+      file:
+        path: "{{ matomo_home }}/.gnupg"
+        state: directory
+        owner: "{{ matomo_user }}"
+        group: "{{ matomo_user }}"
+        mode: 0700
+      tags:
+        - matomo
 
-- name: Include install tasks
-  include_tasks: install.yml
-  when: ( matomo_config_check is defined ) and ( matomo_config_check.stat.exists == False )
-  tags:
-    - matomo
+    - name: The Matomo GPG public key is present
+      get_url:
+        url: https://builds.piwik.org/signature.asc
+        dest: "{{ matomo_private }}/matomo.pub"
+      become: true
+      become_user: "{{ matomo_user }}"
+      tags:
+        - matomo
 
-- name: Include upgrade tasks
-  include_tasks: upgrade.yml
-  when: ( matomo_config_check.stat.exists ) and ( matomo_installed.stdout != matomo_latest )
-  tags:
-    - matomo
+    - name: The Matomo GPG public key is imported
+      command: "gpg --no-tty --import {{ matomo_private }}/matomo.pub"
+      register: matomo_gpg_key_import
+      changed_when: "'not changed' not in matomo_gpg_key_import.stderr"
+      become: true
+      become_user: "{{ matomo_user }}"
+      tags:
+        - matomo
+
+    - name: Include version checks
+      include_tasks: check_version.yml
+      tags:
+        - matomo
+
+    - name: Include install tasks
+      include_tasks: install.yml
+      when: ( matomo_config_check is defined ) and ( matomo_config_check.stat.exists == False )
+      tags:
+        - matomo
+
+    - name: Include upgrade tasks
+      include_tasks: upgrade.yml
+      when: ( matomo_config_check.stat.exists ) and ( matomo_installed.stdout != matomo_latest )
+      tags:
+        - matomo
+
+  when: ( "no such user" not in matomo_user_check.stderr ) and ( matomo_config.stat.exists )
+
