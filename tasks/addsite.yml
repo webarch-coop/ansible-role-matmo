@@ -1,7 +1,4 @@
 ---
-# Get a list of sites to start with?
-# URL's is comer seperated
-#
 - name: Print the matomo_site_name and matomo_site_urls variables
   debug:
     msg:
