@@ -4,6 +4,13 @@
 # This asssumes there is a ~/.my.cnf with the username and
 # password
 
+- name: Set matomo_sites_main_urls to an empty array
+  set_fact:
+    matomo_sites_main_urls: []
+  tags:
+    - matomo
+    - users-update
+
 - name: Get the Matomo database prefix
   shell: "IFS=$'\n' ; php console config:get --no-ansi -n -s database -f text | grep ^tables_prefix | awk '{ print $2 }'"
   args:
@@ -46,32 +53,10 @@
     - matomo
     - users-update
 
-- name: Get the Matomo sites name's
-  command: "mysql {{ matomo_db_name }} --skip-column-names --batch -e 'SELECT name from {{ matomo_table_prefix }}site'"
-  args:
-    chdir: "{{ matomo_html }}/"
-  changed_when: false
-  check_mode: false
-  become: true
-  become_user: "{{ matomo_user }}"
-  register: matomo_sites_names_check
-  tags:
-    - matomo
-    - users-update
-
-- name: Set an array for the Matomo sites names's
-  set_fact:
-    matomo_sites_names': "{{ matomo_sites_names }} + [ {{ item }} ]"
-  loop: "{{ matomo_sites_names_check.stdout_lines }}"
-  tags:
-    - matomo
-    - users-update
-
-- name: Print the Matomo site main_url's and site name's
+- name: Print the Matomo site main_url's
   debug:
     msg:
       - "Matomo sites main_url's: {{ matomo_sites_main_urls }}"
-      - "Matomo sites name's: {{ matomo_sites_names }}"
     verbosity: 1
   tags:
     - matomo
