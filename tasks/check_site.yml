@@ -28,7 +28,6 @@
 - name: Get the Matomo site main_url's
   command: "mysql {{ matomo_db_name }} --skip-column-names --batch -e 'SELECT {{ matomo_table_prefix }}main_url from site'"
   args:
-    executable: /bin/bash
     chdir: "{{ matomo_html }}/"
   changed_when: false
   check_mode: false
@@ -50,7 +49,6 @@
 - name: Get the Matomo sites name's
   command: "mysql {{ matomo_db_name }} --skip-column-names --batch -e 'SELECT {{ matomo_table_prefix.stdout }}name from site'"
   args:
-    executable: /bin/bash
     chdir: "{{ matomo_html }}/"
   changed_when: false
   check_mode: false
@@ -63,7 +61,7 @@
 
 - name: Set an array for the Matomo sites names's
   set_fact:
-    matomo_names: "{{ matomo_sites_main_urls }} + [ {{ item }} ]"
+    matomo_sites_names': "{{ matomo_sites_names }} + [ {{ item }} ]"
   loop: "{{ matomo_sites_names_check.stdout_lines }}"
   tags:
     - matomo
