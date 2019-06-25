@@ -109,7 +109,7 @@
         - users-update
 
     - name: Update main_url for idsite 1 due to bug
-      command: "mysql {{ matomo_db_name }} --skip-column-names --batch -e 'UPDATE site SET main_url=\"{{ matomo_first_site_url | quote }}\" WHERE idsite=1'"
+      command: 'mysql {{ matomo_db_name }} --skip-column-names --batch -e "UPDATE site SET main_url=\"{{ matomo_first_site_url | quote }}\" WHERE idsite=1"'
       args:
         chdir: "{{ matomo_html }}/"
       when: matomo_first_site_url_check.stdout == "http://example.com"
