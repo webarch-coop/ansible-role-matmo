@@ -61,7 +61,7 @@
 
 - name: Generate admin passwd and install Matomo
   block:
-  
+
     - name: Random passwd for Matomo admin generated
       command: pwgen -n 20 1
       register: matomo_first_user_pass_gen

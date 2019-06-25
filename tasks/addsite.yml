@@ -130,6 +130,6 @@
     verbosity: 1
   tags:
     - matomo
-    - users-update    
+    - users-update
 
 # Add missing Apache Aliases to the matomo_site_main_url siteid urls table
