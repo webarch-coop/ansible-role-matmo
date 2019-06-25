@@ -96,7 +96,7 @@
 
     # https://github.com/digitalist-se/extratools/issues/11
     - name: Check if the main_url for siteid 1 is set to http://example.com
-      command: "mysql {{ matomo_db_name }} --skip-column-names --batch -e 'SELECT mail_url FROM site WHERE siteid=1'"
+      command: "mysql {{ matomo_db_name }} --skip-column-names --batch -e 'SELECT main_url FROM site WHERE siteid=1'"
       args:
         chdir: "{{ matomo_html }}/"
       changed_when: false
