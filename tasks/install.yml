@@ -95,8 +95,8 @@
         - matomo
 
     # https://github.com/digitalist-se/extratools/issues/11
-    - name: Check if the main_url for siteid 1 is set to http://example.com
-      command: "mysql {{ matomo_db_name }} --skip-column-names --batch -e 'SELECT main_url FROM site WHERE siteid=1'"
+    - name: Check if the main_url for idsite 1 is set to http://example.com
+      command: "mysql {{ matomo_db_name }} --skip-column-names --batch -e 'SELECT main_url FROM site WHERE idsite=1'"
       args:
         chdir: "{{ matomo_html }}/"
       changed_when: false
@@ -109,7 +109,7 @@
         - users-update
 
     - name: Update main_url for siteid 1 due to bug
-      command: "mysql {{ matomo_db_name }} --skip-column-names --batch -e 'UPDATE site SET main_url={{ matomo_first_site_url | quote }} WHERE siteid=1'"
+      command: "mysql {{ matomo_db_name }} --skip-column-names --batch -e 'UPDATE site SET main_url={{ matomo_first_site_url | quote }} WHERE idsite=1'"
       args:
         chdir: "{{ matomo_html }}/"
       when: matomo_first_site_url_check.stdout == "http://example.com"
