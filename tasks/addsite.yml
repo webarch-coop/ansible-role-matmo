@@ -58,8 +58,8 @@
 
   when: matomo_site_main_url not in matomo_site_urls
 
-# Get the matomo_site_main_url siteid
-#
+# - name: Get the matomo_site_main_url siteid
+
 # Get the table rowns matching the matomo_site_main_url siteid urls
 #
 # Get the difference between the matomo_site_main_url siteid urls and the Apache Aliases

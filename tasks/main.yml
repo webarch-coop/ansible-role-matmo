@@ -1,5 +1,5 @@
 ---
-- name: "Check if the Matomo {{ matomo_user }} exists"
+- name: "Check if the Matomo {{ matomo_user }} user account exists"
   command: "id {{ matomo_user }}"
   ignore_errors: true
   check_mode: false
