@@ -47,7 +47,7 @@
 
 - name: Set an array for the Matomo sites main_url's
   set_fact:
-    matomo_sites_main_urls: "{{ matomo_sites_main_urls }} + [ {{ url }} ]"
+    matomo_sites_main_urls: "{{ matomo_sites_main_urls }} + [ '{{ url }}' ]"
   loop: "{{ matomo_sites_main_urls_check.stdout_lines }}"
   loop_control:
     loop_var: url
