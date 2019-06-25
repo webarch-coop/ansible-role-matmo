@@ -73,7 +73,7 @@
 
 - name: Set a variable for matomo_idsite
   set_fact:
-    matomo_idsite: matomo_idsite_check.stdout
+    matomo_idsite: "{{ matomo_idsite_check.stdout }}"
   tags:
     - matomo
     - users-update
