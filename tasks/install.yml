@@ -66,7 +66,14 @@
   tags:
     - matomo
 
-- name: Motomo installed
+- name: Print the Matomo install command that is to be run
+  debug:
+    msg: "php console --no-ansi -n matomo:install --db-username={{ matomo_db_username }} --db-pass={{ matomo_db_pass }} --db-host={{ matomo_db_host }} --db-name={{ matomo_db_name }} --first-site-name='{{ matomo_first_site_name }}' --first-site-url='{{ matomo_first_site_url }}' --first-user='{{ matomo_first_user }}' --first-user-email='{{ matomo_first_user_email }}' --first-user-pass='{{ matomo_first_user_pass }}' --force"
+    verbosity: 1
+  tags:
+    - matomo
+
+- name: Matomo installed
   shell: "php console --no-ansi -n matomo:install --db-username={{ matomo_db_username }} --db-pass={{ matomo_db_pass }} --db-host={{ matomo_db_host }} --db-name={{ matomo_db_name }} --first-site-name='{{ matomo_first_site_name }}' --first-site-url='{{ matomo_first_site_url }}' --first-user='{{ matomo_first_user }}' --first-user-email='{{ matomo_first_user_email }}' --first-user-pass='{{ matomo_first_user_pass }}' --force"
   # ' vim syntax highlighting buxfix
   args:

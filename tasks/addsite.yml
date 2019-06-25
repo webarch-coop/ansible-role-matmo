@@ -56,7 +56,7 @@
         - matomo
         - users-update
 
-  when: matomo_site_main_url not in matomo_site_urls 
+  when: matomo_site_main_url not in matomo_site_urls
 
 # Get the matomo_site_main_url siteid
 #
