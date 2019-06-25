@@ -78,13 +78,13 @@
 
     - name: Print the Matomo install command that is to be run
       debug:
-        msg: "php console --no-ansi -n matomo:install --db-username={{ matomo_db_username }} --db-pass={{ matomo_db_pass }} --db-host={{ matomo_db_host }} --db-name={{ matomo_db_name }} --first-site-name='{{ matomo_first_site_name }}' --first-site-url='{{ matomo_first_site_url }}' --first-user='{{ matomo_first_user }}' --first-user-email='{{ matomo_first_user_email }}' --first-user-pass='{{ matomo_first_user_pass }}' --force"
+        msg: "php console --no-ansi -n matomo:install --db-username={{ matomo_db_username | quote}} --db-pass={{ matomo_db_pass | quote }} --db-host={{ matomo_db_host | quote}} --db-name={{ matomo_db_name | quote }} --first-site-name={{ matomo_first_site_name | quote }} --first-site-url={{ matomo_first_site_url | quote }} --first-user={{ matomo_first_user | quote }} --first-user-email={{ matomo_first_user_email | quote }} --first-user-pass={{ matomo_first_user_pass | quote }} --force"
         verbosity: 1
       tags:
         - matomo
 
     - name: Matomo installed
-      shell: "php console --no-ansi -n matomo:install --db-username={{ matomo_db_username }} --db-pass={{ matomo_db_pass }} --db-host={{ matomo_db_host }} --db-name={{ matomo_db_name }} --first-site-name='{{ matomo_first_site_name }}' --first-site-url='{{ matomo_first_site_url }}' --first-user='{{ matomo_first_user }}' --first-user-email='{{ matomo_first_user_email }}' --first-user-pass='{{ matomo_first_user_pass }}' --force"
+      shell: "php console --no-ansi -n matomo:install --db-username={{ matomo_db_username | quote }} --db-pass={{ matomo_db_pass | quote }} --db-host={{ matomo_db_host | quote }} --db-name={{ matomo_db_name | quote }} --first-site-name={{ matomo_first_site_name | quote }} --first-site-url={{ matomo_first_site_url | quote }} --first-user={{ matomo_first_user | quote }} --first-user-email={{ matomo_first_user_email | quote }} --first-user-pass={{ matomo_first_user_pass | quote }} --force"
       # ' vim syntax highlighting buxfix
       args:
         executable: /bin/bash
@@ -94,10 +94,35 @@
       tags:
         - matomo
 
+    # https://github.com/digitalist-se/extratools/issues/11
+    - name: Check if the main_url for siteid 1 is set to http://example.com
+      command: "mysql {{ matomo_db_name }} --skip-column-names --batch -e 'SELECT mail_url FROM site WHERE siteid=1'"
+      args:
+        chdir: "{{ matomo_html }}/"
+      changed_when: false
+      check_mode: false
+      register: matomo_first_site_url_check
+      become: true
+      become_user: "{{ matomo_user }}"
+      tags:
+        - matomo
+        - users-update
+
+    - name: Update main_url for siteid 1 due to bug
+      command: "mysql {{ matomo_db_name }} --skip-column-names --batch -e 'UPDATE site SET main_url={{ matomo_first_site_url | quote }} WHERE siteid=1'"
+      args:
+        chdir: "{{ matomo_html }}/"
+      when: matomo_first_site_url_check.stdout == "http://example.com"
+      become: true
+      become_user: "{{ matomo_user }}"
+      tags:
+        - matomo
+        - users-update
+
     - name: "Password notification email sent to {{ matomo_first_user_email }}"
       mail:
         from: "{{ matomo_notify_from | default('Webarchitects') }} <root@{{ ansible_fqdn }}>"
-        to: "{{ matomo_first_user }} <{{ matomo_first_user_email }}>"
+        to: "{{ matomo_first_user | quote}} <{{ matomo_first_user_email }}>"
         subject: "[{{ matomo_notify_subject_tag | default('webarchitects') }}] Matomo admin password for {{ matomo_first_user }} on {{ vhost.value.users_apache_server_name }}"
         body: "{{ lookup('template', 'templates/notify_matomo_passwd.j2') }}"
         host: localhost

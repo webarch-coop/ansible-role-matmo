@@ -58,10 +58,78 @@
 
   when: matomo_site_main_url not in matomo_site_urls
 
-# - name: Get the matomo_site_main_url siteid
+- name: Get the matomo_site_main_url siteid
+  command: "mysql {{ matomo_db_name }} --skip-column-names --batch -e 'SELECT siteid FROM {{ matomo_table_prefix }}site WHERE main_url={{ matomo_site_main_url | quote }}'"
+  args:
+    chdir: "{{ matomo_html }}/"
+  changed_when: false
+  check_mode: false
+  become: true
+  become_user: "{{ matomo_user }}"
+  register: matomo_siteid_check
+  tags:
+    - matomo
+    - users-update
 
-# Get the table rowns matching the matomo_site_main_url siteid urls
-#
-# Get the difference between the matomo_site_main_url siteid urls and the Apache Aliases
-#
+- name: Set a variable for matomo_siteid
+  set_fact:
+    matomo_siteid: matomo_siteid_check.stdout
+  tags:
+    - matomo
+    - users-update
+
+- name: Set matomo_siteid_urls to an empty array
+  set_fact:
+    matomo_siteid_urls: []
+  tags:
+    - matomo
+    - users-update
+
+- name: Get the table rows matching the matomo_site_main_url siteid urls
+  command: "mysql {{ matomo_db_name }} --skip-column-names --batch -e 'SELECT url FROM site_urls WHERE siteid={{ matomo_siteid | quote }}'"
+  args:
+    chdir: "{{ matomo_html }}/"
+  changed_when: false
+  check_mode: false
+  become: true
+  become_user: "{{ matomo_user }}"
+  register: matomo_siteid_urls_check
+  tags:
+    - matomo
+    - users-update
+
+- name: Set an array for the Matomo site url's
+  set_fact:
+    matomo_siteid_urls: "{{ matomo_siteid_urls }} + [ {{ url }} ]"
+  loop: "{{ matomo_siteid_urls_check.stdout_lines }}"
+  loop_control:
+    loop_var: url
+  tags:
+    - matomo
+    - users-update
+
+- name: Print the Matomo existing site url's
+  debug:
+    msg: "Matomo site url's: {{ matomo_siteid_urls }}"
+    verbosity: 1
+  tags:
+    - matomo
+    - users-update
+
+# ./users/tasks/mariadb_user_present.yml:    users_mariadb_delete_list: "{{ users_mariadb_list.stdout_lines | difference(item.value.users_mariadb_databases) }}"
+- name: Get the difference between the matomo_site_main_url siteid urls and the Apache Aliases
+  set_fact:
+    matomo_missing_urls: "{{ matomo_site_urls | difference(matomo_siteid_urls) }}"
+  tags:
+    - matomo
+    - users-update
+
+- name: Print the missing URLs
+  debug:
+    msg: "matomo_missing_urls: {{ matomo_missing_urls }}"
+    verbosity: 1
+  tags:
+    - matomo
+    - users-update    
+
 # Add missing Apache Aliases to the matomo_site_main_url siteid urls table
