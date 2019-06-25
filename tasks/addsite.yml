@@ -86,7 +86,7 @@
     - users-update
 
 - name: Get the table rows matching the matomo_site_main_url idsite urls
-  command: "mysql {{ matomo_db_name }} --skip-column-names --batch -e 'SELECT url FROM site_urls WHERE idsite={{ matomo_idsite | quote }}'"
+  command: "mysql {{ matomo_db_name }} --skip-column-names --batch -e 'SELECT url FROM site_url WHERE idsite={{ matomo_idsite | quote }}'"
   args:
     chdir: "{{ matomo_html }}/"
   changed_when: false
