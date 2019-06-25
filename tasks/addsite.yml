@@ -96,7 +96,7 @@
 
 - name: Set an array for the Matomo site url's
   set_fact:
-    matomo_idsite_urls: "{{ matomo_idsite_urls }} + [ {{ url }} ]"
+    matomo_idsite_urls: "{{ matomo_idsite_urls }} + [ '{{ url }}' ]"
   loop: "{{ matomo_idsite_urls_check.stdout_lines }}"
   loop_control:
     loop_var: url
