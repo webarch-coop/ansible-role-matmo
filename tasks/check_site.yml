@@ -3,6 +3,9 @@
 # https://github.com/digitalist-se/extratools/issues/9
 # This asssumes there is a ~/.my.cnf with the username and
 # password
+#
+# This could now be change to use the site.name column since 
+# the issue above has been fixed
 
 - name: Set matomo_sites_main_urls to an empty array
   set_fact:
