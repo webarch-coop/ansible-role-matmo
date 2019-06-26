@@ -46,11 +46,12 @@
     - matomo
     - users-update
 
-- name: Print the matomo_site_names variable if it is defined
+- name: Print the matomo_sites_names variable if it is defined
   debug:
     msg:
-      - "The matomo_names variable contains: {{ matomo_site_names }}"
+      - "The matomo_sites_names variable contains: {{ matomo_sites_names }}"
     verbosity: 1
+    when: matomo_sites_names is defined
   tags:
     - matomo
     - users-update
@@ -71,7 +72,7 @@
         - matomo
         - users-update
 
-  when: matomo_site_name not in matomo_site_names
+  when: matomo_site_name not in matomo_sites_names
 
 - name: "Get the first {{ matomo_site_name }} site ID"
   shell: 'mysql {{ matomo_db_name }} --skip-column-names --batch -e "SELECT idsite FROM {{ matomo_table_prefix }}site WHERE name=\"{{ matomo_site_name | quote }}\"" | head -n 1'
@@ -99,7 +100,7 @@
     - users-update
 
 - name: "Get the URLs for the {{ matomo_site_name }} site"
-  command: "mysql {{ matomo_db_name }} --skip-column-names --batch -e 'SELECT url FROM site_url WHERE idsite={{ matomo_idsite | quote }}'"
+  command: 'mysql {{ matomo_db_name }} --skip-column-names --batch -e "SELECT url FROM site_url WHERE idsite=\"{{ matomo_idsite | quote }}\""'
   args:
     chdir: "{{ matomo_html }}/"
   become: true
