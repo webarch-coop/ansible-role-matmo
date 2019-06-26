@@ -8,7 +8,7 @@ matomo_db_pass: ""
 matomo_db_host: localhost
 matomo_db_name: "{{ matomo_user }}"
 matomo_first_site_name: "{{ inventory_hostname }}"
-matomo_first_site_url: "https://{{ inventory_hostname }}/"
+matomo_first_site_url: "http://{{ inventory_hostname }}/"
 matomo_first_user: "Webarchitects"
 matomo_first_user_email: "root@{{ inventory_hostname }}"
 matomo_first_user_pass: ""
