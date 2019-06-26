@@ -51,7 +51,7 @@
     msg:
       - "The matomo_sites_names variable contains: {{ matomo_sites_names }}"
     verbosity: 1
-    when: matomo_sites_names is defined
+  when: matomo_sites_names is defined
   tags:
     - matomo
     - users-update
