@@ -13,7 +13,7 @@
 #   tags:
 #     - matomo
 #     - users-update
-# 
+#
 # - name: Set a variable for the Matomo database prefix
 #   set_fact:
 #     matomo_table_prefix: "{{ matomo_table_prefix_check.stdout }}"
@@ -30,7 +30,7 @@
 
 - name: Get the Matomo site names
   # command: "mysql {{ matomo_db_name }} --skip-column-names --batch -e 'SELECT name from {{ matomo_table_prefix }}site'"
-  shell: php console site:list --no-ansi -n | awk '{ print $2 }' 
+  shell: php console site:list --no-ansi -n | awk '{ print $2 }'
   args:
     executable: /bin/bash
     chdir: "{{ matomo_html }}/"
@@ -45,7 +45,7 @@
 
 - name: Set an array for the Matomo site names
   set_fact:
-    matomo_sites_namess: "{{ matomo_sites_names }} + [ '{{ name }}' ]"
+    matomo_sites_names: "{{ matomo_sites_names }} + [ '{{ name }}' ]"
   loop: "{{ matomo_sites_names_check.stdout_lines }}"
   loop_control:
     loop_var: name
@@ -56,7 +56,7 @@
 - name: Print the Matomo site names
   debug:
     msg:
-      - "Matomo site namess: {{ matomo_site_names }}"
+      - "Matomo site names: {{ matomo_site_names }}"
     verbosity: 1
   tags:
     - matomo
