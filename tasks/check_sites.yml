@@ -46,7 +46,7 @@
 - name: Set an array for the Matomo site names
   set_fact:
     matomo_sites_namess: "{{ matomo_sites_names }} + [ '{{ name }}' ]"
-  loop: "{{ matomo_sites_namess_check.stdout_lines }}"
+  loop: "{{ matomo_sites_names_check.stdout_lines }}"
   loop_control:
     loop_var: name
   tags:
