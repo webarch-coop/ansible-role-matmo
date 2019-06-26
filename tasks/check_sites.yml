@@ -1,0 +1,63 @@
+---
+# This might be needed again...
+# - name: Get the Matomo database prefix
+#   shell: "IFS=$'\n' ; php console config:get --no-ansi -n -s database -f text | grep ^tables_prefix | awk '{ print $2 }'"
+#   args:
+#     executable: /bin/bash
+#     chdir: "{{ matomo_html }}"
+#   register: matomo_table_prefix_check
+#   changed_when: false
+#   check_mode: false
+#   become: true
+#   become_user: "{{ matomo_user }}"
+#   tags:
+#     - matomo
+#     - users-update
+# 
+# - name: Set a variable for the Matomo database prefix
+#   set_fact:
+#     matomo_table_prefix: "{{ matomo_table_prefix_check.stdout }}"
+#   tags:
+#     - matomo
+#     - users-update
+
+- name: Set matomo_sites_names to an empty array
+  set_fact:
+    matomo_sites_names: []
+  tags:
+    - matomo
+    - users-update
+
+- name: Get the Matomo site names
+  # command: "mysql {{ matomo_db_name }} --skip-column-names --batch -e 'SELECT name from {{ matomo_table_prefix }}site'"
+  shell: php console site:list --no-ansi -n | awk '{ print $2 }' 
+  args:
+    executable: /bin/bash
+    chdir: "{{ matomo_html }}/"
+  changed_when: false
+  check_mode: false
+  become: true
+  become_user: "{{ matomo_user }}"
+  register: matomo_sites_names_check
+  tags:
+    - matomo
+    - users-update
+
+- name: Set an array for the Matomo site names
+  set_fact:
+    matomo_sites_namess: "{{ matomo_sites_names }} + [ '{{ name }}' ]"
+  loop: "{{ matomo_sites_namess_check.stdout_lines }}"
+  loop_control:
+    loop_var: name
+  tags:
+    - matomo
+    - users-update
+
+- name: Print the Matomo site names
+  debug:
+    msg:
+      - "Matomo site namess: {{ matomo_site_names }}"
+    verbosity: 1
+  tags:
+    - matomo
+    - users-update

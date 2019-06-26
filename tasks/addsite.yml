@@ -25,35 +25,41 @@
     - matomo
     - users-update
 
-- name: Print the matomo_site_urls variable if it is defined
+- name: Set matomo_urls for the console site:add command
+  set_fact:
+    matomo_urls: "{{ matomo_site_main_url }}{% for u in matomo_site_urls %}, {{ u }}{% endfor %}"
+  tags:
+    - matomo
+    - users-update
+
+- name: Print the matomo_urls
+  debug:
+    msg: "matomo_urls: {{ matomo_urls }}"
+    verbosity: 1
+  tags:
+    - matomo
+    - users-update
+
+- name: Include the check sites tasks
+  include_tasks: check_sites.yml
+  tags:
+    - matomo
+    - users-update
+
+- name: Print the matomo_site_names variable if it is defined
   debug:
     msg:
-      - "The matomo_site_urls variable contains: {{ matomo_site_urls }}"
+      - "The matomo_names variable contains: {{ matomo_site_names }}"
     verbosity: 1
   tags:
     - matomo
     - users-update
 
-- name: Include the site check tasks
-  include_tasks: check_site.yml
-  tags:
-    - matomo
-    - users-update
-
-- name: Print the matomo_site_urls
-  debug:
-    msg: "matomo_site_urls: {{ matomo_site_urls }}"
-    verbosity: 1
-  when: ( matomo_site_urls is defined ) and ( matomo_site_urls != [] or matomo_site_urls != "" )
-  tags:
-    - matomo
-    - users-update
-
-- name: "Add {{ matomo_site_main_url }} to the Matomo server"
+- name: "Add {{ matomo_site_name }} to the Matomo server"
   block:
 
     - name: Add Matomo site
-      shell: 'php console site:add --no-ansi -n --name="{{ matomo_site_name }}" --urls="{{ matomo_site_main_url }}{% if matomo_site_urls is defined and matomo_site_urls != \"\" %}{% for u in matomo_site_urls %}, {{ u }}{% endfor %}{% endif %}"'
+      shell: "php console site:add --no-ansi -n --name='{{ matomo_site_name }}' --urls='{{ matomo_urls }}'"
       args:
         executable: /bin/bash
         chdir: "{{ matomo_html }}"
@@ -65,10 +71,10 @@
         - matomo
         - users-update
 
-  when: matomo_site_main_url not in matomo_site_urls
+  when: matomo_site_name not in matomo_site_names
 
-- name: Get the first matomo_site_main_url idsite
-  shell: 'mysql {{ matomo_db_name }} --skip-column-names --batch -e "SELECT idsite FROM {{ matomo_table_prefix }}site WHERE main_url=\"{{ matomo_site_main_url | quote }}\"" | head -n 1'
+- name: "Get the first {{ matomo_site_name }} site ID"
+  shell: 'mysql {{ matomo_db_name }} --skip-column-names --batch -e "SELECT idsite FROM {{ matomo_table_prefix }}site WHERE name=\"{{ matomo_site_name | quote }}\"" | head -n 1'
   args:
     chdir: "{{ matomo_html }}/"
   become: true
@@ -92,7 +98,7 @@
     - matomo
     - users-update
 
-- name: Get the table rows matching the matomo_site_main_url idsite urls
+- name: "Get the URLs for the {{ matomo_site_name }} site"
   command: "mysql {{ matomo_db_name }} --skip-column-names --batch -e 'SELECT url FROM site_url WHERE idsite={{ matomo_idsite | quote }}'"
   args:
     chdir: "{{ matomo_html }}/"
@@ -122,7 +128,7 @@
     - users-update
 
 # ./users/tasks/mariadb_user_present.yml:    users_mariadb_delete_list: "{{ users_mariadb_list.stdout_lines | difference(item.value.users_mariadb_databases) }}"
-- name: Get the difference between the matomo_site_main_url idsite urls and the Apache Aliases
+- name: Get the difference between the matomo_site_urls and the Apache Aliases
   set_fact:
     matomo_missing_urls: "{{ matomo_site_urls | difference(matomo_idsite_urls) }}"
   tags:
