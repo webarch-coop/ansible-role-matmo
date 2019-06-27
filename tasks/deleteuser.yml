@@ -30,7 +30,7 @@
   block:
 
     - name: "Check if the Matomo {{ matomo_login }} exists"
-      shell: "IFS=$'\n' ; for u in $(php console user:list --no-ansi -n); do echo $u | awk '{ print $2 }' ; done | grep ^{{ matomo_login }}$ && echo true || echo false"
+      shell: "IFS=$'\n' ; for u in $(php console user:list --no-ansi -n); do echo $u | awk '{ print $2 }' ; done | grep -q ^{{ matomo_login }}$ && echo true || echo false"
       args:
         executable: /bin/bash
         chdir: "{{ matomo_html }}"

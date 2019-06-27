@@ -1,6 +1,6 @@
 ---
 - name: "Check if a Matomo account uses the {{ matomo_login_email }} email address"
-  shell: "IFS=$'\n' ; for u in $(php console user:list --no-ansi -n); do echo $u | awk '{ print $3 }' | sed 's/(//' | sed 's/)//' ; done | grep ^{{ matomo_login_email | quote }}$ && echo true || echo false"
+  shell: "IFS=$'\n' ; for u in $(php console user:list --no-ansi -n); do echo $u | awk '{ print $3 }' | sed 's/(//' | sed 's/)//' ; done | grep -q ^{{ matomo_login_email | quote }}$ && echo true || echo false"
   args:
     executable: /bin/bash
     chdir: "{{ matomo_html }}"
