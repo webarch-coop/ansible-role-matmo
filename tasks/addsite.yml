@@ -100,7 +100,7 @@
     - users-update
 
 - name: "Get the URLs for the {{ matomo_site_name }} site"
-  command: 'mysql {{ matomo_db_name }} --skip-column-names --batch -e "SELECT url FROM site_url WHERE idsite=\"{{ matomo_idsite | quote }}\""'
+  command: 'mysql {{ matomo_db_name }} --skip-column-names --batch -e "SELECT url FROM {{ matomo_table_prefix }}site_url WHERE idsite=\"{{ matomo_idsite | quote }}\""'
   args:
     chdir: "{{ matomo_html }}/"
   become: true
@@ -128,7 +128,6 @@
     - matomo
     - users-update
 
-# ./users/tasks/mariadb_user_present.yml:    users_mariadb_delete_list: "{{ users_mariadb_list.stdout_lines | difference(item.value.users_mariadb_databases) }}"
 - name: Get the difference between the matomo_site_urls and the Apache Aliases
   set_fact:
     matomo_missing_urls: "{{ matomo_site_urls | difference(matomo_idsite_urls) }}"
@@ -136,7 +135,7 @@
     - matomo
     - users-update
 
-- name: Print the missing URLs
+- name: "Print the missing URLs for site ID: {{ matomo_idsite }}" 
   debug:
     msg: "matomo_missing_urls: {{ matomo_missing_urls }}"
     verbosity: 1
@@ -144,4 +143,16 @@
     - matomo
     - users-update
 
-# Add missing Apache Aliases to the matomo_site_main_url idsite urls table
+- name: Add missing Apache Aliases to the matomo_site_main_url idsite urls table
+  command: 'mysql {{ matomo_db_name }} --skip-column-names --batch -e "INSERT INTO  {{ matomo_table_prefix }}site_url VALUES (\"{{ matomo_idsite | quote }}\", \"{{ url | quote }}\")"'
+  args:
+    chdir: "{{ matomo_html }}/"
+  become: true
+  become_user: "{{ matomo_user }}"
+  loop: "{{ matomo_missing_urls }}"
+  loop_control:
+    loop_var: url
+  when: ( matomo_missing_urls is defined ) and ( matomo_missing_urls != "" )
+  tags:
+    - matomo
+    - users-update

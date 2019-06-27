@@ -31,9 +31,10 @@
       tags:
         - matomo
 
+    # https://builds.piwik.org/signature.asc
     - name: The Matomo GPG public key is present
-      get_url:
-        url: https://builds.piwik.org/signature.asc
+      copy:
+        src: files/matomo.pub
         dest: "{{ matomo_private }}/matomo.pub"
       become: true
       become_user: "{{ matomo_user }}"
@@ -49,20 +50,32 @@
       tags:
         - matomo
 
-    - name: Include version checks
-      include_tasks: check_version.yml
+    - name: Check for config.ini.php
+      stat:
+        path: "{{ matomo_html }}/config/config.ini.php"
+      register: matomo_config_check
       tags:
         - matomo
+
+    - name: Check the Matomo version and then conditionally upgrade
+      block:
+
+        - name: Include version checks
+          include_tasks: check_version.yml
+          tags:
+            - matomo
+
+        - name: Include upgrade tasks
+          include_tasks: upgrade.yml
+          when: ( matomo_config_check.stat.exists ) and ( matomo_installed.stdout != matomo_latest )
+          tags:
+            - matomo
+
+      when: ( matomo_config_check is defined ) and ( matomo_config_check.stat.exists == True )
 
     - name: Include install tasks
       include_tasks: install.yml
       when: ( matomo_config_check is defined ) and ( matomo_config_check.stat.exists == False )
-      tags:
-        - matomo
-
-    - name: Include upgrade tasks
-      include_tasks: upgrade.yml
-      when: ( matomo_config_check.stat.exists ) and ( matomo_installed.stdout != matomo_latest )
       tags:
         - matomo
 

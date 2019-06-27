@@ -9,7 +9,6 @@
   become_user: "{{ matomo_user }}"
   tags:
     - matomo
-    - users-update
 
 - name: Set a variable for the base64 encoded latest Matomo version
   slurp:
@@ -17,14 +16,12 @@
   register: matomo_latest_b64encoded
   tags:
     - matomo
-    - users-update
 
 - name: Set a variable for the latest Matomo version
   set_fact:
     matomo_latest: "{{ matomo_latest_b64encoded['content'] | b64decode | trim }}"
   tags:
     - matomo
-    - users-update
 
 - name: Print the latest version
   debug:
@@ -32,7 +29,6 @@
     verbosity: 1
   tags:
     - matomo
-    - users-update
 
 - name: Check for config.ini.php
   stat:
@@ -57,7 +53,6 @@
       register: matomo_installed
       tags:
         - matomo
-        - users-update
 
     - name: Print the installed version
       debug:
@@ -65,7 +60,6 @@
         verbosity: 1
       tags:
         - matomo
-        - users-update
 
     - name: Matomo version check
       debug:
@@ -73,6 +67,5 @@
       when: matomo_installed.stdout == matomo_latest
       tags:
         - matomo
-        - users-update
 
   when: matomo_config_check.stat.exists

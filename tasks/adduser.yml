@@ -1,6 +1,8 @@
 ---
-- name: Include version checks
-  include_tasks: check_version.yml
+- name: Check for config.ini.php
+  stat:
+    path: "{{ matomo_html }}/config/config.ini.php"
+  register: matomo_config_check
   tags:
     - matomo
     - users-update
