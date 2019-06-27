@@ -44,9 +44,9 @@
     - matomo
     - users-update
 
-- name: Check and update Matomo user 
+- name: Check and update Matomo user
   include_tasks: updateuser.yml
-  when: ( matomo_login_present is defined ) and ( matomo_login_present == True)
+  when: ( matomo_login_present is defined ) and ( matomo_login_present == True )
   tags:
     - matomo
     - users-update
