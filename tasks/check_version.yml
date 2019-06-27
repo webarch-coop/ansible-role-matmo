@@ -1,71 +1,26 @@
 ---
-- name: Get the latest Matomo version number file
-  get_url:
-    url: https://builds.piwik.org/LATEST
-    dest: "{{ matomo_private }}/LATEST"
-    force: true
+- name: Get the installed Matomo version number
+  shell: "php console core:update --no-ansi -n --version | awk '{ print $3 }'"
+  args:
+    executable: /bin/bash
+    chdir: "{{ matomo_html }}"
+  changed_when: false
   check_mode: false
   become: true
   become_user: "{{ matomo_user }}"
+  register: matomo_installed_check
   tags:
     - matomo
 
-- name: Set a variable for the base64 encoded latest Matomo version
-  slurp:
-    src: "{{ matomo_private }}/LATEST"
-  register: matomo_latest_b64encoded
-  tags:
-    - matomo
-
-- name: Set a variable for the latest Matomo version
+- name: Set a variable for the installed Matomo version number
   set_fact:
-    matomo_latest: "{{ matomo_latest_b64encoded['content'] | b64decode | trim }}"
+    matomo_installed: "{{ matomo_installed_check.stdout }}"
   tags:
     - matomo
 
-- name: Print the latest version
+- name: Print the installed version
   debug:
-    msg: "The latest version of Matomo is {{ matomo_latest }}"
+    msg: "The installed version of Matomo is {{ matomo_installed }}"
     verbosity: 1
   tags:
     - matomo
-
-- name: Check for config.ini.php
-  stat:
-    path: "{{ matomo_html }}/config/config.ini.php"
-  register: matomo_config_check
-  tags:
-    - matomo
-    - users-update
-
-- name: Check installed Matomo version
-  block:
-
-    - name: Get the installed Matomo version number
-      shell: "php console core:update --no-ansi -n --version | awk '{ print $3 }'"
-      args:
-        executable: /bin/bash
-        chdir: "{{ matomo_html }}"
-      changed_when: false
-      check_mode: false
-      become: true
-      become_user: "{{ matomo_user }}"
-      register: matomo_installed
-      tags:
-        - matomo
-
-    - name: Print the installed version
-      debug:
-        msg: "The installed version of Matomo is {{ matomo_installed.stdout }}"
-        verbosity: 1
-      tags:
-        - matomo
-
-    - name: Matomo version check
-      debug:
-        msg: "The latest version of Matomo available is {{ matomo_latest }} and {{ matomo_installed.stdout }} is installed"
-      when: matomo_installed.stdout == matomo_latest
-      tags:
-        - matomo
-
-  when: matomo_config_check.stat.exists

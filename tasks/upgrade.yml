@@ -42,23 +42,3 @@
   become_user: "{{ matomo_user }}"
   tags:
     - matomo
-
-- name: Matomo version checked
-  shell: "php console --no-ansi -n core:update --version"
-  args:
-    executable: /bin/bash
-    chdir: "{{ matomo_html }}"
-  changed_when: false
-  check_mode: false
-  become: true
-  become_user: "{{ matomo_user }}"
-  register: matomo_updated
-  tags:
-    - matomo
-
-- name: Matomo version check
-  debug:
-    msg: "The latest version of Matomo available is {{ matomo_latest }} and {{ matomo_installed.stdout }} is installed"
-  when: matomo_installed.stdout == matomo_latest
-  tags:
-    - matomo

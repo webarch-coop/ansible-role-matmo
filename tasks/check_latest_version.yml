@@ -1,0 +1,31 @@
+---
+- name: Get the latest Matomo version number file
+  get_url:
+    url: https://builds.piwik.org/LATEST
+    dest: "{{ matomo_private }}/LATEST"
+    force: true
+  check_mode: false
+  become: true
+  become_user: "{{ matomo_user }}"
+  tags:
+    - matomo
+
+- name: Set a variable for the base64 encoded latest Matomo version
+  slurp:
+    src: "{{ matomo_private }}/LATEST"
+  register: matomo_latest_b64encoded
+  tags:
+    - matomo
+
+- name: Set a variable for the latest Matomo version
+  set_fact:
+    matomo_latest: "{{ matomo_latest_b64encoded['content'] | b64decode | trim }}"
+  tags:
+    - matomo
+
+- name: Print the latest version
+  debug:
+    msg: "The latest version of Matomo is {{ matomo_latest }}"
+    verbosity: 1
+  tags:
+    - matomo

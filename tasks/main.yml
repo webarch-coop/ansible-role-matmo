@@ -45,6 +45,11 @@
       tags:
         - matomo
 
+    - name: Include latest version check
+      include_tasks: check_latest_version.yml
+      tags:
+        - matomo
+
     - name: Check for config.ini.php
       stat:
         path: "{{ matomo_html }}/config/config.ini.php"
@@ -55,14 +60,19 @@
     - name: Check the Matomo version and then conditionally upgrade
       block:
 
-        - name: Include version checks
+        - name: Include version check
           include_tasks: check_version.yml
           tags:
             - matomo
 
         - name: Include upgrade tasks
           include_tasks: upgrade.yml
-          when: ( matomo_config_check.stat.exists ) and ( matomo_installed.stdout != matomo_latest )
+          when: matomo_installed != matomo_latest
+          tags:
+            - matomo
+
+        - name: Include version check
+          include_tasks: check_version.yml
           tags:
             - matomo
 

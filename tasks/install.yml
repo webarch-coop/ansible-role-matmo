@@ -52,6 +52,45 @@
 
   when: ( matomo_db_pass is not defined ) or ( matomo_db_pass == "" )
 
+- name: Generate a password if matomo_first_user_pass if not defined
+  block:
+
+    - name: Random passwd for Matomo admin generated
+      command: pwgen -n 20 1
+      no_log: true
+      register: matomo_first_user_pass_gen
+      tags:
+        - matomo
+
+    - name: Fact set for Matomo admin password
+      set_fact:
+        matomo_first_user_pass: "{{ matomo_first_user_pass_gen.stdout | trim | quote }}"
+      no_log: true
+      when: ( matomo_first_user_pass_gen is defined ) and ( matomo_first_user_pass_gen != "" )
+      tags:
+        - matomo
+
+  when: ( matomo_first_user_pass is not defined ) or ( matomo_first_user_pass == "" )
+
+- name: Print the Matomo install command that is to be run
+  debug:
+    msg: "php console --no-ansi -n matomo:install --db-username={{ matomo_db_username | quote}} --db-pass={{ matomo_db_pass | quote }} --db-host={{ matomo_db_host | quote}} --db-name={{ matomo_db_name | quote }} --first-site-name={{ matomo_first_site_name | quote }} --first-site-url={{ matomo_first_site_url | quote }} --first-user={{ matomo_first_user | quote }} --first-user-email={{ matomo_first_user_email | quote }} --first-user-pass={{ matomo_first_user_pass | quote }} --force"
+    verbosity: 1
+  tags:
+    - matomo
+
+- name: Matomo installed
+  shell: "php console --no-ansi -n matomo:install --db-username={{ matomo_db_username | quote }} --db-pass={{ matomo_db_pass | quote }} --db-host={{ matomo_db_host | quote }} --db-name={{ matomo_db_name | quote }} --first-site-name={{ matomo_first_site_name | quote }} --first-site-url={{ matomo_first_site_url | quote }} --first-user={{ matomo_first_user | quote }} --first-user-email={{ matomo_first_user_email | quote }} --first-user-pass={{ matomo_first_user_pass | quote }} --force"
+  # ' vim syntax highlighting buxfix
+  args:
+    executable: /bin/bash
+    chdir: "{{ matomo_html }}"
+  no_log: true
+  become: true
+  become_user: "{{ matomo_user }}"
+  tags:
+    - matomo
+
 - name: "Check for existance of {{ item.value.users_home | default('/home/' + item.key) }}/.notify_matomo_passwd file"
   stat:
     path: "{{ item.value.users_home | default('/home/' + item.key) }}/.notify_matomo_passwd"
@@ -59,46 +98,14 @@
   tags:
     - matomo
 
-- name: Generate admin passwd and install Matomo
+- name: Password notification for Matomo admin
   block:
-
-    - name: Random passwd for Matomo admin generated
-      command: pwgen -n 20 1
-      register: matomo_first_user_pass_gen
-      when: ( matomo_first_user_pass is not defined ) or ( matomo_first_user_pass == "" )
-      tags:
-        - matomo
-
-    - name: Fact set for Matomo admin password
-      set_fact:
-        matomo_first_user_pass: "{{ matomo_first_user_pass_gen.stdout | trim | quote }}"
-      when: ( matomo_first_user_pass_gen is defined ) and ( matomo_first_user_pass_gen != "" )
-      tags:
-        - matomo
-
-    - name: Print the Matomo install command that is to be run
-      debug:
-        msg: "php console --no-ansi -n matomo:install --db-username={{ matomo_db_username | quote}} --db-pass={{ matomo_db_pass | quote }} --db-host={{ matomo_db_host | quote}} --db-name={{ matomo_db_name | quote }} --first-site-name={{ matomo_first_site_name | quote }} --first-site-url={{ matomo_first_site_url | quote }} --first-user={{ matomo_first_user | quote }} --first-user-email={{ matomo_first_user_email | quote }} --first-user-pass={{ matomo_first_user_pass | quote }} --force"
-        verbosity: 1
-      tags:
-        - matomo
-
-    - name: Matomo installed
-      shell: "php console --no-ansi -n matomo:install --db-username={{ matomo_db_username | quote }} --db-pass={{ matomo_db_pass | quote }} --db-host={{ matomo_db_host | quote }} --db-name={{ matomo_db_name | quote }} --first-site-name={{ matomo_first_site_name | quote }} --first-site-url={{ matomo_first_site_url | quote }} --first-user={{ matomo_first_user | quote }} --first-user-email={{ matomo_first_user_email | quote }} --first-user-pass={{ matomo_first_user_pass | quote }} --force"
-      # ' vim syntax highlighting buxfix
-      args:
-        executable: /bin/bash
-        chdir: "{{ matomo_html }}"
-      become: true
-      become_user: "{{ matomo_user }}"
-      tags:
-        - matomo
 
     - name: "Password notification email sent to {{ matomo_first_user_email }}"
       mail:
         from: "{{ matomo_notify_from | default('Webarchitects') }} <root@{{ ansible_fqdn }}>"
         to: "{{ matomo_first_user | quote}} <{{ matomo_first_user_email }}>"
-        subject: "[{{ matomo_notify_subject_tag | default('webarchitects') }}] Matomo admin password for {{ matomo_first_user }} on {{ vhost.value.users_apache_server_name }}"
+        subject: "[{{ matomo_notify_subject_tag | default('webarchitects') }}] Matomo superuser password for {{ matomo_first_user }} on {{ vhost.value.users_apache_server_name }}"
         body: "{{ lookup('template', 'templates/notify_matomo_passwd.j2') }}"
         host: localhost
         port: 25
@@ -119,4 +126,7 @@
       tags:
         - matomo
 
-  when: matomo_passwd_notify_check.stat.exists == False
+  when: 
+    - ( matomo_notify_passwd is defined ) and ( matomo_notify_passwd == True )
+    - ( matomo_first_user_pass is defined ) and ( matomo_first_user_pass != "" )
+    - matomo_passwd_notify_check.stat.exists == False

@@ -1,21 +1,6 @@
 ---
 - name: Get the Matomo database prefix
-  shell: "IFS=$'\n' ; php console config:get --no-ansi -n -s database -f text | grep ^tables_prefix | awk '{ print $2 }'"
-  args:
-    executable: /bin/bash
-    chdir: "{{ matomo_html }}"
-  register: matomo_table_prefix_check
-  changed_when: false
-  check_mode: false
-  become: true
-  become_user: "{{ matomo_user }}"
-  tags:
-    - matomo
-    - users-update
-
-- name: Set a variable for the Matomo database prefix
-  set_fact:
-    matomo_table_prefix: "{{ matomo_table_prefix_check.stdout }}"
+  include_tasks: table_prefix.yml 
   tags:
     - matomo
     - users-update
