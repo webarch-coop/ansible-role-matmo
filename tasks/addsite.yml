@@ -75,7 +75,7 @@
   when: matomo_site_name not in matomo_sites_names
 
 - name: "Conditionally check and add the {{ matomo_site_name }} site_urls"
-  includetasks: addurls.yml 
+  includetasks: addurls.yml
   when: ( matomo_site_urls is defined ) and ( matomo_site_urls != "" )
   tags:
     - matomo

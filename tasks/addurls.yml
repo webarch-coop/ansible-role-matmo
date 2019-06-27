@@ -64,7 +64,7 @@
     - matomo
     - users-update
 
-- name: "Print the missing URLs for site ID: {{ matomo_idsite }}" 
+- name: "Print the missing URLs for site ID: {{ matomo_idsite }}"
   debug:
     msg: "matomo_missing_urls: {{ matomo_missing_urls }}"
     verbosity: 1

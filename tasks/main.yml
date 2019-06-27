@@ -11,7 +11,7 @@
 - name: Only install or upgrade Matomo if the user account exists
   block:
 
-    - name: Required directories present 
+    - name: Required directories present
       file:
         path: "{{ matomo_home }}/{{ dir }}"
         state: directory
