@@ -1,5 +1,5 @@
 ---
-- name: "Get the existing email address for the Matomo {{ matomo_login_email }} user"
+- name: "Get the existing email address for the Matomo {{ matomo_login }} user"
   shell: "IFS=$'\n' ; for u in $(php console user:list --no-ansi -n); do echo $u | grep ' {{ matomo_login }} ' | sed 's/^Username: //' | awk '{ print $2 }' | sed 's/^(//' | sed 's/)$//' ; done"
   # shell: "IFS=$'\n' ; for u in $(php console user:list --no-ansi -n); do echo $u | awk '{ print $3 }' | sed 's/(//' | sed 's/)//' ; done | grep -q ^{{ matomo_login_email | quote }}$ && echo true || echo false"
   args:
@@ -109,4 +109,4 @@
       tags:
         - matomo
 
-  when: ( matomo_notify_passwd == True ) and ( matomo_passwd_notify_check.stat.exists == False )
+  when: ( matomo_passwd_notify_check.stat.exists == False ) and ( matomo_notify_passwd is defined and matomo_notify_passwd == True ) or ( matomo_notify_passwd is not defined ) 
