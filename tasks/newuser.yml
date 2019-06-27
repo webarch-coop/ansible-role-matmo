@@ -1,0 +1,60 @@
+---
+- name: Generate a random password for the Matomo user
+  block:
+
+    - name: Generate a random string for Matomo password
+      command: pwgen -n 20 1
+      register: matomo_login_password_gen
+      no_log: true
+      tags:
+        - matomo
+        - users-update
+
+    - name: Set a variable with the random password
+      set_fact:
+        matomo_login_password: "{{ matomo_login_password_gen.stdout }}"
+      no_log: true
+      tags:
+        - matomo
+        - users-update
+
+  when: ( matomo_login_password is not defined ) or ( matomo_login_password == "" )
+
+- name: Add user account
+  shell: "php console user:create --no-ansi -n --login='{{ matomo_login }}' --email='{{ matomo_login_email }}' --password='{{ matomo_login_password }}'"
+  args:
+    executable: /bin/bash
+    chdir: "{{ matomo_html }}"
+  become: true
+  become_user: "{{ matomo_user }}"
+  no_log: true
+  tags:
+    - matomo
+    - users-update
+
+- name: "Password notification email sent to {{ matomo_login_email }}"
+  mail:
+    from: "{{ matomo_email_from | default('Webarchitects') }} <root@{{ ansible_fqdn }}>"
+    to: "{{ matomo_login_email }}"
+    subject: "[{{ matomo_email_subject_tag | default('webarchitects') }}] Matomo {{ matomo_login }} account details for {{ matomo_url }}"
+    body: "{{ lookup('template', 'templates/notify_matomo_passwd.j2') }}"
+    host: localhost
+    port: 25
+    secure: never
+  tags:
+    - matomo
+    - users-update
+
+- name: "Notification date recorded in {{ matomo_home }}/.notify_matomo_passwd file"
+  lineinfile:
+    path: "{{ matomo_home }}/.notify_matomo_passwd"
+    line: "{{ lookup('pipe', 'date +%Y-%m-%d-%H-%M-%S')}} : {{ matomo_login }} <{{ matomo_login_email }}>"
+    create: true
+    state: present
+    insertafter: EOF
+    owner: root
+    group: root
+    mode: 0640
+  tags:
+    - matomo
+    - users-update
