@@ -1,24 +1,4 @@
 ---
-- name: "Get the first {{ matomo_site_name }} site ID"
-  shell: 'mysql {{ matomo_db_name }} --skip-column-names --batch -e "SELECT idsite FROM {{ matomo_table_prefix }}site WHERE name=\"{{ matomo_site_name | quote }}\"" | head -n 1'
-  args:
-    chdir: "{{ matomo_html }}"
-  changed_when: false
-  check_mode: false
-  become: true
-  become_user: "{{ matomo_user }}"
-  register: matomo_idsite_check
-  tags:
-    - matomo
-    - users-update
-
-- name: Set a variable for matomo_idsite
-  set_fact:
-    matomo_idsite: "{{ matomo_idsite_check.stdout }}"
-  tags:
-    - matomo
-    - users-update
-
 - name: Set matomo_idsite_urls to an empty array
   set_fact:
     matomo_idsite_urls: []
@@ -73,7 +53,7 @@
     - users-update
 
 - name: Add missing Apache Aliases to the matomo_site_main_url idsite urls table
-  command: 'mysql {{ matomo_db_name }} --skip-column-names --batch -e "INSERT INTO  {{ matomo_table_prefix }}site_url VALUES (\"{{ matomo_idsite | quote }}\", \"{{ url | quote }}\")"'
+  command: 'mysql {{ matomo_db_name | quote }} --skip-column-names --batch -e "INSERT INTO {{ matomo_table_prefix }}site_url VALUES (\"{{ matomo_idsite | quote }}\", \"{{ url | quote }}\")"'
   args:
     chdir: "{{ matomo_html }}"
   become: true

@@ -60,9 +60,8 @@
         - users-update
 
     - name: Add Matomo site
-      shell: "php console site:add --no-ansi -n --name='{{ matomo_site_name }}' --urls='{{ matomo_urls }}'"
+      command: "php console site:add --no-ansi -n --name='{{ matomo_site_name | quote }}' --urls='{{ matomo_urls | quote }}'"
       args:
-        executable: /bin/bash
         chdir: "{{ matomo_html }}"
       register: matomo_addsite_result
       changed_when: '"Site added" in matomo_addsite_result.stdout'
@@ -74,9 +73,50 @@
 
   when: matomo_site_name not in matomo_sites_names
 
+- name: "Get the idsite for {{ matomo_site_name }}"
+  shell: "php console site:list --no-ansi -n | grep ' {{ matomo_site_name | quote }}$' | awk '{ print $1 }' | sed 's/:$//' | head -n 1"
+  args:
+    executable: /bin/bash
+    chdir: "{{ matomo_html }}"
+  changed_when: false
+  check_mode: false
+  become: true
+  become_user: "{{ matomo_user }}"
+  register: matomo_idsite_check
+  tags:
+    - matomo
+    - users-update
+
+- name: "Set a fact for matomo_idsite for {{ matomo_site_name }}"
+  set_fact:
+    matomo_idsite: "{{ matomo_idsite_check.stdout }}"
+  when: ( matomo_idsite_check is defined ) and ( matomo_idsite_check != "" )
+  tags:
+    - matomo
+    - users-update
+
 - name: "Conditionally check and add the {{ matomo_site_name }} site_urls"
   include_tasks: addurls.yml
-  when: ( matomo_site_urls is defined ) and ( matomo_site_urls != "" )
+  when:
+    - matomo_site_urls is defined
+    - matomo_site_urls != ""
+    - matomo_idsite is defined
+    - matomo_idsite != ""
+  tags:
+    - matomo
+    - users-update
+
+- name: "Grant admin access for {{ matomo_site_admin }} to {{ matomo_site_name }}"
+  command: "php console user:access --no-ansi -n --login='{{ matomo_site_admin | quote }}' --access='admin' --sites='{{ matomo_idsite | quote }}'"
+  args:
+    chdir: "{{ matomo_html }}"
+  become: true
+  become_user: "{{ matomo_user }}"
+  when:
+    - matomo_site_admin is defined
+    - matomo_site_admin != ""
+    - matomo_idsite is defined
+    - matomo_idsite != ""
   tags:
     - matomo
     - users-update
