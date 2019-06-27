@@ -60,8 +60,9 @@
         - users-update
 
     - name: Add Matomo site
-      command: "php console site:add --no-ansi -n --name='{{ matomo_site_name | quote }}' --urls='{{ matomo_urls | quote }}'"
+      shell: "php console site:add --no-ansi -n --name='{{ matomo_site_name | quote }}' --urls='{{ matomo_urls | quote }}'"
       args:
+        executable: /bin/bash
         chdir: "{{ matomo_html }}"
       register: matomo_addsite_result
       changed_when: '"Site added" in matomo_addsite_result.stdout'
