@@ -123,9 +123,9 @@
 
   when: ( matomo_login_absent is defined ) and ( matomo_login_absent == False)
 
-- name: "Check for existance of {{ item.value.users_home | default('/home/' + item.key) }}/.notify_matomo_passwd file"
+- name: "Check for existance of {{ matomo_home }}/.notify_matomo_passwd file"
   stat:
-    path: "{{ item.value.users_home | default('/home/' + item.key) }}/.notify_matomo_passwd"
+    path: "{{ matomo_home }}/.notify_matomo_passwd"
   register: matomo_passwd_notify_check
   tags:
     - matomo
@@ -146,5 +146,18 @@
       tags:
         - matomo
         - users-update
+
+    - name: "Notification date recorded in {{ matomo_home }}/.notify_matomo_passwd file"
+      lineinfile:
+        path: "{{ matomo_home }}/.notify_matomo_passwd"
+        line: "{{ lookup('pipe', 'date +%Y-%m-%d-%H-%M-%S')}} : {{ item.value.users_name | default(item.key) }} <{{ item.value.users_email }}>"
+        create: true
+        state: present
+        insertafter: EOF
+        owner: root
+        group: root
+        mode: 0640
+      tags:
+        - matomo
 
   when: matomo_passwd_notify_check.stat.exists == False

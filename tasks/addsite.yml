@@ -53,7 +53,7 @@
 
     - name: Print the matomo_urls
       debug:
-        msg: "matomo_urls: {{ matomo_urls }}"
+        msg: "matomo_urls: '{{ matomo_urls }}'"
         verbosity: 1
       tags:
         - matomo
