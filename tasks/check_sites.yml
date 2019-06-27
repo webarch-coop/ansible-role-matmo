@@ -1,6 +1,6 @@
 ---
 - name: Get the Matomo database prefix
-  include_tasks: table_prefix.yml 
+  include_tasks: table_prefix.yml
   tags:
     - matomo
     - users-update
