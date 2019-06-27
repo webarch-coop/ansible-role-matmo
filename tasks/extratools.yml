@@ -3,7 +3,7 @@
 - name: Composer run to install dependancies
   command: composer require symfony/yaml:~2.6.0
   args:
-    chdir: "{{ matomo_html }}/"
+    chdir: "{{ matomo_html }}"
   register: matomo_symfony_yaml
   changed_when: '"Nothing to install or update" not in matomo_symfony_yaml.stderr'
   become: true
@@ -14,7 +14,7 @@
 - name: Composer run to install dependancies
   command: composer require symfony/process:^3.4
   args:
-    chdir: "{{ matomo_html }}/"
+    chdir: "{{ matomo_html }}"
   register: matomo_symfony_process
   changed_when: '"Nothing to install or update" not in matomo_symfony_process.stderr'
   become: true
@@ -37,7 +37,7 @@
   shell: "php console --no-ansi -n plugin:activate ExtraTools"
   args:
     executable: /bin/bash
-    chdir: "{{ matomo_html }}/"
+    chdir: "{{ matomo_html }}"
   register: matomo_extratools
   changed_when: '"Activated plugin ExtraTools" in matomo_extratools.stdout'
   become: true
@@ -49,7 +49,7 @@
   shell: "php console --no-ansi -n config:set 'ExtraTools.db_backup_path=\"{{ matomo_private }}\"'"
   args:
     executable: /bin/bash
-    chdir: "{{ matomo_html }}/"
+    chdir: "{{ matomo_html }}"
   changed_when: false
   become: true
   become_user: "{{ matomo_user }}"

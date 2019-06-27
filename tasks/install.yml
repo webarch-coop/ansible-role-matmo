@@ -36,7 +36,7 @@
       shell: "my_print_defaults --defaults-file='.my.cnf' client | grep '^--password' | sed -e 's/--password=//'"
       args:
         executable: /bin/bash
-        chdir: "{{ matomo_html }}/"
+        chdir: "{{ matomo_html }}"
       register: matomo_db_pass_read
       become: true
       become_user: "{{ matomo_user }}"
@@ -88,7 +88,7 @@
       # ' vim syntax highlighting buxfix
       args:
         executable: /bin/bash
-        chdir: "{{ matomo_html }}/"
+        chdir: "{{ matomo_html }}"
       become: true
       become_user: "{{ matomo_user }}"
       tags:

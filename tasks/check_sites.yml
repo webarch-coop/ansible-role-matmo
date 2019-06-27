@@ -32,7 +32,7 @@
   shell: php console site:list --no-ansi -n | awk '{ print $2 }'
   args:
     executable: /bin/bash
-    chdir: "{{ matomo_html }}/"
+    chdir: "{{ matomo_html }}"
   changed_when: false
   check_mode: false
   become: true

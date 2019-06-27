@@ -3,6 +3,7 @@
   get_url:
     url: "https://builds.piwik.org/matomo-{{ matomo_latest }}.tar.gz.asc"
     dest: "{{ matomo_private }}/matomo-{{ matomo_latest }}.tar.gz.asc"
+    force: yes
   become: true
   become_user: "{{ matomo_user }}"
   tags:

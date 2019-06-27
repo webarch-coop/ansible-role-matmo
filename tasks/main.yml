@@ -11,23 +11,18 @@
 - name: Only install or upgrade Matomo if the user account exists
   block:
 
-    - name: The ~/.ansible directory exists
+    - name: Required directories present 
       file:
-        path: "{{ matomo_home }}/.ansible"
+        path: "{{ matomo_home }}/{{ dir }}"
         state: directory
         owner: "{{ matomo_user }}"
         group: "{{ matomo_user }}"
         mode: 0700
-      tags:
-        - matomo
-
-    - name: The ~/.gnupg directory exists
-      file:
-        path: "{{ matomo_home }}/.gnupg"
-        state: directory
-        owner: "{{ matomo_user }}"
-        group: "{{ matomo_user }}"
-        mode: 0700
+      loop:
+        - .ansible
+        - .gnupg
+      loop_control:
+        loop_var: dir
       tags:
         - matomo
 

@@ -15,7 +15,7 @@
   shell: "php console --no-ansi -n plugin:activate UserConsole"
   args:
     executable: /bin/bash
-    chdir: "{{ matomo_html }}/"
+    chdir: "{{ matomo_html }}"
   register: matomo_userconsole
   changed_when: '"Activated plugin UserConsole" in matomo_userconsole.stdout'
   become: true
