@@ -126,7 +126,7 @@
       tags:
         - matomo
 
-  when: 
+  when:
     - ( matomo_notify_passwd is defined ) and ( matomo_notify_passwd == True )
     - ( matomo_first_user_pass is defined ) and ( matomo_first_user_pass != "" )
     - matomo_passwd_notify_check.stat.exists == False
