@@ -92,7 +92,7 @@
         - matomo
         - users-update
 
-    - name: Set a variable based on the email address check 
+    - name: Set a variable based on the email address check
       set_fact:
         matomo_login_email_update: true
       when: ( matomo_login_email_check is defined ) and ( matomo_login_email_check.stdout == "true" )
@@ -110,7 +110,7 @@
             - users-update
 
         - name: "Update the email address for {{ matomo_login }}"
-          command: 'mysql {{ matomo_db_name }} --skip-column-names --batch -e "UPDATE {{ matomo_table_prefix }}user SET email=\"{{ matomo_login_email | quote }}\" WHERE login=\"{{ matomo_login | quote }}\""'  
+          command: 'mysql {{ matomo_db_name }} --skip-column-names --batch -e "UPDATE {{ matomo_table_prefix }}user SET email=\"{{ matomo_login_email | quote }}\" WHERE login=\"{{ matomo_login | quote }}\""'
           args:
             chdir: "{{ matomo_html }}"
           become: true
@@ -119,7 +119,7 @@
             - matomo
             - users-update
 
-    when: ( matomo_login_email_update is defined ) and ( matomo_login_email_update == True )
+      when: ( matomo_login_email_update is defined ) and ( matomo_login_email_update == True )
 
   when: ( matomo_login_absent is defined ) and ( matomo_login_absent == False)
 
