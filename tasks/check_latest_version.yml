@@ -25,7 +25,7 @@
 
 - name: Print the latest version
   debug:
-    msg: "The latest version of Matomo is {{ matomo_latest }}"
+    msg: "The latest version of Matomo is {{ matomo_latest | quote }}"
     verbosity: 1
   tags:
     - matomo
