@@ -1,10 +1,10 @@
 Hi
 
-Your Matomo account details for {{ matomo_url }}
+Your Matomo account details for {{ matomo_url | quote }}
 
-  Username:	{{ matomo_login_email }}
-  Password:	{{ matomo_login_password }}
-  URL:          {{ matomo_url }}
+  Username:	{{ matomo_login | quote }}
+  Password:	{{ matomo_login_password | quote }}
+  URL:          {{ matomo_url | quote }}
 
 All the best
 
