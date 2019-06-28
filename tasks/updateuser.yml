@@ -121,7 +121,7 @@
             state: present
             insertafter: EOF
             owner: root
-            group: "{{ matomo_login }}" 
+            group: "{{ matomo_login }}"
             mode: 0640
           when: ( matomo_login_home is defined ) and ( matomo_login_home != "" )
           tags:
