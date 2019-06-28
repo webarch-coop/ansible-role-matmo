@@ -93,7 +93,7 @@
 
 - name: Matomo password notification
 
-    - name: "Check for existance of {{ matomo_home }}/.notify_matomo_passwd file"
+    - name: "Check for existance of ~/.notify_matomo_passwd file"
       stat:
         path: "{{ matomo_home }}/.notify_matomo_passwd"
       register: matomo_passwd_notify_check
