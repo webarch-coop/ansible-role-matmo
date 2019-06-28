@@ -41,6 +41,8 @@ The other repo should also contain a `matomo.yml` file that contains:
     matomo_first_user: "Webarchitects"
     matomo_first_user_email: "root@{{ inventory_hostname }}"
     matomo_first_user_pass: ""
+    matomo_notify_from: "root@{{ inventory_hostname }}"
+    matomo_notify_reply_to: "support@example.org"
 
   roles:
     - matomo

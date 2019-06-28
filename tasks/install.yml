@@ -90,44 +90,32 @@
   tags:
     - matomo
 
-- name: Matomo password notification
+- name: Matomo admin password notification
   block:
 
-    - name: "Check {{ matomo_home }}/.notify_matomo_passwd"
-      stat:
-        path: "{{ matomo_home }}/.notify_matomo_passwd"
-      register: matomo_passwd_notify_check
+    - name: "Password notification email sent to {{ matomo_first_user_email }}"
+      mail:
+        from: "{{ matomo_notify_from }}>"
+        to: '"{{ matomo_first_user | quote }}" <{{ matomo_first_user_email }}>'
+        subject: "[{{ matomo_notify_subject_tag | default('webarchitects') }}] Matomo superuser password for {{ matomo_first_user }} on {{ vhost.value.users_apache_server_name }}"
+        body: "{{ lookup('template', 'templates/notify_matomo_install_passwd.j2') }}"
+        host: localhost
+        port: 25
+        secure: never
       tags:
         - matomo
 
-    - name: Password notification for Matomo admin
-      block:
-
-        - name: "Password notification email sent to {{ matomo_first_user_email }}"
-          mail:
-            from: "{{ matomo_notify_from | default('Webarchitects') }} <root@{{ ansible_fqdn }}>"
-            to: "{{ matomo_first_user | quote }} <{{ matomo_first_user_email }}>"
-            subject: "[{{ matomo_notify_subject_tag | default('webarchitects') }}] Matomo superuser password for {{ matomo_first_user }} on {{ vhost.value.users_apache_server_name }}"
-            body: "{{ lookup('template', 'templates/notify_matomo_install_passwd.j2') }}"
-            host: localhost
-            port: 25
-            secure: never
-          tags:
-            - matomo
-
-        - name: "Notification date recorded in {{ matomo_home }}/.notify_matomo_passwd file"
-          lineinfile:
-            path: "{{ matomo_home}}/.notify_matomo_passwd"
-            line: "{{ lookup('pipe', 'date +%Y-%m-%d-%H-%M-%S')}} : {{ matomo_first_user | quote  }} <{{ matomo_first_user_email }}>"
-            create: true
-            state: present
-            insertafter: EOF
-            owner: root
-            group: root
-            mode: 0640
-          tags:
-            - matomo
-
-      when: matomo_passwd_notify_check.stat.exists == False
+    - name: "Notification date recorded in {{ matomo_home }}/.notify_matomo_passwd file"
+      lineinfile:
+        path: "{{ matomo_home }}/.notify_matomo_passwd"
+        line: "{{ lookup('pipe', 'date +%Y-%m-%d-%H-%M-%S')}} : {{ matomo_first_user | quote  }} <{{ matomo_first_user_email }}>"
+        create: true
+        state: present
+        insertafter: EOF
+        owner: root
+        group: "{{ matomo_user }}"
+        mode: 0640
+      tags:
+        - matomo
 
   when: ( matomo_notify_passwd is defined ) and ( matomo_notify_passwd == True )
