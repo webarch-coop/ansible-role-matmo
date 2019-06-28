@@ -13,6 +13,13 @@
     - matomo
     - users-update
 
+- name: Set a variable for the existing email address
+  set_fact:
+    matomo_old_login_email: "{{ matomo_login_email_check.stdout | quote }}"
+  tags:
+    - matomo
+    - users-update
+
 - name: Update the email address
   block:
 
@@ -32,7 +39,20 @@
         - matomo
         - users-update
 
-  when: matomo_login_email != matomo_login_email_check.stdout
+    - name: "Email address update notification email sent to {{ matomo_login_email }}"
+      mail:
+        from: "{{ matomo_email_from | default('Webarchitects') }} <root@{{ ansible_fqdn }}>"
+        to: "{{ matomo_login_email }}"
+        subject: "[{{ matomo_email_subject_tag | default('webarchitects') }}] Matomo email address updated for {{ matomo_login }} on {{ matomo_url }}"
+        body: "{{ lookup('template', 'templates/notify_matomo_email.j2') }}"
+        host: localhost
+        port: 25
+        secure: never
+      tags:
+        - matomo
+        - users-update
+
+  when: matomo_login_email != matomo_old_login_email
 
 - name: When matomo_notify_passwd is true and matomo_login_home variable is set
   block:
