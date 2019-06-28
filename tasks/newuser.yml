@@ -45,9 +45,9 @@
     - matomo
     - users-update
 
-- name: "Notification date recorded in {{ matomo_home }}/.notify_matomo_passwd file"
+- name: "Notification date recorded in {{ matomo_login_home }}/.notify_matomo_passwd file"
   lineinfile:
-    path: "{{ matomo_home }}/.notify_matomo_passwd"
+    path: "{{ matomo_login_home }}/.notify_matomo_passwd"
     line: "{{ lookup('pipe', 'date +%Y-%m-%d-%H-%M-%S')}} : {{ matomo_login }} <{{ matomo_login_email }}>"
     create: true
     state: present
@@ -55,6 +55,7 @@
     owner: root
     group: root
     mode: 0640
+  when: ( matomo_login_home is defined ) and ( matomo_login_home != "" )
   tags:
     - matomo
     - users-update
