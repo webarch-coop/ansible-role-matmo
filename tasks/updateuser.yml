@@ -44,10 +44,10 @@
       tags:
         - matomo
         - users-update
-    
+
     - name: Password notification
       block:
-    
+
         - name: Generate a random string for Matomo password
           command: pwgen -n 20 1
           register: matomo_login_password_gen
@@ -55,7 +55,7 @@
           tags:
             - matomo
             - users-update
-    
+
         - name: Set a variable with the random password
           set_fact:
             matomo_login_password: "{{ matomo_login_password_gen.stdout }}"
@@ -63,7 +63,7 @@
           tags:
             - matomo
             - users-update
-    
+
         - name: "Reset the Matomo password for {{ matomo_login }}"
           shell: "php console user:reset-password --no-ansi -n --login='{{ matomo_login }}' --new-password='{{ matomo_login_password }}'"
           args:
@@ -75,7 +75,7 @@
           tags:
             - matomo
             - users-update
-    
+
         - name: "Password notification email sent to {{ matomo_login_email }}"
           mail:
             from: "{{ matomo_email_from | default('Webarchitects') }} <root@{{ ansible_fqdn }}>"
@@ -88,7 +88,7 @@
           tags:
             - matomo
             - users-update
-    
+
         - name: "Notification date recorded in {{ matomo_login_home }}/.notify_matomo_passwd file"
           lineinfile:
             path: "{{ matomo_login_home }}/.notify_matomo_passwd"
