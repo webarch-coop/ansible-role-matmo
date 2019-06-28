@@ -103,6 +103,6 @@
           tags:
             - matomo
 
-      when: ( matomo_passwd_notify_check.stat.exists == False ) and ( matomo_notify_passwd is defined and matomo_notify_passwd == True ) or ( matomo_notify_passwd is not defined ) 
+      when: ( matomo_passwd_notify_check.stat.exists == False ) and ( matomo_notify_passwd is not defined or matomo_notify_passwd == True )
 
   when: ( matomo_login_home is defined ) and ( matomo_login_home != "" )
