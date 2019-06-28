@@ -52,7 +52,7 @@
 
   when: ( matomo_db_pass is not defined ) or ( matomo_db_pass == "" )
 
-- name: Generate a password if matomo_first_user_pass if not defined
+- name: Generate a password if matomo_first_user_pass is not defined
   block:
 
     - name: Random passwd for Matomo admin generated
@@ -75,7 +75,7 @@
 - name: Print the Matomo install command that is to be run
   debug:
     msg: "php console --no-ansi -n matomo:install --db-username={{ matomo_db_username | quote}} --db-pass={{ matomo_db_pass | quote }} --db-host={{ matomo_db_host | quote}} --db-name={{ matomo_db_name | quote }} --first-site-name={{ matomo_first_site_name | quote }} --first-site-url={{ matomo_first_site_url | quote }} --first-user={{ matomo_first_user | quote }} --first-user-email={{ matomo_first_user_email | quote }} --first-user-pass={{ matomo_first_user_pass | quote }} --force"
-    verbosity: 1
+    verbosity: 2
   tags:
     - matomo
 
@@ -91,42 +91,43 @@
   tags:
     - matomo
 
-- name: "Check for existance of {{ item.value.users_home | default('/home/' + item.key) }}/.notify_matomo_passwd file"
-  stat:
-    path: "{{ item.value.users_home | default('/home/' + item.key) }}/.notify_matomo_passwd"
-  register: matomo_passwd_notify_check
-  tags:
-    - matomo
+- name: Matomo password notification
 
-- name: Password notification for Matomo admin
-  block:
-
-    - name: "Password notification email sent to {{ matomo_first_user_email }}"
-      mail:
-        from: "{{ matomo_notify_from | default('Webarchitects') }} <root@{{ ansible_fqdn }}>"
-        to: "{{ matomo_first_user | quote}} <{{ matomo_first_user_email }}>"
-        subject: "[{{ matomo_notify_subject_tag | default('webarchitects') }}] Matomo superuser password for {{ matomo_first_user }} on {{ vhost.value.users_apache_server_name }}"
-        body: "{{ lookup('template', 'templates/notify_matomo_passwd.j2') }}"
-        host: localhost
-        port: 25
-        secure: never
+    - name: "Check for existance of {{ matomo_home }}/.notify_matomo_passwd file"
+      stat:
+        path: "{{ matomo_home }}/.notify_matomo_passwd"
+      register: matomo_passwd_notify_check
       tags:
         - matomo
 
-    - name: "Notification date recorded in {{ item.value.users_home | default('/home/' + item.key) }}/.notify_matomo_passwd file"
-      lineinfile:
-        path: "{{ item.value.users_home | default('/home/' + item.key) }}/.notify_matomo_passwd"
-        line: "{{ lookup('pipe', 'date +%Y-%m-%d-%H-%M-%S')}} : {{ item.value.users_name | default(item.key) }} <{{ item.value.users_email }}>"
-        create: true
-        state: present
-        insertafter: EOF
-        owner: root
-        group: root
-        mode: 0640
-      tags:
-        - matomo
+    - name: Password notification for Matomo admin
+      block:
 
-  when:
-    - ( matomo_notify_passwd is defined ) and ( matomo_notify_passwd == True )
-    - ( matomo_first_user_pass is defined ) and ( matomo_first_user_pass != "" )
-    - matomo_passwd_notify_check.stat.exists == False
+        - name: "Password notification email sent to {{ matomo_first_user_email }}"
+          mail:
+            from: "{{ matomo_notify_from | default('Webarchitects') }} <root@{{ ansible_fqdn }}>"
+            to: "{{ matomo_first_user | quote}} <{{ matomo_first_user_email }}>"
+            subject: "[{{ matomo_notify_subject_tag | default('webarchitects') }}] Matomo superuser password for {{ matomo_first_user }} on {{ vhost.value.users_apache_server_name }}"
+            body: "{{ lookup('template', 'templates/notify_matomo_passwd.j2') }}"
+            host: localhost
+            port: 25
+            secure: never
+          tags:
+            - matomo
+
+        - name: "Notification date recorded in {{ item.value.users_home | default('/home/' + item.key) }}/.notify_matomo_passwd file"
+          lineinfile:
+            path: "{{ item.value.users_home | default('/home/' + item.key) }}/.notify_matomo_passwd"
+            line: "{{ lookup('pipe', 'date +%Y-%m-%d-%H-%M-%S')}} : {{ item.value.users_name | default(item.key) }} <{{ item.value.users_email }}>"
+            create: true
+            state: present
+            insertafter: EOF
+            owner: root
+            group: root
+            mode: 0640
+          tags:
+            - matomo
+
+      when: matomo_passwd_notify_check.stat.exists == False
+
+  when: ( matomo_notify_passwd is defined ) and ( matomo_notify_passwd == True )
