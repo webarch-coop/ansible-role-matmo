@@ -18,6 +18,8 @@ matomo_first_user_pass: ""
 # if matomo_notify_passwd: the random password is sent to matomo_first_user_email
 matomo_notify_passwd: true
 matomo_notify_from: "Webarchitects <root@{{ inventory_hostname }}>"
-matomo_notify_reply_to: "Webarchitects <suppport@webarchitects.coop>"
+matomo_notify_headers:
+  - Reply-To = Webarchitects <root@{{ inventory_hostname }}>
+  - X-Auto-Response-Suppress = All
 matomo_notify_subject_tag: webarchitects
 matomo_notify_passwd_signature: Webarch Co-operative Limited\nhttps://www.webarch.coop/
