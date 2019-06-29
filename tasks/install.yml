@@ -98,6 +98,7 @@
         from: "{{ matomo_notify_from }}>"
         to: '"{{ matomo_first_user | quote }}" <{{ matomo_first_user_email }}>'
         subject: "[{{ matomo_notify_subject_tag | default('webarchitects') }}] Matomo superuser password for {{ matomo_first_user }} on {{ vhost.value.users_apache_server_name }}"
+        charset: us-ascii
         body: "{{ lookup('template', 'templates/notify_matomo_install_passwd.j2') }}"
         host: localhost
         port: 25

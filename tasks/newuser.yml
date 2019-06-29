@@ -41,6 +41,7 @@
         to: "{{ matomo_login_email }}"
         subject: "[{{ matomo_email_subject_tag | default('webarchitects') }}] Matomo {{ matomo_login }} account details for {{ matomo_url }}"
         headers: "{{ matomo_notify_headers }}"
+        charset: us-ascii
         body: "{{ lookup('template', 'templates/notify_matomo_passwd.j2') }}"
         host: localhost
         port: 25
