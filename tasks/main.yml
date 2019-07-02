@@ -1,7 +1,6 @@
 ---
 - name: "Check if the Matomo {{ matomo_user }} user account exists"
-  command: "id {{ matomo_user }}"
-  ignore_errors: true
+  shell: "id {{ matomo_user }} && echo true || echo false"
   check_mode: false
   register: matomo_user_check
   changed_when: '"no such user" in matomo_user_check.stderr'
