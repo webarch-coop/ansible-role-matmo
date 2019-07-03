@@ -1,0 +1,28 @@
+---
+- name: Fail if the Matomo user login is not provided
+  fail:
+    msg: "A value for matomo_login needs to be provided"
+  when: ( matomo_login is not defined ) or ( matomo_login == "" )
+  tags:
+    - matomo
+    - users-update
+
+- name: Get the Matomo database prefix
+  include_tasks: table_prefix.yml
+  tags:
+    - matomo
+    - users-update
+
+- name: Get the users token auth 
+  command: "mysql {{ matomo_db_name }} --skip-column-names --batch -e 'SELECT token_auth from {{ matomo_table_prefix }}user WHERE login={{ matomo_login | quote }}'"
+  args:
+    executable: /bin/bash
+    chdir: "{{ matomo_html }}"
+  changed_when: false
+  check_mode: false
+  become: true
+  become_user: "{{ matomo_user }}"
+  register: matomo_token_auth
+  tags:
+    - matomo
+    - users-update

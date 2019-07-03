@@ -96,6 +96,8 @@
     - matomo
     - users-update
 
+# - name: Check that the site isn't a Matomo site 
+
 - name: "Conditionally check and add the {{ matomo_site_name }} site_urls"
   include_tasks: addurls.yml
   when:
