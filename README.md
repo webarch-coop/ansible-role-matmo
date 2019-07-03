@@ -2,6 +2,10 @@
 
 This repository contains an Ansible role for installing and upgrading [Matomo](https://matomo.org/) servers, based on the [ExtraTools plugin](https://github.com/digitalist-se/extratools) for the install and the [manual upgrade steps](https://matomo.org/docs/update/#the-manual-three-step-update).
 
+This role also contains tasks to add delete users using the [UserConsole](https://github.com/digitalist-se/userconsole) plugin and also tasks to add and update sites, however there isn't yet a delete site set of tasks due to the [lack of a `site:delete` command](https://github.com/digitalist-se/extratools/issues/7) in ExtraTools.
+
+For some tasks, where commands are not yet available to be run using the PHP console, there is direct editing of the Matomo MySQL database, hopefully this can be removed at some point in the future.
+
 To use this role you need to use Ansible Galaxy to install it into another repository by adding a `requirements.yml` file in that repo that contains:
 
 ```yml
@@ -120,4 +124,3 @@ Also for example for `addsite.yml`:
     loop_var: vhost
 ```
 
-There isn't yet a `deletesite.yml` set of tasks due to the [lack of a `site:delete` command](https://github.com/digitalist-se/extratools/issues/7).
