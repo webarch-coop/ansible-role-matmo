@@ -15,12 +15,12 @@ matomo_first_user: "{{ matomo_user }}"
 matomo_first_user_email: "root@{{ inventory_hostname }}"
 # if matomo_first_user_pass is not defined a random one is generated
 matomo_first_user_pass: ""
-# if matomo_notify_passwd: the random password is sent to matomo_first_user_email
+# if matomo_notify_passwd is true the random password is sent to matomo_first_user_email
 matomo_notify_passwd: true
 matomo_notify_from: "Webarchitects <root@{{ inventory_hostname }}>"
 matomo_notify_reply_to: "Webarchitects <support@webarchitects.coop>"
 matomo_notify_headers:
-  - X-Auto-Response-Suppress=All
-  - "Reply-To={{ matomo_notify_from }}"
+ - X-Auto-Response-Suppress=All
+ - "Reply-To={{ matomo_notify_reply_to }}"
 matomo_notify_subject_tag: webarchitects
 matomo_notify_passwd_signature: Webarch Co-operative Limited\nhttps://www.webarch.coop/
