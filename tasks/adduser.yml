@@ -16,7 +16,7 @@
     - users-update
 
 - name: "Check the if a Matomo account with email set to {{ matomo_login_email }} exists"
-  shell: "IFS=$'\n' ; for u in $(php console user:list --no-ansi -n); do echo $u | grep -oP '\(\K[^\)]+'; done | grep ^{{ matomo_login_email }}$"
+  shell: "IFS=$'\n' ; for u in $(php console user:list --no-ansi -n); do echo $u | awk -F'[()]' '{print $2}' ; done | grep ^{{ matomo_login_email }}$"
   args:
     executable: /bin/bash
     chdir: "{{ matomo_html }}"
