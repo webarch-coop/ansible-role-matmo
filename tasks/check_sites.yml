@@ -13,7 +13,7 @@
     - users-update
 
 - name: Get the Matomo site names
-  # command: "mysql {{ matomo_db_name }} --skip-column-names --batch -e 'SELECT name from {{ matomo_table_prefix }}site'"
+  # command: "mysql {{ matomo_dbname }} --skip-column-names --batch -e 'SELECT name from {{ matomo_table_prefix }}site'"
   shell: php console site:list --no-ansi -n | awk '{ print $2 }'
   args:
     executable: /bin/bash

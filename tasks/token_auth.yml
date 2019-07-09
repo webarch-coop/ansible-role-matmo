@@ -14,7 +14,7 @@
     - users-update
 
 - name: Get the users token auth
-  command: "mysql {{ matomo_db_name }} --skip-column-names --batch -e 'SELECT token_auth from {{ matomo_table_prefix }}user WHERE login={{ matomo_login | quote }}'"
+  command: "mysql {{ matomo_dbname }} --skip-column-names --batch -e 'SELECT token_auth from {{ matomo_table_prefix }}user WHERE login={{ matomo_login | quote }}'"
   args:
     executable: /bin/bash
     chdir: "{{ matomo_html }}"

@@ -30,7 +30,7 @@
         - users-update
 
     - name: "Update the email address for {{ matomo_login }}"
-      command: 'mysql {{ matomo_db_name }} --skip-column-names --batch -e "UPDATE {{ matomo_table_prefix }}user SET email=\"{{ matomo_login_email | quote }}\" WHERE login=\"{{ matomo_login | quote }}\""'
+      command: 'mysql {{ matomo_dbname }} --skip-column-names --batch -e "UPDATE {{ matomo_table_prefix }}user SET email=\"{{ matomo_login_email | quote }}\" WHERE login=\"{{ matomo_login | quote }}\""'
       args:
         chdir: "{{ matomo_html }}"
       become: true

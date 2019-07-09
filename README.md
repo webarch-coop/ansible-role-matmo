@@ -39,7 +39,7 @@ The other repo should also contain a `matomo.yml` file that contains:
     matomo_db_username: "{{ matomo_user }}"
     matomo_db_pass: ""
     matomo_db_host: localhost
-    matomo_db_name: "{{ matomo_user }}"
+    matomo_dbname: "{{ matomo_user }}"
     matomo_first_site_name: "{{ inventory_hostname }}"
     matomo_first_site_url: "http://{{ inventory_hostname }}/"
     matomo_first_user: "{{ matomo_user }}"
