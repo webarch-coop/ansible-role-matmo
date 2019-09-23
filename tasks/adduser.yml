@@ -65,7 +65,7 @@
   when: ( matomo_login_email == matomo_login_email_present ) and ( matomo_login_email_present != False )
 
 - name: When a Matomo account with the same email address doesn't exist
-  block: 
+  block:
 
     - name: "Check the if the Matomo {{ matomo_login }} account exists"
       shell: "IFS=$'\n' ; for u in $(php console user:list --no-ansi -n); do echo $u | awk '{ print $2 }' ; done | grep -q ^{{ matomo_login }}$ && echo true || echo false"
@@ -103,4 +103,4 @@
         - matomo
         - users-update
 
-  when: ( matomo_login_email != matomo_login_email_present ) or ( matomo_login_email_present == False ) 
+  when: ( matomo_login_email != matomo_login_email_present ) or ( matomo_login_email_present == False )
