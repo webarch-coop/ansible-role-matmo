@@ -14,3 +14,4 @@
   set_fact:
     matomo_idsite: "{{ matomo_idsite_check.stdout }}"
   when: ( matomo_idsite_check is defined ) and ( matomo_idsite_check != "" )
+...

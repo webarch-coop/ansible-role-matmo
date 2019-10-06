@@ -131,3 +131,4 @@
       when: ( matomo_passwd_notify_check.stat.exists == False )
 
   when: ( matomo_notify_passwd == True ) and ( matomo_login_home is defined ) and ( matomo_login_home != "" )
+...

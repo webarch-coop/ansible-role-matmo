@@ -121,3 +121,4 @@
         - matomo
 
   when: ( matomo_notify_passwd is defined ) and ( matomo_notify_passwd == True )
+...

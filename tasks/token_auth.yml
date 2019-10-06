@@ -31,3 +31,4 @@
   set_fact:
     matomo_token_auth: "{{ matomo_token_auth_check.stdout }}"
   when: ( matomo_token_auth_check is defined ) and ( matomo_token_auth_check != "" )
+...

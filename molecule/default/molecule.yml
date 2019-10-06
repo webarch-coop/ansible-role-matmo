@@ -10,7 +10,7 @@ lint:
 
 platforms:
   - name: instance
-    image: registry.git.coop/webarch/containers/images/ansible:0.1
+    image: registry.git.coop/webarch/containers/images/ansible:0.2
     pre_build_image: true
 
 provisioner:
@@ -23,3 +23,4 @@ scenario:
   test_sequence:
     - lint
     - idempotence
+...

@@ -104,3 +104,4 @@
         - users-update
 
   when: ( matomo_login_email != matomo_login_email_present ) or ( matomo_login_email_present == False )
+...

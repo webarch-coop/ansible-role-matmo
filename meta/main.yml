@@ -2,7 +2,7 @@
 galaxy_info:
   role_name: matomo
   author: Chris Croome
-  description: Ansible role for installing and upgrading Matomo servers
+  description: Ansible role for installing and upgrading Matomo servers on Debian
   company: Webarchitects Co-operative
   license: license (GPLv3)
   min_ansible_version: 2.3
@@ -14,3 +14,4 @@ galaxy_info:
         - jessie
   galaxy_tags: []
 dependencies: []
+...

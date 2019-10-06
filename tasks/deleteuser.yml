@@ -66,3 +66,4 @@
         - users-update
 
   when: ( "no such user" not in matomo_user_check.stderr ) and ( matomo_config.stat.exists )
+...
