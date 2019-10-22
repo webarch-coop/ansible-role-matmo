@@ -9,8 +9,8 @@
     - matomo
     - users-update
 
-- name: Print the matomo_site_urls is defined
-  degug:
+- name: Print the matomo_site_urls if defined
+  debug:
     msg: "The matomo_site_urls array contains: {{ matomo_site_urls }}"
     verbosity: 1
   when: ( matomo_site_urls is defined ) and ( matomo_site_urls != [] )
@@ -18,34 +18,17 @@
     - matomo
     - users-update
 
-- name: Fail if a matomo_site_name is not provided
-  fail:
-    msg: "A value for matomo_site_name needs to be provided"
-  when: ( matomo_site_name is not defined ) or ( matomo_site_name == "" )
-  tags:
-    - matomo
-    - users-update
-
-- name: Fail if a matomo_site_main_url is not provided
-  fail:
-    msg: "A value for matomo_site_main_url needs to be provided"
-  when: ( matomo_site_main_url is not defined ) or ( matomo_site_main_url == "" )
+- name: Check that the variables needed are set
+  assert:
+    that:
+      - matomo_site_name is defined
+      - matomo_site_main_url is defined
   tags:
     - matomo
     - users-update
 
 - name: Include the check sites tasks
   include_tasks: check_sites.yml
-  tags:
-    - matomo
-    - users-update
-
-- name: Print the matomo_sites_names variable if it is defined
-  debug:
-    msg:
-      - "The matomo_sites_names variable contains: {{ matomo_sites_names }}"
-    verbosity: 1
-  when: matomo_sites_names is defined
   tags:
     - matomo
     - users-update
