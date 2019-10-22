@@ -9,6 +9,15 @@
     - matomo
     - users-update
 
+- name: Print the matomo_site_urls is defined
+  degug:
+    msg: "The matomo_site_urls array contains: {{ matomo_site_urls }}"
+    verbosity: 1
+  when: ( matomo_site_urls is defined ) and ( matomo_site_urls != [] )
+  tags:
+    - matomo
+    - users-update
+
 - name: Fail if a matomo_site_name is not provided
   fail:
     msg: "A value for matomo_site_name needs to be provided"
