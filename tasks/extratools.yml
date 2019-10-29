@@ -1,5 +1,12 @@
 ---
 # https://github.com/digitalist-se/extratools/issues/15
+- name: "{{ matomo_html }}/vendor/davaxi/sparkline absent"
+  file:
+    path: "{{ matomo_html }}/vendor/davaxi/sparkline"
+    state: absent
+  tags:
+    - matomo
+
 - name: Matomo version of Sparkline present
   git:
     repo: https://github.com/matomo-org/Sparkline.git
