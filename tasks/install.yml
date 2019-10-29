@@ -28,6 +28,7 @@
         executable: /bin/bash
         chdir: "{{ matomo_html }}"
       register: matomo_db_pass_read
+      when: ( matomo_mycnf_check is defined ) and ( matomo_mycnf_check.stat.exists )
       become: true
       become_user: "{{ matomo_user }}"
       changed_when: false
@@ -64,7 +65,7 @@
 
 - name: Print the Matomo install command that is to be run
   debug:
-    msg: 'php console --no-ansi -n matomo:install --db-username="{{ matomo_db_username | quote}}" --db-pass="{{ matomo_db_pass | quote }}" --db-host="{{ matomo_db_host | quote}}" --db-name="{{ matomo_dbname | quote }}" --first-site-name="{{ matomo_first_site_name | quote }}" --first-site-url="{{ matomo_first_site_url | quote }}" --first-user="{{ matomo_first_user | quote }}" --first-user-email="{{ matomo_first_user_email | quote }}" --first-user-pass="{{ matomo_first_user_pass | quote }}" --force'
+    msg: 'php console --no-ansi -n matomo:install --db-username="{{ matomo_db_username | quote }}" --db-pass="{{ matomo_db_pass | quote }}" --db-host="{{ matomo_db_host | quote }}" --db-name="{{ matomo_dbname | quote }}" --first-site-name="{{ matomo_first_site_name | quote }}" --first-site-url="{{ matomo_first_site_url | quote }}" --first-user="{{ matomo_first_user | quote }}" --first-user-email="{{ matomo_first_user_email | quote }}" --first-user-pass="{{ matomo_first_user_pass | quote }}" --force'
     verbosity: 2
   tags:
     - matomo
