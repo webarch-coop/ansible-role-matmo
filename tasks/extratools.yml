@@ -1,12 +1,4 @@
 ---
-# https://github.com/digitalist-se/extratools/issues/15
-- name: davaxi/sparkline absent
-  file:
-    path: "{{ matomo_html }}/vendor/davaxi/"
-    state: absent
-  tags:
-    - matomo
-
 # https://github.com/digitalist-se/extratools
 - name: Run composer require for Extra Tools
   composer:
@@ -17,11 +9,9 @@
   become: true
   become_user: "{{ matomo_user }}"
   loop:
-    - symfony/console:~2.6.13
-    - symfony/yaml
-    - symfony/process
-    # - symfony/yaml:~2.6.0
-    # - symfony/process:^3.4
+    - davaxi/sparkline:dev-multiple-series
+    - symfony/yaml:~2.6.0
+    - symfony/process:^3.4
   loop_control:
     loop_var: pkg
   tags:
