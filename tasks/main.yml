@@ -85,7 +85,7 @@
 
     - name: Include extra tools tasks
       include_tasks: extratools.yml
-      when: ( matomo_extratools is defined ) and ( matomo_extratools == force )
+      when: ( matomo_extratools is defined ) and ( matomo_extratools == "force" )
       tags:
         - matomo
 
