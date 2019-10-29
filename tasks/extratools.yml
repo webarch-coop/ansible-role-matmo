@@ -16,6 +16,7 @@
     command: require
     arguments: symfony/yaml:~2.6.0
     working_dir: "{{ matomo_html }}"
+    classmap_authoritative: true
   register: matomo_symfony_yaml
   become: true
   become_user: "{{ matomo_user }}"
