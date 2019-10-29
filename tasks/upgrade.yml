@@ -25,7 +25,7 @@
 
 - name: Matomo Extra Tools tasks included
   include_tasks: extratools.yml
-  when: ( matomo_extratools is defined ) and ( matomo_extratools == "force" )  
+  when: ( matomo_extratools is defined ) and ( matomo_extratools == "force" )
   tags:
     - matomo
 
