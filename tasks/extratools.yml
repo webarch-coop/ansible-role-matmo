@@ -1,6 +1,6 @@
 ---
 # https://github.com/digitalist-se/extratools
-- name: Composer run to install dependancies
+- name: Composer require symfony/yaml:~2.6.0 for Extra Tools plugin
   command: composer require symfony/yaml:~2.6.0
   args:
     chdir: "{{ matomo_html }}"
@@ -11,7 +11,7 @@
   tags:
     - matomo
 
-- name: Composer run to install dependancies
+- name: Composer require symfony/process:^3.4 for Extra Tools plugin
   command: composer require symfony/process:^3.4
   args:
     chdir: "{{ matomo_html }}"
