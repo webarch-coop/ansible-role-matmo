@@ -17,6 +17,7 @@
   become: true
   become_user: "{{ matomo_user }}"
   loop:
+    - symfony/console:~2.6.13
     - symfony/yaml
     - symfony/process
     # - symfony/yaml:~2.6.0
