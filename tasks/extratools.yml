@@ -17,8 +17,10 @@
   become: true
   become_user: "{{ matomo_user }}"
   loop:
-    - symfony/yaml:~2.6.0
-    - symfony/process:^3.4
+    - symfony/yaml
+    - symfony/process
+    # - symfony/yaml:~2.6.0
+    # - symfony/process:^3.4
   loop_control:
     loop_var: pkg
   tags:
