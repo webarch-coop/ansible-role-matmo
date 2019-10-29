@@ -9,9 +9,12 @@
   become: true
   become_user: "{{ matomo_user }}"
   loop:
-    - davaxi/sparkline:dev-multiple-series
-    - symfony/yaml:~2.6.0
-    - symfony/process:^3.4
+    - "davaxi/sparkline:dev-multiple-series"
+    - "piwik/decompress:~1.0"
+    - "piwik/cache:~1.0.0"
+    - "piwik/ini:^1.0.6"
+    - "symfony/yaml:~2.6.0"
+    - "symfony/process:^3.4"
   loop_control:
     loop_var: pkg
   tags:
