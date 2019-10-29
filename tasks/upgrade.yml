@@ -35,13 +35,19 @@
 
 - name: Matomo Extra Tools tasks included
   include_tasks: extratools.yml
-  when: ( matomo_extratools is defined ) and ( matomo_extratools == "force" or matomo_extratools == "install" )
+  when:
+    - matomo_extratools is defined
+    - ( matomo_extratools == "force" ) or ( matomo_extratools == "install" )
+    - matomo_extratools != "skip"
   tags:
     - matomo
 
 - name: Matomo User Console tasks included
   include_tasks: userconsole.yml
-  when: ( matomo_userconsole is defined ) and ( matomo_userconsole == "force" or matomo_userconsole == "install" )
+  when:
+    - matomo_userconsole is defined
+    - ( matomo_userconsole == "force" ) or ( matomo_userconsole == "install" )
+    - matomo_userconsole != "skip"
   tags:
     - matomo
 ...
