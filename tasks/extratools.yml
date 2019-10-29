@@ -1,13 +1,30 @@
 ---
 # https://github.com/digitalist-se/extratools
+# - name: Composer require symfony/yaml:~2.6.0 for Extra Tools plugin
+#   command: composer require symfony/yaml:~2.6.0
+#   args:
+#     chdir: "{{ matomo_html }}"
+#   register: matomo_symfony_yaml
+#   changed_when: '"Nothing to install or update" not in matomo_symfony_yaml.stderr'
+#   become: true
+#   become_user: "{{ matomo_user }}"
+#   tags:
+#     - matomo
+
 - name: Composer require symfony/yaml:~2.6.0 for Extra Tools plugin
-  command: composer require symfony/yaml:~2.6.0
-  args:
-    chdir: "{{ matomo_html }}"
+  composer:
+    command: require
+    arguments: symfony/yaml:~2.6.0
+    working_dir: "{{ matomo_html }}"
   register: matomo_symfony_yaml
-  changed_when: '"Nothing to install or update" not in matomo_symfony_yaml.stderr'
   become: true
   become_user: "{{ matomo_user }}"
+  tags:
+    - matomo
+
+- name: Composer output
+  debug:
+    msg: "Composer output: {{ matomo_symfony_yaml.stdout }}"
   tags:
     - matomo
 
