@@ -1,18 +1,11 @@
 ---
 # https://github.com/digitalist-se/extratools/issues/15
-- name: vendor/davaxi directory present
-  file:
-    path: "{{ matomo_html }}/vendor/davaxi"
-    state: directory
-    owner: "{{ matomo_user }}"
-    group: "{{ matomo_user }}"
-  tags:
-    - matomo
-
 - name: Matomo version of Sparkline present
   git:
     repo: https://github.com/matomo-org/Sparkline.git
     dest: "{{ matomo_html }}/vendor/davaxi/sparkline"
+    update: true
+    clone: true
     version: multiple-series
   become: true
   become_user: "{{ matomo_user }}"
