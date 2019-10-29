@@ -83,9 +83,15 @@
       tags:
         - matomo
 
-    - name: Include extra tools tasks
+    - name: Include Extra Tools tasks
       include_tasks: extratools.yml
       when: ( matomo_extratools is defined ) and ( matomo_extratools == "force" )
+      tags:
+        - matomo
+
+    - name: Include User Console tasks
+      include_tasks: userconsole.yml
+      when: ( matomo_userconsole is defined ) and ( matomo_userconsole == "force" )
       tags:
         - matomo
 
