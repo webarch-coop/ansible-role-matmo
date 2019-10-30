@@ -11,7 +11,7 @@
 - name: Latest Matomo cloned into private directory
   git:
     repo: https://github.com/matomo-org/matomo
-    dest: "{{ matomo_private }}"
+    dest: "{{ matomo_private }}/matomo"
     version: "{{ matomo_latest }}"
     verify_commit: true
     force: true
