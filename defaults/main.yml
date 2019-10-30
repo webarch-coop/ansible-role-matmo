@@ -25,7 +25,7 @@ matomo_notify_headers:
 matomo_notify_subject_tag: webarchitects
 matomo_notify_passwd_signature: Webarch Co-operative Limited\nhttps://www.webarch.coop/
 # The following two variables can be set to force or skip
-# but without these plugins tasks like adding users will 
+# but without these plugins tasks like adding users will
 # not work.
 # matomo_extratools: force
 # matomo_userconsole: force

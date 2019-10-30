@@ -23,7 +23,7 @@
   tags:
     - matomo
 
-- name: Matomo files rsynced to replace files removed by composer 
+- name: Matomo files rsynced to replace files removed by composer
   shell: "rsync -aq {{ matomo_private }}/matomo/ {{ matomo_html }}/"
   args:
     executable: /bin/bash
