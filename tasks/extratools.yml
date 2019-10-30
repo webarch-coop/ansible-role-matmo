@@ -20,7 +20,7 @@
   loop:
     - "symfony/process:^3.4"
     - "symfony/yaml:~2.6.0"
-    - "davaxi/sparkline:^1.1"
+    - "davaxi/sparkline:dev-multiple-series"
   loop_control:
     loop_var: pkg
   tags:
