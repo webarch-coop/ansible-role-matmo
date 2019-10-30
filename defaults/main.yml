@@ -29,5 +29,5 @@ matomo_notify_passwd_signature: Webarch Co-operative Limited\nhttps://www.webarc
 # matomo_extratools: force
 # matomo_userconsole: force
 # Download using a git clone rather than the tgz archive
-maotom_git: true
+matomo_git: true
 ...
