@@ -44,6 +44,25 @@
       tags:
         - matomo
 
+    # https://github.com/web-flow.gpg
+    - name: The GitHub GPG public key is present
+      copy:
+        src: files/github.pub
+        dest: "{{ matomo_private }}/github.pub"
+      become: true
+      become_user: "{{ matomo_user }}"
+      tags:
+        - matomo
+
+    - name: The GitHub GPG public key is imported
+      command: "gpg --no-tty --import {{ matomo_private }}/github.pub"
+      register: matomo_gh_gpg_key_import
+      changed_when: "'not changed' not in matomo_gh_gpg_key_import.stderr"
+      become: true
+      become_user: "{{ matomo_user }}"
+      tags:
+        - matomo
+
     - name: Include latest version check
       include_tasks: check_latest_version.yml
       tags:
