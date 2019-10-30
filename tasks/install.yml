@@ -13,6 +13,25 @@
   tags:
     - matomo
 
+- name: Matomo extratools tasks included
+  include_tasks: extratools.yml
+  tags:
+    - matomo
+
+- name: Matomo userconsole tasks included
+  include_tasks: userconsole.yml
+  tags:
+    - matomo
+
+- name: Matomo files rsynced to replace files removed by composer 
+  shell: "rsync -aq {{ matomo_private }}/matomo/ {{ matomo_html }}/"
+  args:
+    executable: /bin/bash
+  become: true
+  become_user: "{{ matomo_user }}"
+  tags:
+    - matomo
+
 - block:
 
     - name: "Check for {{ matomo_home }}/.my.cnf"
@@ -112,16 +131,4 @@
         - matomo
 
   when: ( matomo_notify_passwd is defined ) and ( matomo_notify_passwd == True )
-
-- name: Matomo extratools tasks included
-  include_tasks: extratools.yml
-  when: ( matomo_extratools is not defined ) or ( matomo_extratools != "skip" )
-  tags:
-    - matomo
-
-- name: Matomo userconsole tasks included
-  include_tasks: userconsole.yml
-  when: ( matomo_userconsole is not defined ) or ( matomo_extratools != "skip" )
-  tags:
-    - matomo
 ...
