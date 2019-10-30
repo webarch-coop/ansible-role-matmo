@@ -1,10 +1,18 @@
 ---
+- name: "Check if {{ matomo_private }}/matomo/.git exists"
+  stat:
+    path: "{{ matomo_private }}/matomo/.git"
+  register: matomo_git_clone
+  tags:
+    - matomo
+
 - name: Private directory for Matomo to be unarchived into absent
   file:
     path: "{{ matomo_private }}/matomo"
     state: absent
   become: true
   become_user: "{{ matomo_user }}"
+  when: ( matomo_git_clone.stat.exists == False ) and ( matomo_git_clone.stat.isdir == False )
   tags:
     - matomo
 

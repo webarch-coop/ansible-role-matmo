@@ -18,8 +18,9 @@
   become_user: "{{ matomo_user }}"
   ignore_errors: true
   loop:
-    - "symfony/yaml:~2.6.0"
     - "symfony/process:^3.4"
+    - "symfony/yaml:~2.6.0"
+    - "davaxi/sparkline:^1.1"
   loop_control:
     loop_var: pkg
   tags:
