@@ -1,0 +1,22 @@
+---
+- name: Private directory for Matomo to be unarchived into absent
+  file:
+    path: "{{ matomo_private }}/matomo"
+    state: absent
+  become: true
+  become_user: "{{ matomo_user }}"
+  tags:
+    - matomo
+
+- name: Latest Matomo cloned into private directory
+  git:
+    repo: https://github.com/matomo-org/matomo
+    dest: "{{ matomo_private }}"
+    version: "{{ matomo_latest }}"
+    verify_commit: true
+    force: true
+  become: true
+  become_user: "{{ matomo_user }}"
+  tags:
+    - matomo
+...
