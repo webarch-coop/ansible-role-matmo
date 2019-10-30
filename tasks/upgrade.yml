@@ -2,7 +2,7 @@
 - name: Matomo download tgz tasks included
   include_tasks: download.yml
   when: ( matomo_git is not defined ) or ( matomo_git == False )
-  tags: 
+  tags:
     - matomo
 
 - name: Matomo git clone tasks included

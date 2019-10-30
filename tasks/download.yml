@@ -48,7 +48,7 @@
   tags:
     - matomo
 
-- name: Latest composer.json file fetched from GitHub and added to archive 
+- name: Latest composer.json file fetched from GitHub and added to archive
   get_url:
     url: "https://raw.githubusercontent.com/matomo-org/matomo/{{ matomo_latest }}/composer.json"
     dest: "{{ matomo_private }}/matomo/composer.json"
