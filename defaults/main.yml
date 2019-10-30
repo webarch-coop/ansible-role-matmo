@@ -28,6 +28,6 @@ matomo_notify_passwd_signature: Webarch Co-operative Limited\nhttps://www.webarc
 # plugins tasks like installing and adding users will not work.
 # matomo_extratools: force
 # matomo_userconsole: force
-# Download using a git clone rather than the tgz archive
-matomo_git: true
+# Set to true to download using a git clone rather than the tgz archive
+matomo_git: false
 ...
