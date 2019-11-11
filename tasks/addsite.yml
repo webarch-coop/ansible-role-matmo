@@ -82,7 +82,7 @@
     - users-update
 
 - name: "Check if {{ matomo_site_admin }} is already super user"
-  shell: "IFS=$'\n' ; php console user:list --no-ansi -n | grep '\[super user\]' | awk '{ print $2 }'"
+  shell: "IFS=$'\n' ; php console user:list --no-ansi -n | grep 'super user' | awk '{ print $2 }'"
   args:
     executable: /bin/bash
     chdir: "{{ matomo_html }}"
