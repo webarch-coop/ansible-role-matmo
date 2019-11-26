@@ -33,11 +33,11 @@
   stat:
     path: "{{ path }}"
   loop:
-    - matomo_home
-    - matomo_html
-    - matomo_private
-    - matomo_bin
-    - matomo_logs 
+    - "{{ matomo_home }}"
+    - "{{ matomo_html }}"
+    - "{{ matomo_private }}"
+    - "{{ matomo_bin }}"
+    - "{{ matomo_logs  }}"
   register: matomo_dirs
   loop_control:
     loop_var: path
@@ -59,7 +59,7 @@
 - name: "Fail if any of the directories for {{ matomo_user }} don't exist"
   fail:
     msg: "The directory {{ stat.path }} needs to exist"
-  when: stat.isdir == False
+  when: stat.exists == False
   loop: "{{ matomo_dirs.results }}"
   loop_control:
     loop_var: stat
