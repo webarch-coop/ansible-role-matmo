@@ -18,7 +18,7 @@
     chdir: "{{ matomo_html }}"
   become: true
   become_user: "{{ matomo_user }}"
-  when: ( matomo_config_general is defined ) and ( "force_ssl: 1" not in matomo_config_general.stdout_lines )
+  when: ( matomo_config_general is defined ) and ( "force_ssl\\: 1" not in matomo_config_general.stdout_lines )
   tags:
     - matomo
 ...
