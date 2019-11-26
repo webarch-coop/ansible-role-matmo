@@ -12,7 +12,7 @@
     - matomo
 
 - name: "Set force_ssl to true for {{ matomo_user }}"
-  shell: php console config:set --no-ansi -n --section="General" --key="force_ssl" --value="1"
+  shell: "php console config:set --no-ansi -n --section='General' --key='force_ssl' --value='1'"
   args:
     executable: /bin/bash
     chdir: "{{ matomo_html }}"
