@@ -14,18 +14,14 @@
   tags:
     - matomo
 
-- name: Check that the required directories are defined
+- name: "Check that the required directory variables are defined for {{ matomo_user }}"
   assert:
-    that: "{{ path }} is defined"
-  loop:
-    - "{{ matomo_home }}"
-    - "{{ matomo_html }}"
-    - "{{ matomo_private }}"
-    - "{{ matomo_bin }}"
-    - "{{ matomo_logs  }}"
-  loop_control:
-    loop_var: path
-    label: "{{ path }}"
+    that:
+      - matomo_home is defined
+      - matomo_html is defined
+      - matomo_private is defined
+      - matomo_bin is defined
+      - matomo_logs is defined
   tags:
     - matomo
 
@@ -37,7 +33,7 @@
     - "{{ matomo_html }}"
     - "{{ matomo_private }}"
     - "{{ matomo_bin }}"
-    - "{{ matomo_logs  }}"
+    - "{{ matomo_logs }}"
   register: matomo_dirs
   loop_control:
     loop_var: path
@@ -45,7 +41,7 @@
   tags:
     - matomo
 
-- name: Print the results of the directory checks
+- name: "Print the results of the directory checks for {{ matomo_user }}"
   debug:
     msg: "Stat results: {{ stat }}"
     verbosity: 1
@@ -68,7 +64,7 @@
     - matomo
 
 # Additional check on the values of these variables could be added below
-- name: Check that required variables are defined
+- name: "Check that required variables are defined for {{ matomo_user }}"
   assert:
     that:
       - ( matomo_db_username is defined )
