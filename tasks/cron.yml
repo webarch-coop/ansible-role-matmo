@@ -1,6 +1,6 @@
 ---
-# If ~/bin/README.md exists then assume the users is chrooted and 
-# can't create a regular cron job, see 
+# If ~/bin/README.md exists then assume the users is chrooted and
+# can't create a regular cron job, see
 # https://git.coop/webarch/users/blob/dev/tasks/crontab_user_present.yml
 
 - name: "Stat {{ matomo_bin }}/README.md"
@@ -10,7 +10,7 @@
   tags:
     - matomo
 
-- name: "Archive job added to {{ matomo_bin }}/cron_hourly.sh script for {{ matomo_user }}" 
+- name: "Archive job added to {{ matomo_bin }}/cron_hourly.sh script for {{ matomo_user }}"
   lineinfile:
     path: "{{ matomo_bin }}/cron_hourly.sh"
     line: "cd {{ matomo_html }} ; php console core:archive --url={{ matomo_url }} > {{ matomo_logs }}/matomo-archive.log"
@@ -25,7 +25,7 @@
   cron:
     name: "Matomo Archiving"
     minute: "{{ 59 | random }}"
-    job: "cd {{ matomo_html }} ; php console core:archive --url={{ matomo_url }} > {{ matomo_logs }}/matomo-archive.log" 
+    job: "cd {{ matomo_html }} ; php console core:archive --url={{ matomo_url }} > {{ matomo_logs }}/matomo-archive.log"
   when: ( matomo_bin_readme is not defined ) or ( matomo_bin_readme.stat.exists == False )
   tags:
     - matomo

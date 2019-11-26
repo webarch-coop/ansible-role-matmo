@@ -4,28 +4,6 @@
   tags:
     - matomo
 
-- name: Check that required variables are defined
-  assert:
-    that:
-      - ( matomo_user is defined ) and ( matomo_user is regex("^[a-z0-9]*$") ) 
-      - ( matomo_db_username is defined ) and ( ) 
-      - ( matomo_db_host is defined ) and ( ) 
-      - ( matomo_dbname is defined ) and ( ) 
-      - ( matomo_url is defined ) and ( ) 
-      - ( matomo_first_site_name is defined ) and ( ) 
-      - ( matomo_first_site_url is defined ) and ( ) 
-      - ( matomo_first_user is defined ) and ( ) 
-      - ( matomo_first_user_email is defined ) and ( ) 
-      - ( matomo_notify_passwd is defined ) and ( ) 
-      - ( matomo_notify_from is defined ) and ( ) 
-      - ( matomo_notify_reply_to is defined ) and ( ) 
-      - ( matomo_notify_headers is defined ) and ( ) 
-      - ( matomo_notify_subject_tag is defined ) and ( ) 
-      - ( matomo_notify_passwd_signature is defined ) and ( ) 
-      - ( matomo_git is defined ) and ( ) 
-  tags:
-    - matomo
-
 - name: Only install or upgrade Matomo if the user account exists
   block:
 
