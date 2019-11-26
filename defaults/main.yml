@@ -1,5 +1,6 @@
 ---
 matomo_user: stats
+matomo_group: "{{ matomo_user }}"
 matomo_home: "/home/{{ matomo_user }}"
 matomo_html: "{{ matomo_home }}/sites/default"
 matomo_private: "{{ matomo_home }}/private"

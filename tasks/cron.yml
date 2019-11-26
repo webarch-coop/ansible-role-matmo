@@ -10,13 +10,35 @@
   tags:
     - matomo
 
-- name: "Archive job added to {{ matomo_bin }}/cron_hourly.sh script for {{ matomo_user }}"
-  lineinfile:
-    path: "{{ matomo_bin }}/cron_hourly.sh"
-    line: "cd {{ matomo_html }} ; php console core:archive --url={{ matomo_url }} > {{ matomo_logs }}/matomo-archive.log"
-    state: present
-    owner: "{{ matomo_user }}"
-    group: "{{ matomo_user }}"
+- name: Cron job setup for chrooted user
+  block:
+
+    - name: "Stat {{ matomo_bin }}/cron_hourly.sh"
+      stat:
+        path: "{{ matomo_bin }}/cron_hourly.sh"
+      register: matomo_bin_cron_hourly
+
+    - name: "Blank cron_hourly.sh template in place" 
+      template:
+        src: templates/cron_hourly.sh.j2
+        dest: "{{ matomo_bin }}/cron_daily.sh"
+        owner: "{{ matomo_user }}"
+        group: "{{ matomo_group }}"
+        mode: "0750"
+      when: ( matomo_bin_cron_hourly is defined ) and ( matomo_bin_cron_hourly.stat.exists == False )
+
+    - name: "Archive job added to {{ matomo_bin }}/cron_hourly.sh script for {{ matomo_user }}"
+      lineinfile:
+        path: "{{ matomo_bin }}/cron_hourly.sh"
+        line: "cd {{ matomo_html }} ; php console core:archive --url={{ matomo_url }} > {{ matomo_logs }}/matomo-archive.log"
+        state: present
+        insertbefore: "^# END ANSIBLE SCRIPTS"
+        firstmatch: true
+        create: false
+        owner: "{{ matomo_user }}"
+        group: "{{ matomo_group }}"
+        mode: "0750"
+
   when: ( matomo_bin_readme is defined ) and ( matomo_bin_readme.stat.exists )
   tags:
     - matomo
