@@ -18,7 +18,7 @@
         path: "{{ matomo_bin }}/cron_hourly.sh"
       register: matomo_bin_cron_hourly
 
-    - name: "Blank cron_hourly.sh template in place" 
+    - name: "Blank cron_hourly.sh template in place"
       template:
         src: templates/cron_hourly.sh.j2
         dest: "{{ matomo_bin }}/cron_hourly.sh"
