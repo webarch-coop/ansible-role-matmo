@@ -3,6 +3,7 @@ matomo_user: stats
 matomo_home: "/home/{{ matomo_user }}"
 matomo_html: "{{ matomo_home }}/sites/default"
 matomo_private: "{{ matomo_home }}/private"
+matomo_logs: "{{ matomo_home }}/logs"
 matomo_db_username: "{{ matomo_user }}"
 # if matomo_db_pass is not set then it is read from ~/.my.cnf
 matomo_db_pass: ""

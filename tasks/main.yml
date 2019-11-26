@@ -114,5 +114,10 @@
       tags:
         - matomo
 
+    - name: Include cron tasks
+      include_tasks: cron.yml
+      tags:
+        - matomo
+
   when: '"no such user" not in matomo_user_check.stderr'
 ...
