@@ -3,15 +3,16 @@
 # can't create a regular cron job, see 
 # https://git.coop/webarch/users/blob/dev/tasks/crontab_user_present.yml
 
-- name: "Stat {{ matomo_home }}/bin/README.md"
+- name: "Stat {{ matomo_bin }}/README.md"
   stat:
-    path: "{{ matomo_home }}/bin/README.md"
+    path: "{{ matomo_bin }}/README.md"
   register: matomo_bin_readme
   tags:
     - matomo
 
-- name: "Archive job added to ~/bin/cron_hourly.sh script for {{ matomo_user }}" 
+- name: "Archive job added to {{ matomo_bin }}/cron_hourly.sh script for {{ matomo_user }}" 
   lineinfile:
+    path: "{{ matomo_bin }}/cron_hourly.sh"
     line: "cd {{ matomo_html }} ; php console core:archive --url={{ matomo_url }} > {{ matomo_logs }}/matomo-archive.log"
     state: present
     owner: "{{ matomo_user }}"
@@ -20,7 +21,7 @@
   tags:
     - matomo
 
-- name: "Archive cron job created for {{ matomo_user }}"
+- name: "Archive cron job present for {{ matomo_user }}"
   cron:
     name: "Matomo Archiving"
     minute: "{{ 59 | random }}"
