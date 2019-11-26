@@ -1,0 +1,69 @@
+---
+- name: Check that the matomo_users variable is defined
+  assert:
+    that:
+      - ( matomo_user is defined ) and ( matomo_user is regex("^[a-z0-9]*$") )
+  tags:
+    - matomo
+
+- name: "Check if the Matomo {{ matomo_user }} user account exists"
+  shell: "id {{ matomo_user }} && echo true || echo false"
+  check_mode: false
+  register: matomo_user_check
+  changed_when: '"no such user" in matomo_user_check.stderr'
+  tags:
+    - matomo
+
+- name: Check that the required directories are defined
+  assert:
+    that: "{{ path }} is defined"
+  loop:
+    - matomo_home
+    - matomo_html
+    - matomo_private
+    - matomo_bin
+    - matomo_logs
+  loop_control:
+    loop_var: path
+    label: "{{ path }}"
+  tags:
+    - matomo
+
+- name: "Stat directories for {{ matomo_user }}"
+  stat:
+    path: "{{ path }}"
+  loop:
+    - matomo_home
+    - matomo_html
+    - matomo_private
+    - matomo_bin
+    - matomo_logs 
+  register: matomo_dirs
+  loop_control:
+    loop_var: path
+    label: "{{ path }}"
+  tags:
+    - matomo
+
+- name: Print the results of the directory checks
+  debug:
+    msg: "Stat results: {{ stat }}"
+    verbosity: 1
+  loop: "{{ matomo_dirs.results }}"
+  loop_control:
+    loop_var: stat
+    label: "{{ stat.path }}"
+  tags:
+    - matomo
+
+- name: "Fail if any of the directories for {{ matomo_user }} don't exist"
+  fail:
+    msg: "The directory {{ stat.path }} needs to exist"
+  when: stat.isdir == False
+  loop: "{{ matomo_dirs.results }}"
+  loop_control:
+    loop_var: stat
+    label: "{{ stat.path }}"
+  tags:
+    - matomo
+...
