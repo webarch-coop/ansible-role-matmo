@@ -68,7 +68,7 @@
     name: "Matomo Archiving"
     minute: "{{ 59 | random }}"
     job: "cd {{ matomo_html }} ; php console core:archive --url={{ matomo_url }} > {{ matomo_logs }}/matomo-archive.log"
-  when: matomo_bin_readme is not defined
+  when: matomo_bin_readme.skipped
   tags:
     - matomo
 ...
