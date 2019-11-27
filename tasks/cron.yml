@@ -52,7 +52,7 @@
       tags:
         - matomo
 
-  when: ( matomo_bin is defined ) and ( matomo_bin.stat.isdir )
+  when: ( matomo_bin is defined ) and ( matomo_bin.stat.exists )
   tags:
     - matomo
 
