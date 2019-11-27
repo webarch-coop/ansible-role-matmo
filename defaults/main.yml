@@ -4,8 +4,6 @@ matomo_group: "{{ matomo_user }}"
 matomo_home: "/home/{{ matomo_user }}"
 matomo_html: "{{ matomo_home }}/sites/default"
 matomo_private: "{{ matomo_home }}/private"
-# Optional directory, don't define this variable if it doesn't exist
-# matomo_bin: "{{ matomo_home }}/bin"
 matomo_logs: "{{ matomo_private }}"
 matomo_db_username: "{{ matomo_user }}"
 # if matomo_db_pass is not set then it is read from ~/.my.cnf
