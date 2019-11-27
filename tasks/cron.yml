@@ -48,7 +48,7 @@
             group: "{{ matomo_group }}"
             mode: "0750"
 
-      when: ( matomo_bin_readme is defined ) and ( matomo_bin_readme.stat.isfile )
+      when: ( matomo_bin_readme is defined ) and ( matomo_bin_readme.stat.exists )
       tags:
         - matomo
 

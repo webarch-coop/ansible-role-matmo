@@ -5,9 +5,9 @@
     executable: /bin/bash
     chdir: "{{ matomo_html }}"
   register: matomo_config_general
-  changed_when: false
   become: true
   become_user: "{{ matomo_user }}"
+  changed_when: ( "force_ssl 1" not in matomo_config_general.stdout_lines )
   tags:
     - matomo
 
