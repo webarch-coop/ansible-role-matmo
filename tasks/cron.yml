@@ -17,6 +17,7 @@
       stat:
         path: "{{ matomo_home }}/bin/README.md"
       register: matomo_bin_readme
+      when: matomo_bin.stat.isdir
 
     - name: Cron job setup for chrooted user
       block:
@@ -47,11 +48,11 @@
             group: "{{ matomo_group }}"
             mode: "0750"
 
-      when: ( matomo_bin_readme is defined ) and ( matomo_bin_readme.stat.exists )
+      when: ( matomo_bin_readme is defined ) and ( matomo_bin_readme.stat.isfile )
       tags:
         - matomo
 
-  when: ( matomo_bin is defined ) and ( matomo_bin.stat.isdir )
+  when: matomo_bin is defined
   tags:
     - matomo
 
