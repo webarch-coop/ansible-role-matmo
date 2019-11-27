@@ -20,7 +20,6 @@
       - matomo_home is defined
       - matomo_html is defined
       - matomo_private is defined
-      - matomo_bin is defined
       - matomo_logs is defined
   tags:
     - matomo
@@ -32,7 +31,6 @@
     - "{{ matomo_home }}"
     - "{{ matomo_html }}"
     - "{{ matomo_private }}"
-    - "{{ matomo_bin }}"
     - "{{ matomo_logs }}"
   register: matomo_dirs
   loop_control:
