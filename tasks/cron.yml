@@ -58,7 +58,7 @@
 
 - name: Debug
   debug:
-    msg: "matomo_bin_readme: {{ matomo_bin_readme }}" 
+    msg: "matomo_bin_readme: {{ matomo_bin_readme }}"
     verbosity: 1
   tags:
     - matomo
