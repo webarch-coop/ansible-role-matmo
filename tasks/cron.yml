@@ -60,7 +60,6 @@
   debug:
     msg: "matomo_bin_readme: {{ matomo_bin_readme }}" 
     verbosity: 1
-  when: matomo_bin_readme is not defined
   tags:
     - matomo
 
