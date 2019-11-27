@@ -56,6 +56,14 @@
   tags:
     - matomo
 
+- name: Debug
+  debug:
+    msg: "matomo_bin_readme: {{ matomo_bin_readme }}" 
+    verbosity: 1
+  when: matomo_bin_readme is not defined
+  tags:
+    - matomo
+
 - name: "Archive cron job present for {{ matomo_user }}"
   cron:
     name: "Matomo Archiving"
