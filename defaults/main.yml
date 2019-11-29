@@ -32,4 +32,6 @@ matomo_notify_passwd_signature: Webarch Co-operative Limited\nhttps://www.webarc
 # matomo_userconsole: force
 # Set to true to download using a git clone rather than the tgz archive
 matomo_git: false
+# Set matomo_cron to true to setup cron archiving
+matomo_cron: false
 ...

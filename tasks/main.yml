@@ -89,6 +89,7 @@
 
     - name: Include cron tasks
       include_tasks: cron.yml
+      when: ( matomo_cron is defined ) and ( matomo_cron == True )
 
     - name: Include settings tasks
       include_tasks: settings.yml
