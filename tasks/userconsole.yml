@@ -6,6 +6,7 @@
     dest: "{{ matomo_html }}/plugins/UserConsole"
     clone: true
     update: true
+    depth: 1
   become: true
   become_user: "{{ matomo_user }}"
   tags:
