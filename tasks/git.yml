@@ -23,6 +23,7 @@
     version: "{{ matomo_latest }}"
     verify_commit: true
     force: true
+    depth: 1
   become: true
   become_user: "{{ matomo_user }}"
   tags:
