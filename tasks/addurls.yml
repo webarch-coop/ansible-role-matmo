@@ -59,7 +59,8 @@
     - users-update
 
 - name: Add missing Apache Aliases to the matomo_site_main_url idsite urls table
-  command: 'mysql {{ matomo_dbname | quote }} --skip-column-names --batch -e "INSERT INTO {{ matomo_table_prefix }}site_url VALUES (\"{{ matomo_idsite | quote }}\", \"{{ url | quote }}\")"'
+  # command: 'mysql {{ matomo_dbname | quote }} --skip-column-names --batch -e "INSERT INTO {{ matomo_table_prefix }}site_url VALUES (\"{{ matomo_idsite | quote }}\", \"{{ url | quote }}\")"'
+  command: "php console site:add --no-ansi -n --id={{ matomo_idsite | quote }} --url={{ url | quote }}"
   args:
     chdir: "{{ matomo_html }}"
   become: true
