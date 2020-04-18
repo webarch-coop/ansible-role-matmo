@@ -1,7 +1,11 @@
 ---
-image: registry.git.coop/webarch/containers/images/ansible:0.2
+image: registry.git.coop/webarch/containers/images/ansible:0.3
+
+stages:
+  - check
 
 ansible-lint:
+  stage: check
   script:
-    - molecule lint
+    - yamllint .
 ...
