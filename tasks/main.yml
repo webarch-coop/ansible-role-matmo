@@ -81,11 +81,9 @@
 
     - name: Include Extra Tools tasks
       include_tasks: extratools.yml
-      when: ( matomo_extratools is defined ) and ( matomo_extratools == "force" )
 
     - name: Include User Console tasks
       include_tasks: userconsole.yml
-      when: ( matomo_userconsole is defined ) and ( matomo_userconsole == "force" )
 
     - name: Include cron tasks
       include_tasks: cron.yml
