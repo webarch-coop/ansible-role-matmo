@@ -80,6 +80,7 @@
       - ( matomo_notify_subject_tag is defined )
       - ( matomo_notify_passwd_signature is defined )
       - ( matomo_git is defined )
+      - ( matomo_update_strategy is defined ) and ( matomo_update_strategy == "version" or matomo_update_strategy == "latest" )
   tags:
     - matomo
 ...
