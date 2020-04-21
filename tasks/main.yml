@@ -74,6 +74,7 @@
           fail:
             msg: "Downgrading from Matomo version {{ matomo_installed }} to Matomo {{ matomo_required }} is not supported"
           when:
+            - matomo_update_strategy == "version"
             - matomo_installed is version(matomo_required, '>')
 
         - name: Include upgrade tasks
