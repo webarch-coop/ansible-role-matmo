@@ -1,12 +1,12 @@
 ---
-# Set matomo_update_strategy to "latest" for auto-updating to the 
+# Set matomo_update_strategy to "latest" for auto-updating to the
 # latest release, set it to "version"
 matomo_update_strategy: version
 # The matomo_version number is used if matomo_update_strategy is
 # set to "version"
 # https://github.com/matomo-org/matomo/releases
 matomo_version: 3.13.3
-# The Extra Tools and User Console plugins are required, these 
+# The Extra Tools and User Console plugins are required, these
 # variables can be set to "install", "force" or "skip"
 matomo_extratools: install
 matomo_userconsole: install

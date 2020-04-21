@@ -70,6 +70,12 @@
         - name: Include version check
           include_tasks: check_version.yml
 
+        - name: Fail if a downgrade has been specified
+          fail:
+            msg: "Downgrading from Matomo version {{ matomo_installed }} to Matomo {{ matomo_required }} is not supported"
+          when:
+            - matomo_installed is version(matomo_required, '>')
+
         - name: Include upgrade tasks
           include_tasks: upgrade.yml
           when:

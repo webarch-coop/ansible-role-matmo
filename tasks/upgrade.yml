@@ -58,7 +58,7 @@
   tags:
     - matomo
 
- name: Get the installed Matomo version number
+- name: Get the installed Matomo version number
   command: "php console core:update --no-ansi -n --version"
   args:
     chdir: "{{ matomo_html }}"
