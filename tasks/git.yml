@@ -16,11 +16,11 @@
   tags:
     - matomo
 
-- name: Latest Matomo cloned into private directory
+- name: Required Matomo cloned into private directory
   git:
     repo: https://github.com/matomo-org/matomo
     dest: "{{ matomo_private }}/matomo"
-    version: "{{ matomo_latest }}"
+    version: "{{ matomo_required }}"
     verify_commit: true
     force: true
     depth: 1

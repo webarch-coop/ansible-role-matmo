@@ -1,4 +1,4 @@
----
+--
 # https://github.com/digitalist-se/extratools/issues/15
 - name: "{{ matomo_html }}/vendor/davaxi/sparkline absent"
   file:

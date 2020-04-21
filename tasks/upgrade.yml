@@ -21,7 +21,7 @@
   tags:
     - matomo
 
-- name: Latest Matomo rsynced over last version
+- name: Required Matomo rsynced over last version
   shell: "rsync -aq {{ matomo_private }}/matomo/ {{ matomo_html }}/"
   args:
     executable: /bin/bash
@@ -55,6 +55,31 @@
     - matomo_userconsole is defined
     - ( matomo_userconsole == "force" ) or ( matomo_userconsole == "install" )
     - matomo_userconsole != "skip"
+  tags:
+    - matomo
+
+ name: Get the installed Matomo version number
+  command: "php console core:update --no-ansi -n --version"
+  args:
+    chdir: "{{ matomo_html }}"
+  changed_when: false
+  check_mode: false
+  become: true
+  become_user: "{{ matomo_user }}"
+  register: matomo_installed_check
+  tags:
+    - matomo
+
+- name: Set a variable for the installed Matomo version number
+  set_fact:
+    matomo_installed: "{{ matomo_installed_check.stdout.split(' ')[2] }}"
+  tags:
+    - matomo
+
+- name: Print the installed version of Matomo
+  debug:
+    msg: "The installed version of Matomo is {{ matomo_installed }}"
+    verbosity: 1
   tags:
     - matomo
 ...

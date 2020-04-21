@@ -1,25 +1,26 @@
 ---
-- name: Latest Matomo GPG signature downloaded
+
+- name: Required Matomo GPG signature downloaded
   get_url:
-    url: "https://builds.piwik.org/matomo-{{ matomo_latest }}.tar.gz.asc"
-    dest: "{{ matomo_private }}/matomo-{{ matomo_latest }}.tar.gz.asc"
+    url: "https://builds.piwik.org/matomo-{{ matomo_required }}.tar.gz.asc"
+    dest: "{{ matomo_private }}/matomo-{{ matomo_required }}.tar.gz.asc"
     force: true
   become: true
   become_user: "{{ matomo_user }}"
   tags:
     - matomo
 
-- name: Latest Matomo downloaded
+- name: Required Matomo downloaded
   get_url:
-    url: "https://builds.piwik.org/matomo-{{ matomo_latest }}.tar.gz"
-    dest: "{{ matomo_private }}/matomo-{{ matomo_latest }}.tar.gz"
+    url: "https://builds.piwik.org/matomo-{{ matomo_required }}.tar.gz"
+    dest: "{{ matomo_private }}/matomo-{{ matomo_required }}.tar.gz"
   become: true
   become_user: "{{ matomo_user }}"
   tags:
     - matomo
 
 - name: Matomo GPG signature checked
-  shell: "gpg --no-tty --verify --logger-fd 1 {{ matomo_private }}/matomo-{{ matomo_latest }}.tar.gz.asc | grep 'Good signature'"
+  shell: "gpg --no-tty --verify --logger-fd 1 {{ matomo_private }}/matomo-{{ matomo_required }}.tar.gz.asc | grep 'Good signature'"
   args:
     executable: /bin/bash
   register: matomo_signature_check
@@ -38,19 +39,19 @@
   tags:
     - matomo
 
-- name: Latest Matomo unarchived into private directory
+- name: Required Matomo unarchived into private directory
   unarchive:
     remote_src: true
-    src: "{{ matomo_private }}/matomo-{{ matomo_latest }}.tar.gz"
+    src: "{{ matomo_private }}/matomo-{{ matomo_required }}.tar.gz"
     dest: "{{ matomo_private }}"
   become: true
   become_user: "{{ matomo_user }}"
   tags:
     - matomo
 
-- name: Latest composer.json file fetched from GitHub and added to archive
+- name: Required composer.json file fetched from GitHub and added to archive
   get_url:
-    url: "https://raw.githubusercontent.com/matomo-org/matomo/{{ matomo_latest }}/composer.json"
+    url: "https://raw.githubusercontent.com/matomo-org/matomo/{{ matomo_required }}/composer.json"
     dest: "{{ matomo_private }}/matomo/composer.json"
     force: true
     owner: "{{ matomo_user }}"

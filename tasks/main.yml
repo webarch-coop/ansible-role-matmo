@@ -50,8 +50,13 @@
       become: true
       become_user: "{{ matomo_user }}"
 
+    # Set matomo_latest to the latest available version of Matomo
     - name: Include latest version check
       include_tasks: check_latest_version.yml
+
+    - name: Set the matomo_required variable
+      set_fact:
+        matomo_required: "{% if matomo_update_strategy == 'latest' %}{{ matomo_latest }}{% else %}{{ matomo_version }}{% endif %}"
 
     - name: Check for config.ini.php
       stat:
@@ -61,15 +66,14 @@
     - name: Check the Matomo version and then conditionally upgrade
       block:
 
+        # Set matomo_installed to the installed version of Matomo
         - name: Include version check
           include_tasks: check_version.yml
 
         - name: Include upgrade tasks
           include_tasks: upgrade.yml
-          when: matomo_installed is version(matomo_latest, '<')
-
-        - name: Include version check
-          include_tasks: check_version.yml
+          when:
+            - matomo_installed is version(matomo_required, '<')
 
       when: ( matomo_config_check is defined ) and ( matomo_config_check.stat.exists == True )
       tags:
@@ -78,12 +82,6 @@
     - name: Include install tasks
       include_tasks: install.yml
       when: ( matomo_config_check is defined ) and ( matomo_config_check.stat.exists == False )
-
-    - name: Include Extra Tools tasks
-      include_tasks: extratools.yml
-
-    - name: Include User Console tasks
-      include_tasks: userconsole.yml
 
     - name: Include cron tasks
       include_tasks: cron.yml

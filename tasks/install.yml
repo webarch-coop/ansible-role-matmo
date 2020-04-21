@@ -22,11 +22,19 @@
 
 - name: Matomo extratools tasks included
   include_tasks: extratools.yml
+  when:
+    - matomo_extratools is defined
+    - ( matomo_extratools == "force" ) or ( matomo_extratools == "install" )
+    - matomo_extratools != "skip"
   tags:
     - matomo
 
 - name: Matomo userconsole tasks included
   include_tasks: userconsole.yml
+  when:
+    - matomo_userconsole is defined
+    - ( matomo_userconsole == "force" ) or ( matomo_userconsole == "install" )
+    - matomo_userconsole != "skip"
   tags:
     - matomo
 
@@ -36,8 +44,6 @@
       stat:
         path: "{{ matomo_home }}/.my.cnf"
       register: matomo_mycnf_check
-      tags:
-        - matomo
 
     - name: "MariaDB password read from {{ matomo_home }}/.my.cnf"
       shell: "my_print_defaults --defaults-file='.my.cnf' client | grep '^--password' | sed -e 's/--password=//'"
@@ -49,16 +55,14 @@
       become: true
       become_user: "{{ matomo_user }}"
       changed_when: false
-      tags:
-        - matomo
 
     - name: Set a fact for the MariaDB password
       set_fact:
         matomo_db_pass: "{{ matomo_db_pass_read.stdout }}"
-      tags:
-        - matomo
 
   when: ( matomo_db_pass is not defined ) or ( matomo_db_pass == "" )
+  tags:
+    - matomo
 
 - name: Generate a password if matomo_first_user_pass is not defined
   block:
@@ -67,18 +71,16 @@
       command: pwgen -n 20 1
       no_log: true
       register: matomo_first_user_pass_gen
-      tags:
-        - matomo
 
     - name: Fact set for Matomo admin password
       set_fact:
         matomo_first_user_pass: "{{ matomo_first_user_pass_gen.stdout | trim | quote }}"
       no_log: true
       when: ( matomo_first_user_pass_gen is defined ) and ( matomo_first_user_pass_gen != "" )
-      tags:
-        - matomo
 
   when: ( matomo_first_user_pass is not defined ) or ( matomo_first_user_pass == "" )
+  tags:
+    - matomo
 
 - name: Print the Matomo install command that is to be run
   debug:
@@ -112,8 +114,6 @@
         host: localhost
         port: 25
         secure: never
-      tags:
-        - matomo
 
     - name: "Notification date recorded in {{ matomo_home }}/.notify_matomo_passwd file"
       lineinfile:
@@ -125,8 +125,33 @@
         owner: root
         group: "{{ matomo_user }}"
         mode: 0640
-      tags:
-        - matomo
 
   when: ( matomo_notify_passwd is defined ) and ( matomo_notify_passwd == True )
+  tags:
+    - matomo
+
+- name: Get the installed Matomo version number
+  command: "php console core:update --no-ansi -n --version"
+  args:
+    chdir: "{{ matomo_html }}"
+  changed_when: false
+  check_mode: false
+  become: true
+  become_user: "{{ matomo_user }}"
+  register: matomo_installed_check
+  tags:
+    - matomo
+
+- name: Set a variable for the installed Matomo version number
+  set_fact:
+    matomo_installed: "{{ matomo_installed_check.stdout.split(' ')[2] }}"
+  tags:
+    - matomo
+
+- name: Print the installed version of Matomo
+  debug:
+    msg: "The installed version of Matomo is {{ matomo_installed }}"
+    verbosity: 1
+  tags:
+    - matomo
 ...
