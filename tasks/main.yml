@@ -79,7 +79,7 @@
             - ( matomo_installed is version(matomo_required, '>') )
 
         - name: Warn if the installed version is newer than the latest version
-          warn:
+          debug:
             msg: "Downgrading from the installed Matomo version {{ matomo_installed }} to the latest Matomo {{ matomo_required }} is not supported so has been skipped."
           when:
             - ( matomo_update_strategy is defined ) and ( matomo_update_strategy == "latest" )
