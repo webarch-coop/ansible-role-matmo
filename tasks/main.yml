@@ -56,7 +56,7 @@
 
     - name: Set the matomo_required variable
       set_fact:
-        matomo_required: "{% if matomo_update_strategy == 'latest' %}{{ matomo_latest }}{% else %}{{ matomo_version }}{% endif %}"
+        matomo_required: "{% if matomo_autoupdate == True %}{{ matomo_latest }}{% else %}{{ matomo_version }}{% endif %}"
 
     - name: Check for config.ini.php
       stat:
@@ -74,17 +74,15 @@
           fail:
             msg: "Downgrading from the installed Matomo version {{ matomo_installed }} to Matomo {{ matomo_required }} is not supported."
           when:
-            - ( matomo_update_strategy is defined ) and ( matomo_update_strategy == "version" )
             - ( matomo_installed is defined) and ( matomo_required is defined )
-            - ( matomo_installed is version(matomo_required, '>') )
+            - ( matomo_autoupdate == False ) and ( matomo_installed is version(matomo_required, '>') )
 
         - name: Warn if the installed version is newer than the latest version
           debug:
             msg: "Downgrading from the installed Matomo version {{ matomo_installed }} to the latest Matomo {{ matomo_required }} is not supported so has been skipped."
           when:
-            - ( matomo_update_strategy is defined ) and ( matomo_update_strategy == "latest" )
             - ( matomo_installed is defined) and ( matomo_required is defined )
-            - ( matomo_installed is version(matomo_required, '>') )
+            - ( matomo_autoupdate == True ) and ( matomo_installed is version(matomo_required, '>') )
 
         - name: Include upgrade tasks
           include_tasks: upgrade.yml
