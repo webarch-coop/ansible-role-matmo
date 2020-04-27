@@ -2,7 +2,7 @@
 - name: Get all the sites in JSON format
   command: php console site:list --no-ansi -n --format=json
   args:
-     chdir: "{{ matomo_html }}"
+    chdir: "{{ matomo_html }}"
   check_mode: false
   become: true
   become_user: "{{ matomo_user }}"
@@ -27,7 +27,7 @@
     matomo_site_names: "{{ matomo_site_names }} + [ '{{ site.name }}' ]"
   loop: "{{ matomo_sites_dict | dict2items }}"
   loop_control:
-    loop: site
+    loop_var: site
     label: "{{ site.name }}"
   tags:
     - matomo
