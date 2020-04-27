@@ -53,8 +53,12 @@
 
 - name: Debug matomo_sites.name
   debug:
-    var: matomo_sites.name
+    var: site.name
     verbosity: 1
+  loop: "{{ matomo_sites }}"
+  loop_control:
+    loop_var: site
+    label: "{{ site.id }}" 
   tags:
     - matomo
 
