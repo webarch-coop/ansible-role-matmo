@@ -1,17 +1,33 @@
 ---
-- name: "Get the idsite for {{ matomo_site_name }}"
-  shell: "php console site:list --no-ansi -n | grep ' {{ matomo_site_name | quote }}$' | awk '{ print $1 }' | sed 's/:$//' | head -n 1"
-  args:
-    executable: /bin/bash
-    chdir: "{{ matomo_html }}"
-  changed_when: false
-  check_mode: false
-  become: true
-  become_user: "{{ matomo_user }}"
-  register: matomo_idsite_check
+- name: "Update the matomo_sites_dict"
+  include_tasks: list_sites.yml
+  tags:
+    - matomo
 
-- name: "Set a fact for matomo_idsite for {{ matomo_site_name }}"
+- name: "Get the idsite for {{ matomo_site_name }}"
   set_fact:
-    matomo_idsite: "{{ matomo_idsite_check.stdout }}"
-  when: ( matomo_idsite_check is defined ) and ( matomo_idsite_check != "" )
+    matomo_idsite: "{{ site.id }}"
+  when: site.name == matomo_site_name
+  loop: "{{ matomo_sites_dict | dict2items }}"
+  loop_control:
+    loop: site
+    label: "{{ site.name }}"
+  tags:
+    - matomo
+
+# - name: "Get the idsite for {{ matomo_site_name }}"
+#   shell: "php console site:list --no-ansi -n | grep ' {{ matomo_site_name | quote }}$' | awk '{ print $1 }' | sed 's/:$//' | head -n 1"
+#   args:
+#     executable: /bin/bash
+#     chdir: "{{ matomo_html }}"
+#   changed_when: false
+#   check_mode: false
+#   become: true
+#   become_user: "{{ matomo_user }}"
+#   register: matomo_idsite_check
+# 
+# - name: "Set a fact for matomo_idsite for {{ matomo_site_name }}"
+#   set_fact:
+#     matomo_idsite: "{{ matomo_idsite_check.stdout }}"
+#   when: ( matomo_idsite_check is defined ) and ( matomo_idsite_check != "" )
 ...

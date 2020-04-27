@@ -1,10 +1,4 @@
 ---
-- name: Get the Matomo database prefix
-  include_tasks: table_prefix.yml
-  tags:
-    - matomo
-    - users-update
-
 - name: Set matomo_sites_names to an empty array
   set_fact:
     matomo_sites_names: []

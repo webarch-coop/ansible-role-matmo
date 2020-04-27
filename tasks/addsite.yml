@@ -27,11 +27,16 @@
     - matomo
     - users-update
 
-- name: Include the check sites tasks
+# - name: Include the check sites tasks
+#   include_tasks: check_sites.yml
+#   tags:
+#     - matomo
+#     - users-update
+
+- name: Include the list sites tasks
   include_tasks: check_sites.yml
   tags:
     - matomo
-    - users-update
 
 - name: "Add {{ matomo_site_name }} to the Matomo server"
   block:
