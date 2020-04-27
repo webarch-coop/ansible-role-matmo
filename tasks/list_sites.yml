@@ -10,7 +10,7 @@
   tags:
     - matomo
 
-- name: Create a matomo_sites array 
+- name: Create a matomo_sites array
   set_fact:
     matomo_sites: "{{ matomo_site_list_json.stdout | from_json }}"
   tags:
