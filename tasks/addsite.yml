@@ -35,10 +35,10 @@
   become: true
   become_user: "{{ matomo_user }}"
   register: matomo_site_list_json
-  tags: 
+  tags:
     - matomo
-  
-- name: Create a matomo_sites array     
+
+- name: Create a matomo_sites array
   set_fact:
     matomo_sites: "{{ matomo_site_list_json.stdout | from_json }}"
   tags:
@@ -47,6 +47,13 @@
 - name: Debug matomo_sites
   debug:
     var: matomo_sites
+    verbosity: 1
+  tags:
+    - matomo
+
+- name: Debug matomo_sites.name
+  debug:
+    var: matomo_sites.name
     verbosity: 1
   tags:
     - matomo

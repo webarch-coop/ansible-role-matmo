@@ -10,25 +10,9 @@
   tags:
     - matomo
 
-- name: Create a sites dictionary
+- name: Create a matomo_sites array 
   set_fact:
-    matomo_sites_dict: "{{ matomo_site_list_json.stdout | from_json }}"
-  tags:
-    - matomo
-
-- name: Set matomo_sites_names to an empty array
-  set_fact:
-    matomo_site_names: []
-  tags:
-    - matomo
-
-- name: Create a matomo_sites_names array
-  set_fact:
-    matomo_site_names: "{{ matomo_site_names }} + [ '{{ site.name }}' ]"
-  loop: "{{ matomo_sites_dict | dict2items }}"
-  loop_control:
-    loop_var: site
-    label: "{{ site.name }}"
+    matomo_sites: "{{ matomo_site_list_json.stdout | from_json }}"
   tags:
     - matomo
 ...
