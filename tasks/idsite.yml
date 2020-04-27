@@ -1,5 +1,5 @@
 ---
-- name: "Update the matomo_sites_dict"
+- name: "Update the matomo_sites list"
   include_tasks: list_sites.yml
   tags:
     - matomo
@@ -8,7 +8,7 @@
   set_fact:
     matomo_idsite: "{{ site.id }}"
   when: site.name == matomo_site_name
-  loop: "{{ matomo_sites_dict | dict2items }}"
+  loop: "{{ matomo_sites }}"
   loop_control:
     loop_var: site
     label: "{{ site.name }}"

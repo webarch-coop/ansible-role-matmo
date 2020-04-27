@@ -27,14 +27,27 @@
     - matomo
     - users-update
 
-# - name: Include the check sites tasks
-#   include_tasks: check_sites.yml
-#   tags:
-#     - matomo
-#     - users-update
+- name: Get all the sites in JSON format
+  command: php console site:list --no-ansi -n --format=json
+  args:
+    chdir: "{{ matomo_html }}"
+  check_mode: false
+  become: true
+  become_user: "{{ matomo_user }}"
+  register: matomo_site_list_json
+  tags: 
+    - matomo
+  
+- name: Create a matomo_sites array     
+  set_fact:
+    matomo_sites: "{{ matomo_site_list_json.stdout | from_json }}"
+  tags:
+    - matomo
 
-- name: Include the list sites tasks
-  include_tasks: check_sites.yml
+- name: Debug matomo_sites
+  debug:
+    var: matomo_sites
+    verbosity: 1
   tags:
     - matomo
 
@@ -69,7 +82,7 @@
         - matomo
         - users-update
 
-  when: matomo_site_name not in matomo_sites_names
+  when: matomo_site_name not in matomo_sites.name
 
 - name: Include the idsite tasks, this sets matomo_idsite
   include_tasks: idsite.yml
