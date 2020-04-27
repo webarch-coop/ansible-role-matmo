@@ -10,7 +10,7 @@
   when: site.name == matomo_site_name
   loop: "{{ matomo_sites_dict | dict2items }}"
   loop_control:
-    loop: site
+    loop_var: site
     label: "{{ site.name }}"
   tags:
     - matomo
