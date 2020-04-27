@@ -15,4 +15,35 @@
     matomo_sites: "{{ matomo_site_list_json.stdout | from_json }}"
   tags:
     - matomo
+
+- name: Print matomo_sites
+  debug:
+    var: matomo_sites
+    verbosity: 2
+  tags:
+    - matomo
+
+- name: Set matomo_sites_names to an empty array
+  set_fact:
+    matomo_sites_names: []
+  tags:
+    - matomo
+
+- name: Set an array for the Matomo site names
+  set_fact:
+    matomo_sites_names: "{{ matomo_sites_names }} + [ '{{ site.name }}' ]"
+  loop: "{{ matomo_sites }}"
+  loop_control:
+    loop_var: site
+    label: "{{ site.id }}"
+  tags:
+    - matomo
+
+- name: Print the Matomo site names
+  debug:
+    msg:
+      - "Matomo site names: {{ matomo_sites_names }}"
+    verbosity: 2
+  tags:
+    - matomo
 ...
