@@ -70,6 +70,16 @@
         - name: Include version check
           include_tasks: check_version.yml
 
+        - name: Debug version variables
+          debug:
+            msg:
+              - "Matomo automatic update: {{ matomo_autoupdate }}"
+              - "Matomo version (from defaults): {{ matomo_version }}"
+              - "Matomo installed (checked on the server): {{ matomo_installed }}"
+              - "Matomo required (based on autoupdate): {{ matomo_required }}"
+              - "Matomo latest (checked on GitHub): {{ matomo_latest }}"
+            verbosity: 1
+
         - name: Warn if the installed version is older than the latest version 
           debug:
             msg: "The installed Matomo version {{ matomo_installed }}, is older than the latest Matomo {{ matomo_required }}."
