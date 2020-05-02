@@ -80,13 +80,13 @@
               - "Matomo latest (checked on GitHub): {{ matomo_latest }}"
             verbosity: 1
 
-        - name: Warn if the installed version is older than the latest version 
+        - name: Warn if the installed version is older than the latest version
           debug:
             msg: "The installed Matomo version {{ matomo_installed }}, is older than the latest Matomo {{ matomo_required }}."
           when:
             - ( matomo_installed is version(matomo_latest, '<') )
 
-        - name: Warn if the installed version is newer than the required version 
+        - name: Warn if the installed version is newer than the required version
           debug:
             msg: "Downgrading from the installed Matomo version {{ matomo_installed }}, to the required version, Matomo {{ matomo_required }}, is not supported so has been skipped."
           when:
