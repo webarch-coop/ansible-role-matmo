@@ -63,22 +63,13 @@
         path: "{{ matomo_html }}/config/config.ini.php"
       register: matomo_config_check
 
-    - name: Debug version variables
-      debug:
-        msg:
-          - "Matomo automatic update: {{ matomo_autoupdate }}"
-          - "Matomo version (from defaults): {{ matomo_version }}"
-          - "Matomo installed (checked on the server): {{ matomo_installed }}"
-          - "Matomo required (based on autoupdate): {{ matomo_required }}"
-          - "Matomo latest (checked on GitHub): {{ matomo_latest }}"
-        verbosity: 1
+    # Set matomo_installed to the installed version of Matomo
+    - name: Include version check
+      include_tasks: check_version.yml
+      when: ( matomo_config_check is defined ) and ( matomo_config_check.stat.exists == True )
 
-    - name: Check the Matomo version and then conditionally upgrade
+    - name: Matomo upgrade
       block:
-
-        # Set matomo_installed to the installed version of Matomo
-        - name: Include version check
-          include_tasks: check_version.yml
 
         - name: Debug version variables
           debug:
@@ -107,10 +98,7 @@
           when:
             - ( matomo_autoupdate == True ) or ( matomo_installed is version(matomo_required, '<')
 
-      when:
-        - ( matomo_autoupdate is defined )
-        - ( matomo_installed is defined) and ( matomo_required is defined )
-        - ( matomo_config_check is defined ) and ( matomo_config_check.stat.exists == True )
+      when: ( matomo_autoupdate is defined ) and ( matomo_installed is defined) and ( matomo_required is defined )
       tags:
         - matomo
 
