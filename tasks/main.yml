@@ -63,6 +63,16 @@
         path: "{{ matomo_html }}/config/config.ini.php"
       register: matomo_config_check
 
+    - name: Debug version variables
+      debug:
+        msg:
+          - "Matomo automatic update: {{ matomo_autoupdate }}"
+          - "Matomo version (from defaults): {{ matomo_version }}"
+          - "Matomo installed (checked on the server): {{ matomo_installed }}"
+          - "Matomo required (based on autoupdate): {{ matomo_required }}"
+          - "Matomo latest (checked on GitHub): {{ matomo_latest }}"
+        verbosity: 1
+
     - name: Check the Matomo version and then conditionally upgrade
       block:
 
