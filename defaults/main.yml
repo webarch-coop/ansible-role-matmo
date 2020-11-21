@@ -5,11 +5,12 @@ matomo_autoupdate: false
 # The matomo_version is used if matomo_autoupdate is
 # false
 # https://github.com/matomo-org/matomo/releases
-matomo_version: 3.13.5
+matomo_version: 4.0.0-rc6
 # The Extra Tools and User Console plugins are required, these
 # variables can be set to "install", "force" or "skip"
 matomo_extratools: install
 matomo_userconsole: install
+matomo_userconsole_version: 4.x-dev
 # The system user name for the account (for example www-data)
 matomo_user: stats
 matomo_group: "{{ matomo_user }}"

@@ -1,0 +1,17 @@
+---
+dependency:
+  name: galaxy
+driver:
+  name: docker
+platforms:
+  - name: instance
+    image: registry.git.coop/webarch/containers/images/ansible:0.3
+    pre_build_image: true
+provisioner:
+  name: ansible
+lint: |
+ set -e
+  yamllint -c .yamllint .
+  ansible-lint -c .ansible-lint.yml .
+# vim: syntax=yaml
+...

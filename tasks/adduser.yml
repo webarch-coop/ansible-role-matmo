@@ -2,7 +2,7 @@
 - name: Fail if the Matomo user login is not provided
   fail:
     msg: "A value for matomo_login needs to be provided"
-  when: ( matomo_login is not defined ) or ( matomo_login == "" )
+  when: ( matomo_login is not defined ) or ( matomo_login | length == 0 )
   tags:
     - matomo
     - users-update
@@ -10,7 +10,7 @@
 - name: Fail if the Matomo user email address is not provided
   fail:
     msg: "A value for matomo_login_email needs to be provided"
-  when: ( matomo_login_email is not defined ) or ( matomo_login_email == "" )
+  when: ( matomo_login_email is not defined ) or ( matomo_login_email | length == 0 )
   tags:
     - matomo
     - users-update
@@ -62,7 +62,7 @@
         - matomo
         - users-update
 
-  when: ( matomo_login_email == matomo_login_email_present ) and ( matomo_login_email_present != False )
+  when: ( matomo_login_email == matomo_login_email_present ) and ( matomo_login_email_present )
 
 - name: When a Matomo account with the same email address doesn't exist
   block:
@@ -91,17 +91,17 @@
 
     - name: Add Matomo user
       include_tasks: newuser.yml
-      when: ( matomo_login_present is defined ) and ( matomo_login_present == False )
+      when: ( matomo_login_present is defined ) and ( not matomo_login_present )
       tags:
         - matomo
         - users-update
 
     - name: Check and update Matomo user
       include_tasks: updateuser.yml
-      when: ( matomo_login_present is defined ) and ( matomo_login_present == True )
+      when: ( matomo_login_present is defined ) and ( matomo_login_present )
       tags:
         - matomo
         - users-update
 
-  when: ( matomo_login_email != matomo_login_email_present ) or ( matomo_login_email_present == False )
+  when: ( matomo_login_email != matomo_login_email_present ) or ( not matomo_login_email_present )
 ...

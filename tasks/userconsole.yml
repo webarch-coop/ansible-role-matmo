@@ -4,6 +4,7 @@
   git:
     repo: https://github.com/digitalist-se/userconsole.git
     dest: "{{ matomo_html }}/plugins/UserConsole"
+    version: "{{ matomo_userconsole_version }}"
     clone: true
     update: true
     depth: 1

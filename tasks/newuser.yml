@@ -61,10 +61,10 @@
         owner: root
         group: "{{ matomo_login }}"
         mode: 0640
-      when: ( matomo_login_home is defined ) and ( matomo_login_home != "" )
+      when: ( matomo_login_home is defined ) and ( matomo_login_home | length > 0 )
       tags:
         - matomo
         - users-update
 
-  when: matomo_notify_passwd == True
+  when: matomo_notify_passwd
 ...
