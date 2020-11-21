@@ -9,8 +9,9 @@ matomo_version: 4.0.0-rc6
 # The Extra Tools and User Console plugins are required, these
 # variables can be set to "install", "force" or "skip"
 matomo_extratools: install
+matomo_extratools_version: 4.0.0-beta1
 matomo_userconsole: install
-matomo_userconsole_version: 4.x-dev
+matomo_userconsole_version: 4.0.0
 # The system user name for the account (for example www-data)
 matomo_user: stats
 matomo_group: "{{ matomo_user }}"

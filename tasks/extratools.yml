@@ -30,6 +30,7 @@
   git:
     repo: https://github.com/digitalist-se/extratools.git
     dest: "{{ matomo_html }}/plugins/ExtraTools"
+    version: "{{ matomo_extratools_version }}"
     clone: true
     update: true
     depth: 1
