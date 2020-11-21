@@ -4,7 +4,7 @@
   tags:
     - matomo
 
-- name: Only install or upgrade Matomo if the user account exists
+- name: Only install or upgrade Matomo if the user account is present
   block:
 
     - name: Required directories present
@@ -113,7 +113,7 @@
     - name: Include settings tasks
       include_tasks: settings.yml
 
-  when: '"no such user" not in matomo_user_check.stderr'
+  when: matomo_user in getent_passwd
   tags:
     - matomo
 ...

@@ -6,11 +6,17 @@
   tags:
     - matomo
 
-- name: "Check if the Matomo {{ matomo_user }} user account exists"
-  shell: "id {{ matomo_user }} && echo true || echo false"
-  check_mode: false
-  register: matomo_user_check
-  changed_when: '"no such user" in matomo_user_check.stderr'
+- name: "Populate the getent_passwd array for {{ inventory_hostname }}"
+  getent:
+    database: passwd
+    split: ':'
+  tags:
+    - matomo
+
+- name: "Fail if the {{ matomo_user }} user account doesn't exist"
+  fail:
+    msg: "The {{ matomo_user }} user account doesn't exist on {{ inventory_hostname }}"
+  when: matomo_user not in getent_passwd
   tags:
     - matomo
 
