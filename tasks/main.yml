@@ -74,8 +74,7 @@
 
     - name: Include install tasks
       include_tasks: install.yml
-      when:
-        - ( not matomo_config_check.stat.exists ) or ( "Looks like section database does not exist" in matomo_config_database.stdout_lines )
+      when: ( not matomo_config_check.stat.exists ) or ( "Looks like section database does not exist" in matomo_config_database.stdout_lines )
 
     # Set matomo_installed to the installed version of Matomo
     - name: Include version check
