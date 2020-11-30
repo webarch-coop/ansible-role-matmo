@@ -56,17 +56,33 @@
 
     - name: Set the matomo_required variable
       set_fact:
-        matomo_required: "{% if matomo_autoupdate == True %}{{ matomo_latest }}{% else %}{{ matomo_version }}{% endif %}"
+        matomo_required: "{% if matomo_autoupdate %}{{ matomo_latest }}{% else %}{{ matomo_version }}{% endif %}"
 
     - name: Check for config.ini.php
       stat:
         path: "{{ matomo_html }}/config/config.ini.php"
       register: matomo_config_check
 
+    - name: Check if Matomo is installed
+      command: php console config:get -s database --no-ansi -n
+      args:
+        chdir: "{{ matomo_html }}"
+      register: matomo_config_database
+      when: ( matomo_config_check is defined ) and ( matomo_config_check.stat.exists )
+      become: true
+      become_user: "{{ matomo_user }}"
+
+    - name: Include install tasks
+      include_tasks: install.yml
+      when:
+        - ( not matomo_config_check.stat.exists ) or ( "Looks like section database does not exist" in matomo_config_database.stdout_lines )
+
     # Set matomo_installed to the installed version of Matomo
     - name: Include version check
       include_tasks: check_version.yml
-      when: ( matomo_config_check is defined ) and ( matomo_config_check.stat.exists == True )
+      when:
+        - ( matomo_config_check is defined ) and ( matomo_config_check.stat.exists )
+        - ( matomo_config_database is defined ) and ( "Looks like section database does not exist" not in matomo_config_database.stdout_lines )
 
     - name: Matomo upgrade
       block:
@@ -96,19 +112,17 @@
         - name: Include upgrade tasks
           include_tasks: upgrade.yml
           when:
-            - ( matomo_autoupdate == True ) or ( matomo_installed is version(matomo_required, '<') )
+            - ( matomo_autoupdate ) or ( matomo_installed is version(matomo_required, '<') )
 
-      when: ( matomo_autoupdate is defined ) and ( matomo_installed is defined) and ( matomo_required is defined )
+      when:
+        - ( matomo_autoupdate is defined ) and ( matomo_installed is defined) and ( matomo_required is defined )
+        - ( matomo_config_database is defined ) and ( "Looks like section database does not exist" not in matomo_config_database.stdout_lines )
       tags:
         - matomo
 
-    - name: Include install tasks
-      include_tasks: install.yml
-      when: ( matomo_config_check is defined ) and ( matomo_config_check.stat.exists == False )
-
     - name: Include cron tasks
       include_tasks: cron.yml
-      when: ( matomo_cron is defined ) and ( matomo_cron == True )
+      when: ( matomo_cron is defined ) and ( matomo_cron )
 
     - name: Include settings tasks
       include_tasks: settings.yml
