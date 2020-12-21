@@ -1,4 +1,5 @@
 ---
+# TODO use the Ansible URI module
 - name: Get the latest Matomo version number file
   get_url:
     url: https://builds.matomo.org/LATEST
