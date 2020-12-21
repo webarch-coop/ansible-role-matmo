@@ -2,7 +2,7 @@
 - name: Fail if the Matomo user login is not provided
   fail:
     msg: "A value for matomo_login needs to be provided"
-  when: ( matomo_login is not defined ) or ( matomo_login == "" )
+  when: ( matomo_login is not defined ) or ( matomo_login | length == 0 )
   tags:
     - matomo
     - users-update
@@ -30,5 +30,5 @@
 - name: "Set a fact for matomo_token_auth for {{ matomo_login }}"
   set_fact:
     matomo_token_auth: "{{ matomo_token_auth_check.stdout }}"
-  when: ( matomo_token_auth_check is defined ) and ( matomo_token_auth_check != "" )
+  when: ( matomo_token_auth_check is defined ) and ( matomo_token_auth_check | length > 0 )
 ...

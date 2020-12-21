@@ -18,7 +18,7 @@
         - matomo
         - users-update
 
-  when: ( matomo_login_password is not defined ) or ( matomo_login_password == "" )
+  when: ( matomo_login_password is not defined ) or ( matomo_login_password | length == 0 )
 
 - name: Add user account
   shell: "php console user:create --no-ansi -n --login='{{ matomo_login }}' --email='{{ matomo_login_email }}' --password='{{ matomo_login_password }}'"

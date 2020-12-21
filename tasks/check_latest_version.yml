@@ -1,7 +1,7 @@
 ---
 - name: Get the latest Matomo version number file
   get_url:
-    url: https://builds.piwik.org/LATEST
+    url: https://builds.matomo.org/LATEST
     dest: "{{ matomo_private }}/LATEST"
     force: true
   check_mode: false

@@ -2,7 +2,7 @@
 
 - name: Required Matomo GPG signature downloaded
   get_url:
-    url: "https://builds.piwik.org/matomo-{{ matomo_required }}.tar.gz.asc"
+    url: "https://builds.matomo.org/matomo-{{ matomo_required }}.tar.gz.asc"
     dest: "{{ matomo_private }}/matomo-{{ matomo_required }}.tar.gz.asc"
     force: true
   become: true
@@ -12,7 +12,7 @@
 
 - name: Required Matomo downloaded
   get_url:
-    url: "https://builds.piwik.org/matomo-{{ matomo_required }}.tar.gz"
+    url: "https://builds.matomo.org/matomo-{{ matomo_required }}.tar.gz"
     dest: "{{ matomo_private }}/matomo-{{ matomo_required }}.tar.gz"
   become: true
   become_user: "{{ matomo_user }}"

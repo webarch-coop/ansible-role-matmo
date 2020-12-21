@@ -74,8 +74,8 @@
 - name: "Conditionally check and add the {{ matomo_site_name }} site_urls"
   include_tasks: addurls.yml
   when:
-    - ( matomo_site_urls is defined ) and ( matomo_site_urls != "" )
-    - ( matomo_idsite is defined ) and ( matomo_idsite != "" )
+    - ( matomo_site_urls is defined ) and ( matomo_site_urls | length > 0 )
+    - ( matomo_idsite is defined ) and ( matomo_idsite | length > 0 )
   tags:
     - matomo
     - users-update
@@ -101,9 +101,9 @@
   become: true
   become_user: "{{ matomo_user }}"
   when:
-    - ( matomo_site_admin is defined ) and ( matomo_site_admin != "" )
+    - ( matomo_site_admin is defined ) and ( matomo_site_admin | length > 0 )
     - ( matomo_superuser.stdout != matomo_site_admin )
-    - ( matomo_idsite is defined ) and ( matomo_idsite != "" )
+    - ( matomo_idsite is defined ) and ( matomo_idsite | length > 0 )
   tags:
     - matomo
     - users-update

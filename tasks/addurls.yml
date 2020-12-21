@@ -68,7 +68,7 @@
   loop: "{{ matomo_missing_urls }}"
   loop_control:
     loop_var: url
-  when: ( matomo_missing_urls is defined ) and ( matomo_missing_urls != "" )
+  when: ( matomo_missing_urls is defined ) and ( matomo_missing_urls | length > 0 )
   tags:
     - matomo
     - users-update

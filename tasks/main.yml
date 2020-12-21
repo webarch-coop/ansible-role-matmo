@@ -20,7 +20,7 @@
       loop_control:
         loop_var: dir
 
-    # https://builds.piwik.org/signature.asc
+    # https://builds.matomo.org/signature.asc
     - name: The Matomo GPG public key is present
       copy:
         src: files/matomo.pub

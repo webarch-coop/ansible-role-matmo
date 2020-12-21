@@ -34,7 +34,9 @@
             owner: "{{ matomo_user }}"
             group: "{{ matomo_group }}"
             mode: "0750"
-          when: ( matomo_bin_cron_hourly is defined ) and ( matomo_bin_cron_hourly.stat.exists == False )
+          when:
+            - matomo_bin_cron_hourly is defined
+            - not matomo_bin_cron_hourly.stat.exists
 
         - name: "Archive job added to {{ matomo_home }}/bin/cron_hourly.sh script for {{ matomo_user }}"
           lineinfile:

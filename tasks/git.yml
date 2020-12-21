@@ -12,7 +12,9 @@
     state: absent
   become: true
   become_user: "{{ matomo_user }}"
-  when: ( matomo_git_clone.stat.exists == False ) and ( matomo_git_clone.stat.isdir == False )
+  when:
+    - not matomo_git_clone.stat.exists
+    - not matomo_git_clone.stat.isdir
   tags:
     - matomo
 

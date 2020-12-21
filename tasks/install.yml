@@ -60,7 +60,7 @@
       set_fact:
         matomo_db_pass: "{{ matomo_db_pass_read.stdout }}"
 
-  when: ( matomo_db_pass is not defined ) or ( matomo_db_pass == "" )
+  when: ( matomo_db_pass is not defined ) or ( matomo_db_pass | length == 0 )
   tags:
     - matomo
 
@@ -76,9 +76,9 @@
       set_fact:
         matomo_first_user_pass: "{{ matomo_first_user_pass_gen.stdout | trim | quote }}"
       no_log: true
-      when: ( matomo_first_user_pass_gen is defined ) and ( matomo_first_user_pass_gen != "" )
+      when: ( matomo_first_user_pass_gen is defined ) and ( matomo_first_user_pass_gen | length > 0 )
 
-  when: ( matomo_first_user_pass is not defined ) or ( matomo_first_user_pass == "" )
+  when: ( matomo_first_user_pass is not defined ) or ( matomo_first_user_pass | length == 0 )
   tags:
     - matomo
 

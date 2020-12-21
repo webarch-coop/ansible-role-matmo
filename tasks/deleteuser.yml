@@ -2,7 +2,7 @@
 - name: Fail if the Matomo user login is not present
   fail:
     msg: "A value for matomo_login needs to be provided"
-  when: ( matomo_login is not defined ) or ( matomo_login == "" )
+  when: ( matomo_login is not defined ) or ( matomo_login | length == 0 )
   tags:
     - matomo
     - users-update
@@ -58,7 +58,7 @@
         chdir: "{{ matomo_html }}"
       when:
         - matomo_login_present is defined
-        - matomo_login_present == True
+        - matomo_login_present
       become: true
       become_user: "{{ matomo_user }}"
       tags:

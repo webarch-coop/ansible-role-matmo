@@ -59,7 +59,7 @@
 - name: "Fail if any of the directories for {{ matomo_user }} don't exist"
   fail:
     msg: "The directory {{ dir.stat.path }} needs to exist"
-  when: dir.stat.isdir == False
+  when: not dir.stat.isdir
   loop: "{{ matomo_dirs.results }}"
   loop_control:
     loop_var: dir
