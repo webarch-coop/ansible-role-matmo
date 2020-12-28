@@ -29,9 +29,9 @@
   uri:
     url: "{{ matomo_url }}index.php?action=systemCheck"
     method: GET
-    status_code: 200
     headers:
-      Cookie: "{{ matomo_welcome.cookie_string }}"
+      Cookie: "{{ matomo_session_cookie }}"
+    status_code: 200
 
 - name: Pause
   pause:
@@ -40,6 +40,9 @@
 - name: Step 3 Database Set-up
   uri:
     url: "{{ matomo_url }}index.php?action=databaseSetup"
+    method: POST
+    headers:
+      Cookie: "{{ matomo_session_cookie }}"
     body:
       host: "{{ matomo_db_host }}"
       username: "{{ matomo_db_username }}"
@@ -48,7 +51,6 @@
       tables_prefix: "{{ matomo_db_prefix | default('matomo_') }}"
       adapter: "{{ matomo_db_adaptor | default('PDO\\MYSQL') }}"
     body_format: form-urlencoded
-    method: POST
     status_code: 302
 
 - name: Pause
@@ -68,6 +70,9 @@
 - name: Step 5 General Set-up
   uri:
     url: "{{ matomo_url }}index.php?action=setupSuperUser&module=Installation"
+    method: POST
+    headers:
+      Cookie: "{{ matomo_session_cookie }}"
     body:
       login: "{{ matomo_first_user }}"
       password: "{{ matomo_first_user_pass }}"
@@ -76,7 +81,6 @@
       subscribe_newsletter_piwikorg: 0
       subscribe_newsletter_professionalservices: 0
     body_format: form-urlencoded
-    method: POST
     status_code: 302
 
 - name: Pause
@@ -86,13 +90,15 @@
 - name: Step 6 Configure first web-site
   uri:
     url: "{{ matomo_url }}index.php?action=firstWebsiteSetup&module=Installation"
+    method: POST
+    headers:
+      Cookie: "{{ matomo_session_cookie }}"
     body:
       siteName: "{{ matomo_first_site_name }}"
       url: "{{ matomo_first_site_url }}"
       timezone: "{{ matomo_first_site_tz | default('Europe/London') }}"
       ecommerce: 0
     body_format: form-urlencoded
-    method: POST
     status_code: 302
 
 - name: Pause
@@ -103,6 +109,8 @@
   uri:
     url: "{{ matomo_url }}index.php?action=trackingCode&module=Installation&site_idSite=1&site_name=example.org"
     method: GET
+    headers:
+      Cookie: "{{ matomo_session_cookie }}"
     status_code: 200
 
 - name: Pause
@@ -112,11 +120,13 @@
 - name: Step 8 Finished!
   uri:
     url: "{{ matomo_url }}index.php?action=finished&module=Installation"
+    method: POST
+    headers:
+      Cookie: "{{ matomo_session_cookie }}"
     body:
       do_not_track: 1
       anonymise_ip: 1
       submit: "Continue to Matomo »"
     body_format: form-urlencoded
-    method: POST
     status_code: 302
 ...
