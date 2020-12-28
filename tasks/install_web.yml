@@ -39,7 +39,7 @@
       register: matomo_system_check
 
     - name: Write the system check body to a file
-      content:
+      copy:
         src: "{{  matomo_system_check.content }}"
         dest: "{{ matomo_private }}/matomo_system_check.html"
         force: true
