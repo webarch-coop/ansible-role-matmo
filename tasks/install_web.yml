@@ -40,7 +40,7 @@
 
     - name: Write the system check body to a file
       copy:
-        src: "{{ matomo_system_check.content }}"
+        content: "{{ matomo_system_check.content }}"
         dest: "{{ matomo_private }}/matomo_system_check.html"
         force: true
         owner: "{{ matomo_user }}"
