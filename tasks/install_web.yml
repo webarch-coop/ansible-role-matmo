@@ -1,5 +1,5 @@
 ---
-# This has been based on https://github.com/Aversiste/ansible-matomo/blob/master/tasks/main.yml
+# This is based on https://github.com/Aversiste/ansible-matomo/blob/master/tasks/main.yml
 - name: Install Matomo using HTTP requests
   block:
 
