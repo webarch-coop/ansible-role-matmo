@@ -22,6 +22,8 @@
     url: "{{ matomo_url }}index.php?action=systemCheck"
     method: GET
     status_code: 200
+  headers:
+    Cookie: "{{ matomo_welcome.cookie_string }}"
 
 - name: Pause
   pause:
