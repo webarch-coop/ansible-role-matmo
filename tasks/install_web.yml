@@ -30,7 +30,7 @@
       password: "{{ matomo_db_pass }}"
       dbname: "{{ matomo_dbname }}"
       tables_prefix: "{{ matomo_db_prefix | default('matomo_') }}"
-      adapter: "{{ matomo_db_adaptor }}"
+      adapter: "{{ matomo_db_adaptor | default('PDO\\MYSQL') }}"
     body_format: form-urlencoded
     method: POST
     status_code: 302

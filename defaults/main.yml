@@ -28,7 +28,7 @@ matomo_db_pass: ""
 matomo_db_host: localhost
 matomo_dbname: "{{ matomo_user }}"
 matomo_db_prefix: "matomo_"
-matomo_db_adaptor: "PDO\MYSQL"
+matomo_db_adaptor: "PDO\\MYSQL"
 matomo_url: "https://{{ matomo_user }}.{{ inventory_hostname }}/"
 matomo_first_site_name: "{{ inventory_hostname }}"
 matomo_first_site_url: "http://{{ inventory_hostname }}/"
