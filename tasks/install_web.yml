@@ -1,6 +1,6 @@
 ---
-# https://github.com/Aversiste/ansible-matomo/blob/master/tasks/main.yml
-- name: Install MAtomo using HTTP requests
+# This has been based on https://github.com/Aversiste/ansible-matomo/blob/master/tasks/main.yml
+- name: Install Matomo using HTTP requests
   block:
 
     - name: HTTP GET Welcome
@@ -98,6 +98,17 @@
         status_code: 200
       register: matomo_table_creation
  
+    - name: Set a variable for the MATOMO_SESSID cookie
+      set_fact:
+        matomo_session_cookie: "MATOMO_SESSID={{ cookie.value }}" 
+      when:
+        - matomo_table_creation.cookies is defined
+        - matomo_table_creation.cookies | length > 0
+        - cookie.key == "MATOMO_SESSID"
+      loop: "{{ matomo_table_creation.cookies | dict2items }}"
+      loop_control:
+        loop_var: cookie
+ 
     - name: Debug Table Creation HTTP GET
       debug:
         var: matomo_table_creation
@@ -159,7 +170,7 @@
  
     - name: HTTP GET Display JavaScript tracking code
       uri:
-        url: "{{ matomo_url }}index.php?action=trackingCode&module=Installation&site_idSite=1&site_name=example.org"
+        url: "{{ matomo_url }}index.php?action=trackingCode&module=Installation&site_idSite=1&site_name={{ matomo_first_site_name }}"
         method: GET
         headers:
           Cookie: "{{ matomo_session_cookie }}"
