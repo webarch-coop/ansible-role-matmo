@@ -8,10 +8,17 @@
     status_code: 200
   register: matomo_welcome
 
-- name: Debug Welcome
+- name: Debug Welcome Cookies
   debug:
-    var: matomo_welcome
+    var: matomo_welcome.cookies
     verbosity: 2
+
+# - name: Set a variable for the MATOMO_SESSID cookie
+#   set_fact:
+#     matomo_session_cookie:  
+#   loop: "{{ matomo_welcome.cookies }}"
+#   loop_control:
+#     loop_var: cookie
 
 - name: Pause
   pause:
