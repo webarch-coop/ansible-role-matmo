@@ -5,7 +5,7 @@ matomo_autoupdate: false
 # The matomo_version is used if matomo_autoupdate is
 # false
 # https://github.com/matomo-org/matomo/releases
-matomo_version: 4.0.5
+matomo_version: 4.1.0
 # The matomo_install options are web for a HTTP install or extratools for
 # a CLI install process  
 matomo_install: web
