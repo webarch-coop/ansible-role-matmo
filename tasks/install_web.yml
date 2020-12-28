@@ -6,6 +6,12 @@
     url: "{{ matomo_url }}index.php?action=welcome"
     method: GET
     status_code: 200
+  register: matomo_welcome
+
+- name: Debug Welcome
+  debug:
+    var: matomo_welcome
+    verbosity: 2
 
 - name: Pause
   pause:
