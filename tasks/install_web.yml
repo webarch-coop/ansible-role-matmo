@@ -13,12 +13,13 @@
     var: matomo_welcome.cookies
     verbosity: 2
 
-# - name: Set a variable for the MATOMO_SESSID cookie
-#   set_fact:
-#     matomo_session_cookie:  
-#   loop: "{{ matomo_welcome.cookies }}"
-#   loop_control:
-#     loop_var: cookie
+- name: Set a variable for the MATOMO_SESSID cookie
+  set_fact:
+    matomo_session_cookie: "MATOMO_SESSID={{ cookie.value }}" 
+  when: cookie.key == "MATOMO_SESSID"
+  loop: "{{ matomo_welcome.cookies | dict2items }}"
+  loop_control:
+    loop_var: cookie
 
 - name: Pause
   pause:
