@@ -35,7 +35,7 @@
         msg:
           - "Matomo GPG check failed:"
           - "{{ matomo_signature_check.stdout_lines }}"
-      when: ( "Good signature from" not in matomo_signature_check.stdout_lines )
+      when: ( 'gpg: Good signature from "Matthieu Aubry <matt@piwik.org>" [unknown]' not in matomo_signature_check.stdout_lines )
 
     - name: Private directory for Matomo to be unarchived into absent
       file:
