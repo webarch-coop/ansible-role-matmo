@@ -22,6 +22,7 @@
     - name: Matomo GPG signature checked
       command: "gpg --no-tty --verify --logger-fd 1 '{{ matomo_private }}/matomo-{{ matomo_required }}.tar.gz.asc'"
       register: matomo_signature_check
+      failed_when: ( "Good signature from \"Matthieu Aubry <matt@piwik.org>\"" not in matomo_signature_check.stdout_lines )
       become: true
       become_user: "{{ matomo_user }}"
 
@@ -29,13 +30,6 @@
       debug:
         var: matomo_signature_check.stdout_lines
         verbosity: 2
-
-    - name: Fail if the GPG signature isn't good
-      fail:
-        msg:
-          - "Matomo GPG check failed:"
-          - "{{ matomo_signature_check.stdout_lines }}"
-      when: ( "gpg:\ Good signature from \"Matthieu Aubry <matt@piwik.org>\" [unknown]" not in matomo_signature_check.stdout_lines )
 
     - name: Private directory for Matomo to be unarchived into absent
       file:
