@@ -46,7 +46,6 @@
         dest: "{{ matomo_private }}"
         owner: "{{ matomo_user }}"
         group: "{{ matomo_group }}"
-        mode: 0640
 
     - name: Required composer.json file fetched from GitHub and added to archive
       get_url:
