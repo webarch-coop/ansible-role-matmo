@@ -25,6 +25,11 @@
       become: true
       become_user: "{{ matomo_user }}"
 
+    - name: Debug GPG signature check
+      debug:
+        var: matomo_signature_check.stdout_lines
+        verbosity: 2
+
     - name: Fail if the GPG signature isn't good
       fail:
         msg:
