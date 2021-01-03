@@ -20,9 +20,11 @@
         mode: 0640
 
     - name: Matomo GPG signature checked
-      command: "gpg --no-tty --verify --logger-fd 1 '{{ matomo_private }}/matomo-{{ matomo_required }}.tar.gz.asc'"
+      command: >
+        gpg --no-tty --verify --logger-fd 1
+        "{{ matomo_private }}/matomo-{{ matomo_required }}.tar.gz.asc"
+        "{{ matomo_private }}/matomo-{{ matomo_required }}.tar.gz"
       register: matomo_signature_check
-      failed_when: ( "Good signature from \"Matthieu Aubry <matt@piwik.org>\"" not in matomo_signature_check.stdout_lines )
       become: true
       become_user: "{{ matomo_user }}"
 
