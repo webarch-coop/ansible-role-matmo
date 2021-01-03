@@ -25,11 +25,12 @@
       copy:
         src: files/matomo.pub
         dest: "{{ matomo_private }}/matomo.pub"
-      become: true
-      become_user: "{{ matomo_user }}"
+        owner: "{{ matomo_user }}"
+        group: "{{ matomo_user }}"
+        mode: 0644
 
     - name: The Matomo GPG public key is imported
-      command: "gpg --no-tty --import {{ matomo_private }}/matomo.pub"
+      command: "gpg --no-tty --import '{{ matomo_private }}/matomo.pub'"
       register: matomo_gpg_key_import
       changed_when: "'not changed' not in matomo_gpg_key_import.stderr"
       become: true
@@ -40,11 +41,12 @@
       copy:
         src: files/github.pub
         dest: "{{ matomo_private }}/github.pub"
-      become: true
-      become_user: "{{ matomo_user }}"
+        owner: "{{ matomo_user }}"
+        group: "{{ matomo_user }}"
+        mode: 0644
 
     - name: The GitHub GPG public key is imported
-      command: "gpg --no-tty --import {{ matomo_private }}/github.pub"
+      command: "gpg --no-tty --import '{{ matomo_private }}/github.pub'"
       register: matomo_gh_gpg_key_import
       changed_when: "'not changed' not in matomo_gh_gpg_key_import.stderr"
       become: true

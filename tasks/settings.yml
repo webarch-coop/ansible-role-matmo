@@ -1,16 +1,4 @@
 ---
-- name: "Check if force_ssl is set to 1 for {{ matomo_user }}"
-  shell: "php console config:get --no-ansi -n --section='General' | sed 's/://g'"
-  args:
-    executable: /bin/bash
-    chdir: "{{ matomo_html }}"
-  register: matomo_config_general
-  become: true
-  become_user: "{{ matomo_user }}"
-  changed_when: ( "force_ssl 1" not in matomo_config_general.stdout_lines )
-  tags:
-    - matomo
-
 - name: "Set force_ssl to true for {{ matomo_user }}"
   shell: "php console config:set --no-ansi -n --section='General' --key='force_ssl' --value='1'"
   args:

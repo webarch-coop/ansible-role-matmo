@@ -7,13 +7,15 @@ matomo_autoupdate: false
 # https://github.com/matomo-org/matomo/releases
 matomo_version: 4.1.0
 # The matomo_install options are web for a HTTP install or extratools for
-# a CLI install process  
+# a CLI install process
 matomo_install: web
 # The Extra Tools and User Console plugins are required, these
 # variables can be set to "install", "force" or "skip"
-matomo_extratools: skip # doesn't install with Matomo 4.x yet
+# ExtraTools doesn't install for Matomo 4.x
+matomo_extratools: skip
 matomo_extratools_version: 4.0.0-beta2
-matomo_userconsole: skip # doesn't install with Matomo 4.x yet
+# UserConsole doesn't install for Matomo 4.x
+matomo_userconsole: skip
 matomo_userconsole_version: 4.0.0
 # The system user name for the account (for example www-data)
 matomo_user: stats

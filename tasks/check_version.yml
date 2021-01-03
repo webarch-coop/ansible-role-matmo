@@ -1,66 +1,60 @@
 ---
-- name: Get the installed Matomo version number
-  command: "php console core:update --no-ansi -n --version"
-  args:
-    chdir: "{{ matomo_html }}"
-  changed_when: false
-  check_mode: false
-  become: true
-  become_user: "{{ matomo_user }}"
-  register: matomo_installed_check
-  tags:
-    - matomo
+- name: Check the versuon of Matomo and if the ExtraTools and UserConsole are installed and activated
+  block:
 
-- name: Set a variable for the installed Matomo version number
-  set_fact:
-    matomo_installed: "{{ matomo_installed_check.stdout.split(' ')[2] }}"
-  tags:
-    - matomo
+    - name: Get the installed Matomo version number
+      command: "php console core:update --no-ansi -n --version"
+      args:
+        chdir: "{{ matomo_html }}"
+      changed_when: false
+      check_mode: false
+      become: true
+      become_user: "{{ matomo_user }}"
+      register: matomo_installed_check
 
-- name: Print the installed version of Matomo
-  debug:
-    msg: "The installed version of Matomo is {{ matomo_installed }}"
-    verbosity: 1
-  tags:
-    - matomo
+    - name: Set a variable for the installed Matomo version number
+      set_fact:
+        matomo_installed: "{{ matomo_installed_check.stdout.split(' ')[2] | trim }}"
 
-- name: Check if Extra Tools is activated
-  shell: "php console --no-ansi plugin:activate ExtraTools || echo FAIL"
-  args:
-    executable: /bin/bash
-    chdir: "{{ matomo_html }}"
-  check_mode: false
-  become: true
-  become_user: "{{ matomo_user }}"
-  register: matomo_extratools_check
-  changed_when: '"ExtraTools is already activated" not in matomo_extratools_check.stdout'
-  tags:
-    - matomo
+    - name: Print the installed version of Matomo
+      debug:
+        msg: "The installed version of Matomo is {{ matomo_installed | quote }}"
+        verbosity: 1
 
-- name: Variable set for Extra Tools install
-  set_fact:
-    matomo_extratools: install
-  when: '"FAIL" in matomo_extratools_check.stdout'
-  tags:
-    - matomo
+    - name: Check if ExtraTools plugin is present
+      stat:
+        path: "{{ matomo_html }}/plugins/ExtraTools"
+        register: matomo_extratools_path
 
-- name: Check if User Console is activated
-  shell: "php console --no-ansi plugin:activate UserConsole || echo FAIL"
-  args:
-    executable: /bin/bash
-    chdir: "{{ matomo_html }}"
-  check_mode: false
-  become: true
-  become_user: "{{ matomo_user }}"
-  register: matomo_userconsole_check
-  changed_when: '"UserConsole is already activated" not in matomo_userconsole_check.stdout'
-  tags:
-    - matomo
+    - name: Check if Extra Tools is activated
+      shell: "php console --no-ansi plugin:activate ExtraTools || echo FAIL"
+      args:
+        executable: /bin/bash
+        chdir: "{{ matomo_html }}"
+      check_mode: false
+      become: true
+      become_user: "{{ matomo_user }}"
+      register: matomo_extratools_check
+      changed_when: '"ExtraTools is already activated" not in matomo_extratools_check.stdout'
+      when: matomo_extratools_path.stat.isdir
 
-- name: Variable set for User Console install
-  set_fact:
-    matomo_userconsole: install
-  when: '"FAIL" in matomo_userconsole_check.stdout'
+    - name: Check if UserConsole plugin is present
+      stat:
+        path: "{{ matomo_html }}/plugins/UserConsole"
+        register: matomo_userconsole_path
+
+    - name: Check if User Console is activated
+      shell: "php console --no-ansi plugin:activate UserConsole || echo FAIL"
+      args:
+        executable: /bin/bash
+        chdir: "{{ matomo_html }}"
+      check_mode: false
+      become: true
+      become_user: "{{ matomo_user }}"
+      register: matomo_userconsole_check
+      changed_when: '"UserConsole is already activated" not in matomo_userconsole_check.stdout'
+      when: matomo_userconsole_path.stat.isdir
+
   tags:
     - matomo
 ...
