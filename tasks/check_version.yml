@@ -1,5 +1,5 @@
 ---
-- name: Check the versuon of Matomo and if the ExtraTools and UserConsole are installed and activated
+- name: Check the version of Matomo and if the ExtraTools and UserConsole are installed and activated
   block:
 
     - name: Get the installed Matomo version number

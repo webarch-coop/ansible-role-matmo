@@ -1,153 +1,132 @@
 ---
-- name: Matomo download tgz tasks included
-  include_tasks: download.yml
-  when: ( matomo_git is not defined ) or ( not matomo_git )
-  tags:
-    - matomo
+- name: Install Matomo
+  block:
 
-- name: Matomo git clone tasks included
-  include_tasks: git.yml
-  when: ( matomo_git is defined ) and ( matomo_git )
-  tags:
-    - matomo
+    - name: Matomo download tgz tasks included
+      include_tasks: download.yml
+      when: ( matomo_git is not defined ) or ( not matomo_git )
 
-- name: Matomo files rsynced into place
-  shell: "rsync -aq {{ matomo_private }}/matomo/ {{ matomo_html }}/"
-  args:
-    executable: /bin/bash
-  become: true
-  become_user: "{{ matomo_user }}"
-  tags:
-    - matomo
+    - name: Matomo git clone tasks included
+      include_tasks: git.yml
+      when: ( matomo_git is defined ) and ( matomo_git )
 
-- name: Matomo extratools tasks included
-  include_tasks: extratools.yml
-  when:
-    - matomo_extratools is defined
-    - ( matomo_extratools == "force" ) or ( matomo_extratools == "install" )
-    - matomo_extratools != "skip"
-  tags:
-    - matomo
-
-- name: Matomo userconsole tasks included
-  include_tasks: userconsole.yml
-  when:
-    - matomo_userconsole is defined
-    - ( matomo_userconsole == "force" ) or ( matomo_userconsole == "install" )
-    - matomo_userconsole != "skip"
-  tags:
-    - matomo
-
-- block:
-
-    - name: "Check for {{ matomo_home }}/.my.cnf"
-      stat:
-        path: "{{ matomo_home }}/.my.cnf"
-      register: matomo_mycnf_check
-
-    - name: "MariaDB password read from {{ matomo_home }}/.my.cnf"
-      shell: "my_print_defaults --defaults-file='.my.cnf' client | grep '^--password' | sed -e 's/--password=//'"
+    - name: Matomo files rsynced into place
+      shell: "rsync -aq {{ matomo_private }}/matomo/ {{ matomo_html }}/"
       args:
         executable: /bin/bash
-        chdir: "{{ matomo_html }}"
-      register: matomo_db_pass_read
-      when: ( matomo_mycnf_check is defined ) and ( matomo_mycnf_check.stat.exists )
       become: true
       become_user: "{{ matomo_user }}"
+
+    - name: Matomo extratools tasks included
+      include_tasks: extratools.yml
+      when:
+        - ( matomo_extratools is defined) and ( matomo_extratools != "skip" )
+        - ( matomo_extratools == "force" ) or ( matomo_extratools == "install" )
+
+    - name: Matomo userconsole tasks included
+      include_tasks: userconsole.yml
+      when:
+        - ( matomo_userconsole is defined ) and ( matomo_userconsole != "skip" )
+        - ( matomo_userconsole == "force" ) or ( matomo_userconsole == "install" )
+
+    - block:
+
+        - name: "Check for {{ matomo_home }}/.my.cnf"
+          stat:
+            path: "{{ matomo_home }}/.my.cnf"
+          register: matomo_mycnf_check
+
+        - name: "MariaDB password read from {{ matomo_home }}/.my.cnf"
+          command: "my_print_defaults --defaults-file='.my.cnf' client"
+          args:
+            chdir: "{{ matomo_home }}"
+          register: matomo_my_print_defaults
+          changed_when: false
+          when: ( matomo_mycnf_check is defined ) and ( matomo_mycnf_check.stat.exists )
+          no_log: true
+
+        - name: Set a fact for the MariaDB password
+          set_fact:
+            matomo_db_pass: "{{ line | regex_replace('^--password=') | trim }}"
+          when: line is regex('^--password=')
+          loop: "{{ my_print_defaults.stdout_lines }}"
+          loop_control:
+            loop_var: line
+          no_log: true
+
+      when: ( matomo_db_pass is not defined ) or ( matomo_db_pass | length == 0 )
+
+    - name: Generate a password if matomo_first_user_pass is not defined
+      block:
+
+        - name: Random passwd for Matomo admin generated
+          command: pwgen -n 20 1
+          no_log: true
+          register: matomo_first_user_pass_gen
+
+        - name: Fact set for Matomo admin password
+          set_fact:
+            matomo_first_user_pass: "{{ matomo_first_user_pass_gen.stdout | trim | quote }}"
+          when: ( matomo_first_user_pass_gen is defined ) and ( matomo_first_user_pass_gen | length > 0 )
+          no_log: true
+
+      when: ( matomo_first_user_pass is not defined ) or ( matomo_first_user_pass | length == 0 )
+
+    - name: Include extratools install tasks
+      include_tasks: install_extratools.yml
+      when: matomo_install == "extratools"
+
+    - name: Include web install tasks
+      include_tasks: install_web.yml
+      when: matomo_install == "web"
+
+    - name: Matomo admin password notification
+      block:
+
+        - name: "Password notification email sent to {{ matomo_first_user_email }}"
+          mail:
+            from: "{{ matomo_notify_from }}"
+            to: '"{{ matomo_first_user | quote }}" <{{ matomo_first_user_email }}>'
+            subject: "[{{ matomo_notify_subject_tag | default('webarchitects') }}] Matomo superuser password for {{ matomo_first_user }} on {{ vhost.value.users_apache_server_name }}"
+            # https://github.com/ansible/ansible/issues/58543
+            charset: us-ascii
+            body: "{{ lookup('template', 'templates/notify_matomo_install_passwd.j2') }}"
+            host: localhost
+            port: 25
+            secure: never
+
+        - name: "Notification date recorded in {{ matomo_home }}/.notify_matomo_passwd file"
+          lineinfile:
+            path: "{{ matomo_home }}/.notify_matomo_passwd"
+            line: "{{ lookup('pipe', 'date +%Y-%m-%d-%H-%M-%S')}} : {{ matomo_first_user | quote  }} <{{ matomo_first_user_email }}>"
+            create: true
+            state: present
+            insertafter: EOF
+            owner: root
+            group: "{{ matomo_user }}"
+            mode: 0640
+
+      when: ( matomo_notify_passwd is defined ) and ( matomo_notify_passwd )
+
+    - name: Get the installed Matomo version number
+      command: "php console core:update --no-ansi -n --version"
+      args:
+        chdir: "{{ matomo_html }}"
       changed_when: false
+      check_mode: false
+      become: true
+      become_user: "{{ matomo_user }}"
+      register: matomo_installed_check
 
-    - name: Set a fact for the MariaDB password
+    - name: Set a variable for the installed Matomo version number
       set_fact:
-        matomo_db_pass: "{{ matomo_db_pass_read.stdout }}"
+        matomo_installed: "{{ matomo_installed_check.stdout.split(' ')[2] }}"
 
-  when: ( matomo_db_pass is not defined ) or ( matomo_db_pass | length == 0 )
-  tags:
-    - matomo
+    - name: Print the installed version of Matomo
+      debug:
+        msg: "The installed version of Matomo is {{ matomo_installed }}"
+        verbosity: 1
 
-- name: Generate a password if matomo_first_user_pass is not defined
-  block:
-
-    - name: Random passwd for Matomo admin generated
-      command: pwgen -n 20 1
-      no_log: true
-      register: matomo_first_user_pass_gen
-
-    - name: Fact set for Matomo admin password
-      set_fact:
-        matomo_first_user_pass: "{{ matomo_first_user_pass_gen.stdout | trim | quote }}"
-      no_log: true
-      when: ( matomo_first_user_pass_gen is defined ) and ( matomo_first_user_pass_gen | length > 0 )
-
-  when: ( matomo_first_user_pass is not defined ) or ( matomo_first_user_pass | length == 0 )
-  tags:
-    - matomo
-
-- name: Include extratools install tasks
-  include_tasks: install_extratools.yml
-  when:
-    - matomo_install == "extratools"
-  tags:
-    - matomo
-
-- name: Include web install tasks
-  include_tasks: install_web.yml
-  when:
-    - matomo_install == "web"
-  tags:
-    - matomo
-
-- name: Matomo admin password notification
-  block:
-
-    - name: "Password notification email sent to {{ matomo_first_user_email }}"
-      mail:
-        from: "{{ matomo_notify_from }}>"
-        to: '"{{ matomo_first_user | quote }}" <{{ matomo_first_user_email }}>'
-        subject: "[{{ matomo_notify_subject_tag | default('webarchitects') }}] Matomo superuser password for {{ matomo_first_user }} on {{ vhost.value.users_apache_server_name }}"
-        # https://github.com/ansible/ansible/issues/58543
-        charset: us-ascii
-        body: "{{ lookup('template', 'templates/notify_matomo_install_passwd.j2') }}"
-        host: localhost
-        port: 25
-        secure: never
-
-    - name: "Notification date recorded in {{ matomo_home }}/.notify_matomo_passwd file"
-      lineinfile:
-        path: "{{ matomo_home }}/.notify_matomo_passwd"
-        line: "{{ lookup('pipe', 'date +%Y-%m-%d-%H-%M-%S')}} : {{ matomo_first_user | quote  }} <{{ matomo_first_user_email }}>"
-        create: true
-        state: present
-        insertafter: EOF
-        owner: root
-        group: "{{ matomo_user }}"
-        mode: 0640
-
-  when: ( matomo_notify_passwd is defined ) and ( matomo_notify_passwd )
-  tags:
-    - matomo
-
-- name: Get the installed Matomo version number
-  command: "php console core:update --no-ansi -n --version"
-  args:
-    chdir: "{{ matomo_html }}"
-  changed_when: false
-  check_mode: false
-  become: true
-  become_user: "{{ matomo_user }}"
-  register: matomo_installed_check
-  tags:
-    - matomo
-
-- name: Set a variable for the installed Matomo version number
-  set_fact:
-    matomo_installed: "{{ matomo_installed_check.stdout.split(' ')[2] }}"
-  tags:
-    - matomo
-
-- name: Print the installed version of Matomo
-  debug:
-    msg: "The installed version of Matomo is {{ matomo_installed }}"
-    verbosity: 1
   tags:
     - matomo
 ...

@@ -1,85 +1,70 @@
 ---
-- name: Matomo download tgz tasks included
-  include_tasks: download.yml
-  when: ( matomo_git is not defined ) or ( not matomo_git )
-  tags:
-    - matomo
+- name: Upgrade Matomo
+  block:
+    
+    - name: Matomo download tgz tasks included
+      include_tasks: download.yml
+      when: ( matomo_git is not defined ) or ( not matomo_git )
+    
+    - name: Matomo git clone tasks included
+      include_tasks: git.yml
+      when: ( matomo_git is defined ) and ( matomo_git )
+    
+    - name: Backup up the Matomo config file
+      copy:
+        remote_src: true
+        src: "{{ matomo_html }}/config/config.ini.php"
+        dest: "{{ matomo_private }}/config.ini.php.{{ ansible_date_time.date }}.{{ ansible_date_time.time }}.bak"
+        owner: "{{ matomo_user }}"
+        group: "{{ matomo_group }}"
+        mode: 0600
+    
+    - name: Required Matomo rsynced over last version
+      shell: "rsync -aq {{ matomo_private }}/matomo/ {{ matomo_html }}/"
+      args:
+        executable: /bin/bash
+      become: true
+      become_user: "{{ matomo_user }}"
+    
+    - name: Matomo database upgraded
+      shell: "php console --no-ansi -n core:update --yes"
+      args:
+        executable: /bin/bash
+        chdir: "{{ matomo_html }}"
+      become: true
+      become_user: "{{ matomo_user }}"
+    
+    - name: Matomo Extra Tools tasks included
+      include_tasks: extratools.yml
+      when:
+        - ( matomo_extratools is defined ) and ( matomo_extratools != "skip" )
+        - ( matomo_extratools == "force" ) or ( matomo_extratools == "install" )
+    
+    - name: Matomo User Console tasks included
+      include_tasks: userconsole.yml
+      when:
+        - ( matomo_userconsole is defined ) and ( matomo_userconsole != "skip" )
+        - ( matomo_userconsole == "force" ) or ( matomo_userconsole == "install" )
+    
+    - name: Get the installed Matomo version number
+      command: "php console core:update --no-ansi -n --version"
+      args:
+        chdir: "{{ matomo_html }}"
+      changed_when: false
+      check_mode: false
+      become: true
+      become_user: "{{ matomo_user }}"
+      register: matomo_installed_check
+    
+    - name: Set a variable for the installed Matomo version number
+      set_fact:
+        matomo_installed: "{{ matomo_installed_check.stdout.split(' ')[2] }}"
+    
+    - name: Print the installed version of Matomo
+      debug:
+        msg: "The installed version of Matomo is {{ matomo_installed }}"
+        verbosity: 1
 
-- name: Matomo git clone tasks included
-  include_tasks: git.yml
-  when: ( matomo_git is defined ) and ( matomo_git )
-  tags:
-    - matomo
-
-- name: Backup up the Matomo config file
-  copy:
-    remote_src: true
-    src: "{{ matomo_html }}/config/config.ini.php"
-    dest: "{{ matomo_private }}/config.ini.php.{{ ansible_date_time.date }}.{{ ansible_date_time.time }}.bak"
-  become: true
-  become_user: "{{ matomo_user }}"
-  tags:
-    - matomo
-
-- name: Required Matomo rsynced over last version
-  shell: "rsync -aq {{ matomo_private }}/matomo/ {{ matomo_html }}/"
-  args:
-    executable: /bin/bash
-  become: true
-  become_user: "{{ matomo_user }}"
-  tags:
-    - matomo
-
-- name: Matomo database upgraded
-  shell: "php console --no-ansi -n core:update --yes"
-  args:
-    executable: /bin/bash
-    chdir: "{{ matomo_html }}"
-  become: true
-  become_user: "{{ matomo_user }}"
-  tags:
-    - matomo
-
-- name: Matomo Extra Tools tasks included
-  include_tasks: extratools.yml
-  when:
-    - matomo_extratools is defined
-    - ( matomo_extratools == "force" ) or ( matomo_extratools == "install" )
-    - matomo_extratools != "skip"
-  tags:
-    - matomo
-
-- name: Matomo User Console tasks included
-  include_tasks: userconsole.yml
-  when:
-    - matomo_userconsole is defined
-    - ( matomo_userconsole == "force" ) or ( matomo_userconsole == "install" )
-    - matomo_userconsole != "skip"
-  tags:
-    - matomo
-
-- name: Get the installed Matomo version number
-  command: "php console core:update --no-ansi -n --version"
-  args:
-    chdir: "{{ matomo_html }}"
-  changed_when: false
-  check_mode: false
-  become: true
-  become_user: "{{ matomo_user }}"
-  register: matomo_installed_check
-  tags:
-    - matomo
-
-- name: Set a variable for the installed Matomo version number
-  set_fact:
-    matomo_installed: "{{ matomo_installed_check.stdout.split(' ')[2] }}"
-  tags:
-    - matomo
-
-- name: Print the installed version of Matomo
-  debug:
-    msg: "The installed version of Matomo is {{ matomo_installed }}"
-    verbosity: 1
   tags:
     - matomo
 ...
