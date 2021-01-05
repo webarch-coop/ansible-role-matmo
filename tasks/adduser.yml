@@ -13,11 +13,6 @@
   tags:
     - matomo
 
-- name: Include the version check tasks
-  include_tasks: check_version.yml
-  tags:
-    - matomo
-
 - name: "Check the if a Matomo account with email set to {{ matomo_login_email }} exists"
   shell: "IFS=$'\n' ; for u in $(php console user:list --no-ansi -n); do echo $u | awk -F'[()]' '{print $2}' ; done | grep ^{{ matomo_login_email }}$ || echo false"
   args:
@@ -60,8 +55,17 @@
 
 - name: "Set a variable based on the presence of a Matomo account with the email address {{ matomo_login_email }}"
   set_fact:
-    matomo_login_email_present: "{{ matomo_login_email_check.stdout }}"
-  when: matomo_login_email_check is defined
+    matomo_login_email_present: >
+      {% if matomo_login_email_check is defined %}
+      {{ matomo_login_email_check.stdout }}
+      {% elif matomo_api_get_user_by_email is defined %}
+      {% if matomo_api_get_user_by_email.result == "error" %}
+      false
+      {% endif %}
+      {% else %}
+      false
+      {% endif %}  
+  when: ( matomo_login_email_check is defined ) or ( matomo_api_get_user_by_email is defined )
   tags:
     - matomo
     - users-update
