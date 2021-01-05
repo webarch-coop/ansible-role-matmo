@@ -49,10 +49,6 @@
     - not matomo_userconsole_enabled
     - matomo_api_get_user_by_email is defined
 
-- name: Debug fail
-  fail:
-    msg: debug
-
 - name: "Set a variable based on the presence of a Matomo account with the email address {{ matomo_login_email }}"
   set_fact:
     matomo_login_email_present: >
@@ -69,6 +65,10 @@
   tags:
     - matomo
     - users-update
+
+- name: Debug fail
+  fail:
+    msg: debug
 
 - name: When a Matomo account with the same email address already exists
   block:
