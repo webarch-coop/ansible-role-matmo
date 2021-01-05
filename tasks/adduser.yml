@@ -52,7 +52,7 @@
 - name: "Set a variable based on the presence of a Matomo account with the email address {{ matomo_login_email }}"
   set_fact:
     matomo_login_email_present: >
-      {% if matomo_login_email_check is defined %}
+      {% if matomo_login_email_check.stdout is defined %}
       {{ matomo_login_email_check.stdout }}
       {% elif matomo_api_get_user_by_email is defined %}
       {% if matomo_api_get_user_by_email.result == "error" %}
