@@ -42,7 +42,7 @@
       become_user: "{{ matomo_user }}"
       register: matomo_extratools_check
       changed_when: '"ExtraTools is already activated" not in matomo_extratools_check.stdout'
-      when: matomo_extratools_path is defined
+      when: ( matomo_extratools_path is defined ) and ( matomo_extratools_path.exists )
 
     - name: Check if UserConsole plugin is present
       stat:
@@ -65,7 +65,7 @@
       become_user: "{{ matomo_user }}"
       register: matomo_userconsole_check
       changed_when: '"UserConsole is already activated" not in matomo_userconsole_check.stdout'
-      when: matomo_userconsole_path is defined
+      when: ( matomo_userconsole_path is defined ) and ( matomo_userconsole_path.exists )
 
   tags:
     - matomo
