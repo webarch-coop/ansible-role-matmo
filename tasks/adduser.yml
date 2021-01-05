@@ -49,26 +49,14 @@
     - not matomo_userconsole_enabled
     - matomo_api_get_user_by_email is defined
 
+# TODO: Fix setting this variable to the email address using the API
 - name: "Set a variable based on the presence of a Matomo account with the email address {{ matomo_login_email }}"
   set_fact:
-    matomo_login_email_present: >
-      {% if matomo_login_email_check.stdout is defined %}
-      {{ matomo_login_email_check.stdout }}
-      {% elif matomo_api_get_user_by_email.json.result is defined %}
-      {% if matomo_api_get_user_by_email.json.result == "error" %}
-      false
-      {% endif %}
-      {% else %}
-      false
-      {% endif %}  
+    matomo_login_email_present: "{% if matomo_login_email_check.stdout is defined %}{{ matomo_login_email_check.stdout }}{% elif matomo_api_get_user_by_email.json.result is defined %}{% if matomo_api_get_user_by_email.json.result == 'error' %}false{% endif %}{% else %}false{% endif %}"
   when: ( matomo_login_email_check is defined ) or ( matomo_api_get_user_by_email is defined )
   tags:
     - matomo
     - users-update
-
-- name: Debug fail
-  fail:
-    msg: debug
 
 - name: When a Matomo account with the same email address already exists
   block:
