@@ -44,6 +44,10 @@
       changed_when: '"ExtraTools is already activated" not in matomo_extratools_check.stdout'
       when: ( matomo_extratools_path is defined ) and ( matomo_extratools_path.stat.exists )
 
+    - name: Set matomo_extratools_enabled variable
+      set_fact:
+        matomo_extratools_enabled: "{% if matomo_extratools_check.stdout is defined and matomo_extratools_check.stdout != 'FAIL' %}true{% else %}false{% endif %}"
+
     - name: Check if UserConsole plugin is present
       stat:
         path: "{{ matomo_html }}/plugins/UserConsole"
@@ -66,6 +70,10 @@
       register: matomo_userconsole_check
       changed_when: '"UserConsole is already activated" not in matomo_userconsole_check.stdout'
       when: ( matomo_userconsole_path is defined ) and ( matomo_userconsole_path.stat.exists )
+
+    - name: Set matomo_userconsole_enabled variable
+      set_fact:
+        matomo_userconsole_enabled: "{% if matomo_extratools_check.stdout is defined and matomo_extratools_check.stdout != 'FAIL' %}true{% else %}false{% endif %}"
 
   tags:
     - matomo

@@ -5,7 +5,6 @@
   when: ( matomo_login is not defined ) or ( matomo_login | length == 0 )
   tags:
     - matomo
-    - users-update
 
 - name: Fail if the Matomo user email address is not provided
   fail:
@@ -13,7 +12,11 @@
   when: ( matomo_login_email is not defined ) or ( matomo_login_email | length == 0 )
   tags:
     - matomo
-    - users-update
+
+- name: Include the version check tasks
+  include_tasks: check_version.yml
+  tags:
+    - matomo
 
 - name: "Check the if a Matomo account with email set to {{ matomo_login_email }} exists"
   shell: "IFS=$'\n' ; for u in $(php console user:list --no-ansi -n); do echo $u | awk -F'[()]' '{print $2}' ; done | grep ^{{ matomo_login_email }}$ || echo false"
@@ -25,9 +28,35 @@
   check_mode: false
   become: true
   become_user: "{{ matomo_user }}"
+  when: matomo_userconsole_enabled
   tags:
     - matomo
-    - users-update
+
+- name: "Check the if a Matomo account with email set to {{ matomo_login_email }} exists"
+  uri:
+    url: "{{ matomo_url }}"
+      method: POST
+      body_format: form-urlencoded
+      body:
+        module: API
+        format: JSON
+        token_auth: "{{ matomo_token_auth }}"
+        method: UsersManager.getUserByEmail
+        userEmail: "{{ matomo_login_email }}"
+  register: matomo_api_get_user_by_email
+  when: not matomo_userconsole_enabled
+
+- name: Debug matomo_api_get_user_by_email
+  debug:
+    var: matomo_api_get_user_by_email.content
+    verbosity: 1
+  when:
+    - not matomo_userconsole_enabled
+    - matomo_api_get_user_by_email is defined
+
+- name: Debug fail
+  fail:
+    msg: debug
 
 - name: "Set a variable based on the presence of a Matomo account with the email address {{ matomo_login_email }}"
   set_fact:
