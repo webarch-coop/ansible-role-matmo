@@ -35,14 +35,14 @@
 - name: "Check the if a Matomo account with email set to {{ matomo_login_email }} exists"
   uri:
     url: "{{ matomo_url }}"
-      method: POST
-      body_format: form-urlencoded
-      body:
-        module: API
-        format: JSON
-        token_auth: "{{ matomo_token_auth }}"
-        method: UsersManager.getUserByEmail
-        userEmail: "{{ matomo_login_email }}"
+    method: POST
+    body_format: form-urlencoded
+    body:
+      module: API
+      format: JSON
+      token_auth: "{{ matomo_token_auth }}"
+      method: UsersManager.getUserByEmail
+      userEmail: "{{ matomo_login_email }}"
   register: matomo_api_get_user_by_email
   when: not matomo_userconsole_enabled
 
