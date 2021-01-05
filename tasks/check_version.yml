@@ -24,7 +24,7 @@
     - name: Check if ExtraTools plugin is present
       stat:
         path: "{{ matomo_html }}/plugins/ExtraTools"
-        register: matomo_extratools_path
+      register: matomo_extratools_path
 
     - name: Check if Extra Tools is activated
       shell: "php console --no-ansi plugin:activate ExtraTools || echo FAIL"
@@ -41,7 +41,7 @@
     - name: Check if UserConsole plugin is present
       stat:
         path: "{{ matomo_html }}/plugins/UserConsole"
-        register: matomo_userconsole_path
+      register: matomo_userconsole_path
 
     - name: Check if User Console is activated
       shell: "php console --no-ansi plugin:activate UserConsole || echo FAIL"
