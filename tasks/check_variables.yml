@@ -77,6 +77,18 @@
           - ( matomo_git is defined )
           - ( matomo_autoupdate is defined )
 
+    - name: Check that matomo_token_auth is correct if defined
+      uri:
+        url: "{{ matomo_url }}?module=API&token_auth={{ matomo_token_auth }}&method=UsersManager.getUsers&format=JSON"
+        return_content: true
+      register: matomo_get_users
+      when: ( matomo_token_auth is defined ) and ( matomo_token_auth | length > 0 )
+
+    - name: Debug matomo_get_users
+      debug:
+        var: matomo_get_users.content
+      when: matomo_get_users is defined
+
   tags:
     - matomo
 ...
