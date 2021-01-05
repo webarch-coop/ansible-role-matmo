@@ -54,8 +54,8 @@
     matomo_login_email_present: >
       {% if matomo_login_email_check.stdout is defined %}
       {{ matomo_login_email_check.stdout }}
-      {% elif matomo_api_get_user_by_email is defined %}
-      {% if matomo_api_get_user_by_email.result == "error" %}
+      {% elif matomo_api_get_user_by_email.json.result is defined %}
+      {% if matomo_api_get_user_by_email.json.result == "error" %}
       false
       {% endif %}
       {% else %}
