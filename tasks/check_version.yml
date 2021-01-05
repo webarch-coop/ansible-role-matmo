@@ -26,6 +26,12 @@
         path: "{{ matomo_html }}/plugins/ExtraTools"
       register: matomo_extratools_path
 
+    - name: Debug matomo_extratools_path
+      debug:
+        var: matomo_extratools_path
+        verbosity: 2
+      when: matomo_extratools_path is defined
+
     - name: Check if Extra Tools is activated
       shell: "php console --no-ansi plugin:activate ExtraTools || echo FAIL"
       args:
@@ -42,6 +48,12 @@
       stat:
         path: "{{ matomo_html }}/plugins/UserConsole"
       register: matomo_userconsole_path
+
+    - name: Debug matomo_userconsole_path
+      debug:
+        var: matomo_userconsole_path
+        verbosity: 2
+      when: matomo_userconsole_path is defined
 
     - name: Check if User Console is activated
       shell: "php console --no-ansi plugin:activate UserConsole || echo FAIL"
