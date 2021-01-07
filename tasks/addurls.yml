@@ -24,6 +24,11 @@
         var: matomo_api_get_site_urls_from_id
         verbosity: 2
 
+    - name: Debug matomo_api_get_site_urls_from_id
+      debug:
+        var: matomo_api_get_site_urls_from_id.json
+        verbosity: 2
+
     - name: Set an array for the Matomo site url's
       set_fact:
         matomo_idsite_urls: "{{ matomo_idsite_urls }} + [ '{{ url }}' ]"
