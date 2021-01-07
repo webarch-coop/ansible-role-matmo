@@ -37,10 +37,6 @@
           - "Matomo site names: {{ matomo_sites_names }}"
         verbosity: 2
 
-    - name: Debug
-      fail:
-        msg: Debug
-
   tags:
     - matomo
 ...
