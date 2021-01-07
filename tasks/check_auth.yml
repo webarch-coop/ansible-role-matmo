@@ -22,7 +22,7 @@
           method: UsersManager.setSuperUserAccess
           userLogin: "{{ matomo_user }}"
           hasSuperUserAccess: true
-          passwordConfirmation: "{{ matomo_password }}" 
+          passwordConfirmation: "{{ matomo_password }}"
       register: matomo_api_set_super_user_access
 
     - name: Debug matomo_api_set_super_user_access
@@ -32,4 +32,4 @@
 
   tags:
     - munin
-....
+...
