@@ -1,0 +1,35 @@
+---
+- name: Check that the matomo_token_auth and matomo_admin_password are correct
+  block:
+
+    - name: Check variables are defined
+      assert:
+        that:
+          - matomo_url is defined
+          - matomo_user is defined
+          - matomo_token_auth is defined
+          - matomo_admin_password is defined
+
+    - name: "Set superuser access for {{ matomo_user }}"
+      uri:
+        url: "{{ matomo_url }}"
+        method: POST
+        body_format: form-urlencoded
+        body:
+          module: API
+          format: JSON
+          token_auth: "{{ matomo_token_auth }}"
+          method: UsersManager.setSuperUserAccess
+          userLogin: "{{ matomo_user }}"
+          hasSuperUserAccess: true
+          passwordConfirmation: "{{ matomo_password }}" 
+      register: matomo_api_set_super_user_access
+
+    - name: Debug matomo_api_set_super_user_access
+      debug:
+        var: matomo_api_set_super_user_access
+        verbosity: 2
+
+  tags:
+    - munin
+....
