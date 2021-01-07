@@ -9,9 +9,6 @@
           command: pwgen -n 20 1
           register: matomo_login_password_gen
           no_log: true
-          tags:
-            - matomo
-            - users-update
 
         - name: Set a variable with the random password
           set_fact:
