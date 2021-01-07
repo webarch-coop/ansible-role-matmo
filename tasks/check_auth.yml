@@ -7,8 +7,8 @@
         that:
           - matomo_url is defined
           - matomo_user is defined
+          - matomo_password is defined
           - matomo_token_auth is defined
-          - matomo_admin_password is defined
 
     - name: "Set superuser access for {{ matomo_user }}"
       uri:
