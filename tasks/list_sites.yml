@@ -29,7 +29,7 @@
       loop: "{{ matomo_api_get_all_sites.json }}"
       loop_control:
         loop_var: site
-        label: "{{ site.id }}"
+        label: "{{ site.idsite }}"
 
     - name: Print the Matomo site names
       debug:
