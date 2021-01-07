@@ -1,49 +1,62 @@
 ---
-- name: Get all the sites in JSON format
-  command: php console site:list --no-ansi -n --format=json
-  args:
-    chdir: "{{ matomo_html }}"
-  check_mode: false
-  become: true
-  become_user: "{{ matomo_user }}"
-  register: matomo_site_list_json
-  tags:
-    - matomo
+- name: Get all Matomo sites
+  block:
 
-- name: Create a matomo_sites array
-  set_fact:
-    matomo_sites: "{{ matomo_site_list_json.stdout | from_json }}"
-  tags:
-    - matomo
+    - name: Get all the sites in JSON format using the API
+      uri:
+        url: "{{ matomo_url }}"
+        method: POST
+        body_format: form-urlencoded
+        body:
+          module: API
+          format: JSON
+          token_auth: "{{ matomo_token_auth }}"
+          method: SitesManager.getAllSites
+      register: matomo_api_get_all_sites
 
-- name: Print matomo_sites
-  debug:
-    var: matomo_sites
-    verbosity: 2
-  tags:
-    - matomo
+    - name: Debug matomo_api_get_all_sites
+      debug:
+        var: matomo_api_get_all_sites
+        verbosity: 2
 
-- name: Set matomo_sites_names to an empty array
-  set_fact:
-    matomo_sites_names: []
-  tags:
-    - matomo
+    - name: Get all the sites in JSON format
+      command: php console site:list --no-ansi -n --format=json
+      args:
+        chdir: "{{ matomo_html }}"
+      check_mode: false
+      become: true
+      become_user: "{{ matomo_user }}"
+      register: matomo_site_list_json
+      tags:
+        - matomo
+    
+    - name: Create a matomo_sites array
+      set_fact:
+        matomo_sites: "{{ matomo_site_list_json.stdout | from_json }}"
+    
+    - name: Print matomo_sites
+      debug:
+        var: matomo_sites
+        verbosity: 2
+    
+    - name: Set matomo_sites_names to an empty array
+      set_fact:
+        matomo_sites_names: []
+    
+    - name: Set an array for the Matomo site names
+      set_fact:
+        matomo_sites_names: "{{ matomo_sites_names }} + [ '{{ site.name }}' ]"
+      loop: "{{ matomo_sites }}"
+      loop_control:
+        loop_var: site
+        label: "{{ site.id }}"
+    
+    - name: Print the Matomo site names
+      debug:
+        msg:
+          - "Matomo site names: {{ matomo_sites_names }}"
+        verbosity: 2
 
-- name: Set an array for the Matomo site names
-  set_fact:
-    matomo_sites_names: "{{ matomo_sites_names }} + [ '{{ site.name }}' ]"
-  loop: "{{ matomo_sites }}"
-  loop_control:
-    loop_var: site
-    label: "{{ site.id }}"
-  tags:
-    - matomo
-
-- name: Print the Matomo site names
-  debug:
-    msg:
-      - "Matomo site names: {{ matomo_sites_names }}"
-    verbosity: 2
   tags:
     - matomo
 ...

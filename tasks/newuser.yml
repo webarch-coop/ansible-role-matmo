@@ -34,6 +34,7 @@
           password: "{{ matomo_login_password }}"
           email: "{{ matomo_login_email }}"
       register: matomo_api_add_user
+      failed_when: matomo_api_add_user.json.result != "success"
 
     - name: Debug matomo_api_add_user
       debug:
@@ -68,7 +69,7 @@
             mode: 0640
           when: ( matomo_login_home is defined ) and ( matomo_login_home | length > 0 )
 
-      when: matomo_notify_passwd
+      when: matomo_api_add_user.json.result == "success"
 
   tags:
     - matomo
