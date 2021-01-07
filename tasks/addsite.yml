@@ -1,36 +1,36 @@
 ---
 - name: Add Matomo site
   block:
-    
+
     - name: Print the matomo_site_name and matomo_site_main_url variables
       debug:
         msg:
           - "The matomo_site_name variable contains: {{ matomo_site_name }}"
           - "The matomo_site_main_url variable contains: {{ matomo_site_main_url }}"
         verbosity: 1
-    
+
     - name: Print the matomo_site_urls if defined
       debug:
         msg: "The matomo_site_urls array contains: {{ matomo_site_urls }}"
         verbosity: 1
       when: ( matomo_site_urls is defined ) and ( matomo_site_urls != [] )
-    
+
     - name: Check that the variables needed are set
       assert:
         that:
           - matomo_site_name is defined
           - matomo_site_main_url is defined
-    
+
     - name: Check the sites and populate the matomo_sites_names array
       include_tasks: list_sites.yml
-    
+
     - name: "Add {{ matomo_site_name }} to the Matomo server"
       block:
-    
+
         - name: Set matomo_urls for the console site:add command
           set_fact:
             matomo_urls: "{{ matomo_site_main_url }}{% for u in matomo_site_urls %}, {{ u }}{% endfor %}"
-    
+
         - name: Print the matomo_urls
           debug:
             msg: "matomo_urls: '{{ matomo_urls }}'"
@@ -38,7 +38,7 @@
           tags:
             - matomo
             - users-update
-    
+
         - name: Add Matomo site
           shell: "IFS=$'\n' ; php console site:add --no-ansi -n --name='{{ matomo_site_name | quote }}' --urls='{{ matomo_urls }}'"
           args:
@@ -48,18 +48,18 @@
           changed_when: '"Site added" in matomo_addsite_result.stdout'
           become: true
           become_user: "{{ matomo_user }}"
-    
+
       when: matomo_site_name not in matomo_sites_names
-    
+
     - name: Include the idsite tasks, this sets matomo_idsite
       include_tasks: idsite.yml
-    
+
     - name: "Conditionally check and add the {{ matomo_site_name }} site_urls"
       include_tasks: addurls.yml
       when:
         - ( matomo_site_urls is defined ) and ( matomo_site_urls | length > 0 )
         - ( matomo_idsite is defined ) and ( matomo_idsite | length > 0 )
-    
+
     - name: "Check if {{ matomo_site_admin }} is already super user"
       shell: "IFS=$'\n' ; php console user:list --no-ansi -n | grep 'super user' | awk '{ print $2 }'"
       args:
@@ -70,7 +70,7 @@
       check_mode: false
       become: true
       become_user: "{{ matomo_user }}"
-    
+
     - name: "Grant admin access for {{ matomo_site_admin }} to {{ matomo_site_name }}"
       command: "php console user:access --no-ansi -n --login='{{ matomo_site_admin | quote }}' --access='admin' --sites='{{ matomo_idsite | quote }}'"
       args:
