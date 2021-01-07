@@ -1,128 +1,107 @@
 ---
-- name: Fail if the Matomo user login is not provided
-  fail:
-    msg: "A value for matomo_login needs to be provided"
-  when: ( matomo_login is not defined ) or ( matomo_login | length == 0 )
-  tags:
-    - matomo
-
-- name: Fail if the Matomo user email address is not provided
-  fail:
-    msg: "A value for matomo_login_email needs to be provided"
-  when: ( matomo_login_email is not defined ) or ( matomo_login_email | length == 0 )
-  tags:
-    - matomo
-
-- name: "Check the if a Matomo account with email set to {{ matomo_login_email }} exists"
-  shell: "IFS=$'\n' ; for u in $(php console user:list --no-ansi -n); do echo $u | awk -F'[()]' '{print $2}' ; done | grep ^{{ matomo_login_email }}$ || echo false"
-  args:
-    executable: /bin/bash
-    chdir: "{{ matomo_html }}"
-  register: matomo_login_email_check
-  changed_when: false
-  check_mode: false
-  become: true
-  become_user: "{{ matomo_user }}"
-  when: matomo_userconsole_enabled
-  tags:
-    - matomo
-
-- name: "Check the if a Matomo account with email set to {{ matomo_login_email }} exists"
-  uri:
-    url: "{{ matomo_url }}"
-    method: POST
-    body_format: form-urlencoded
-    body:
-      module: API
-      format: JSON
-      token_auth: "{{ matomo_token_auth }}"
-      method: UsersManager.getUserByEmail
-      userEmail: "{{ matomo_login_email }}"
-  register: matomo_api_get_user_by_email
-  when: not matomo_userconsole_enabled
-
-- name: Debug matomo_api_get_user_by_email
-  debug:
-    var: matomo_api_get_user_by_email.content
-    verbosity: 1
-  when:
-    - not matomo_userconsole_enabled
-    - matomo_api_get_user_by_email is defined
-
-# TODO: Fix setting this variable to the email address using the API
-- name: "Set a variable based on the presence of a Matomo account with the email address {{ matomo_login_email }}"
-  set_fact:
-    matomo_login_email_present: "{% if matomo_login_email_check.stdout is defined %}{{ matomo_login_email_check.stdout }}{% elif matomo_api_get_user_by_email.json.result is defined %}{% if matomo_api_get_user_by_email.json.result == 'error' %}false{% endif %}{% else %}false{% endif %}"
-  when: ( matomo_login_email_check is defined ) or ( matomo_api_get_user_by_email is defined )
-  tags:
-    - matomo
-    - users-update
-
-- name: When a Matomo account with the same email address already exists
+- name: Add Matomo user
   block:
 
-    - name: Get the existing Matomo login
-      shell: "IFS=$'\n' ; for u in $(php console user:list --no-ansi -n); do echo $u ; done | grep '{{ matomo_login_email }}' | awk '{ print $2 }'"
-      args:
-        executable: /bin/bash
-        chdir: "{{ matomo_html }}"
-      register: matomo_login_check
-      changed_when: false
-      check_mode: false
-      become: true
-      become_user: "{{ matomo_user }}"
-      tags:
-        - matomo
-        - users-update
+    - name: Check variables
+      assert:
+        that:
+          - ( matomo_login is defined ) and ( matomo_login is regex("^[a-zA-Z0-9-]{2,14}$") )
+          - ( matomo_login_email is defined ) and ( matomo_login_email is regex("^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$") )
+          - ( matomo_token_auth is defined )
+          - ( matomo_url is defined )
 
-    - name: "Set a variable based on Matomo username for {{ matomo_login_email }}"
+    - name: "Check the if a Matomo account with email set to {{ matomo_login_email }} exists"
+      uri:
+        url: "{{ matomo_url }}"
+        method: POST
+        body_format: form-urlencoded
+        body:
+          module: API
+          format: JSON
+          token_auth: "{{ matomo_token_auth }}"
+          method: UsersManager.userEmailExists
+          userEmail: "{{ matomo_login_email }}"
+      register: matomo_api_user_email_exists
+
+    - name: Debug matomo_api_user_email_exists
+      debug:
+        var: matomo_api_user_email_exists.content
+        verbosity: 1
+
+    - name: Debug fail
+      fail:
+        msg: Debug
+
+    # TODO: Fix setting this variable to the email address using the API
+    - name: "Set a variable based on the presence of a Matomo account with the email address {{ matomo_login_email }}"
       set_fact:
-        matomo_login: "{{ matomo_login_check.stdout }}"
-      when: matomo_login_check is defined
-      tags:
-        - matomo
-        - users-update
+        matomo_login_email_present: "{% if matomo_login_email_check.stdout is defined %}{{ matomo_login_email_check.stdout }}{% elif matomo_api_get_user_by_email.json.result is defined %}{% if matomo_api_get_user_by_email.json.result == 'error' %}false{% endif %}{% else %}false{% endif %}"
+      when: ( matomo_login_email_check is defined ) or ( matomo_api_get_user_by_email is defined )
 
-  when: ( matomo_login_email == matomo_login_email_present ) and ( matomo_login_email_present )
+    - name: When a Matomo account with the same email address already exists
+      block:
 
-- name: When a Matomo account with the same email address doesn't exist
-  block:
+        - name: Get the existing Matomo login using UserConsole plugin
+          shell: "IFS=$'\n' ; for u in $(php console user:list --no-ansi -n); do echo $u ; done | grep '{{ matomo_login_email }}' | awk '{ print $2 }'"
+          args:
+            executable: /bin/bash
+            chdir: "{{ matomo_html }}"
+          register: matomo_login_check
+          changed_when: false
+          check_mode: false
+          become: true
+          become_user: "{{ matomo_user }}"
+          when: matomo_userconsole_enabled
 
-    - name: "Check the if the Matomo {{ matomo_login }} account exists"
-      shell: "IFS=$'\n' ; for u in $(php console user:list --no-ansi -n); do echo $u | awk '{ print $2 }' ; done | grep -q ^{{ matomo_login }}$ && echo true || echo false"
-      args:
-        executable: /bin/bash
-        chdir: "{{ matomo_html }}"
-      register: matomo_login_check
-      changed_when: false
-      check_mode: false
-      become: true
-      become_user: "{{ matomo_user }}"
-      tags:
-        - matomo
-        - users-update
+        - name: Get the existing Matomo login using the API
+          uri:
+            url: "{{ matomo_url }}"
+            method: POST
+            body_format: form-urlencoded
+            body:
+              module: API
+              format: JSON
+              token_auth: "{{ matomo_token_auth }}"
+              method: UsersManager.getUser
+              userLogin: "{{ test&format=JSON&token_auth=anonymous
 
-    - name: "Set a variable based on the presence of the Matomo {{ matomo_login }} account"
-      set_fact:
-        matomo_login_present: "{{ matomo_login_check.stdout }}"
-      when: matomo_login_check is defined
-      tags:
-        - matomo
-        - users-update
+        - name: "Set a variable based on Matomo username for {{ matomo_login_email }}"
+          set_fact:
+            matomo_login: "{{ matomo_login_check.stdout }}"
+          when: matomo_login_check is defined
 
-    - name: Add Matomo user
-      include_tasks: newuser.yml
-      when: ( matomo_login_present is defined ) and ( not matomo_login_present )
-      tags:
-        - matomo
-        - users-update
+      when: ( matomo_login_email == matomo_login_email_present ) and ( matomo_login_email_present )
 
-    - name: Check and update Matomo user
-      include_tasks: updateuser.yml
-      when: ( matomo_login_present is defined ) and ( matomo_login_present )
-      tags:
-        - matomo
-        - users-update
+    - name: When a Matomo account with the same email address doesn't exist
+      block:
 
-  when: ( matomo_login_email != matomo_login_email_present ) or ( not matomo_login_email_present )
+        - name: "Check the if the Matomo {{ matomo_login }} account exists"
+          shell: "IFS=$'\n' ; for u in $(php console user:list --no-ansi -n); do echo $u | awk '{ print $2 }' ; done | grep -q ^{{ matomo_login }}$ && echo true || echo false"
+          args:
+            executable: /bin/bash
+            chdir: "{{ matomo_html }}"
+          register: matomo_login_check
+          changed_when: false
+          check_mode: false
+          become: true
+          become_user: "{{ matomo_user }}"
+          when: matomo_userconsole_enabled
+
+        - name: "Set a variable based on the presence of the Matomo {{ matomo_login }} account"
+          set_fact:
+            matomo_login_present: "{{ matomo_login_check.stdout }}"
+          when: matomo_login_check is defined
+
+        - name: Add Matomo user
+          include_tasks: newuser.yml
+          when: ( matomo_login_present is defined ) and ( not matomo_login_present )
+
+        - name: Check and update Matomo user
+          include_tasks: updateuser.yml
+          when: ( matomo_login_present is defined ) and ( matomo_login_present )
+
+      when: ( matomo_login_email != matomo_login_email_present ) or ( not matomo_login_email_present )
+
+  tags:
+    - matomo
 ...
