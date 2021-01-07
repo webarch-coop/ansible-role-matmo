@@ -24,14 +24,10 @@
         var: matomo_api_get_site_urls_from_id
         verbosity: 2
 
-    - name: Debug fail
-      fail:
-        msg: Debug fail
-
     - name: Set an array for the Matomo site url's
       set_fact:
         matomo_idsite_urls: "{{ matomo_idsite_urls }} + [ '{{ url }}' ]"
-      loop: "{{ matomo_idsite_urls_check.stdout_lines }}"
+      loop: "{{ matomo_api_get_site_urls_from_id.json.split(', ') | list }}"
       loop_control:
         loop_var: url
 
@@ -48,6 +44,10 @@
       debug:
         msg: "matomo_missing_urls: {{ matomo_missing_urls }}"
         verbosity: 1
+
+    - name: Debug
+      fail:
+        msg: debug
 
     - name: Add missing Apache Aliases to the matomo_site_main_url idsite urls table
       # command: 'mysql {{ matomo_dbname | quote }} --skip-column-names --batch -e "INSERT INTO {{ matomo_table_prefix }}site_url VALUES (\"{{ matomo_idsite | quote }}\", \"{{ url | quote }}\")"'
