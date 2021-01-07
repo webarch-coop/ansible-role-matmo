@@ -1,5 +1,5 @@
 ---
-- name: Add Matomo user
+- name: Add Matomo user using the API
   block:
 
     - name: Check variables
@@ -25,12 +25,13 @@
     - name: Debug matomo_api_user_email_exists
       debug:
         var: matomo_api_user_email_exists
-        verbosity: 1
+        verbosity: 2
 
     - name: "Set a variable based on the presence of a Matomo account with the email address {{ matomo_login_email }}"
       set_fact:
         matomo_login_email_present: "{{ matomo_api_user_email_exists.json.value }}"
       when:
+        - not matomo_api_user_email_exists.failed
         - matomo_api_user_email_exists.json is defined
 
     - name: When a Matomo account with the same email address already exists
@@ -52,7 +53,7 @@
         - name: Debug matomo_api_get_user_login_from_user_email
           debug:
             var: matomo_api_get_user_login_from_user_email
-            verbosity: 1
+            verbosity: 2
 
         - name: Debug fail
           fail:
@@ -67,6 +68,28 @@
 
     - name: When a Matomo account with the same email address doesn't exist
       block:
+
+        - name: "Check the if the Matomo {{ matomo_login }} account exists using the API"
+          uri:
+            url: "{{ matomo_url }}"
+            method: POST
+            body_format: form-urlencoded
+            body:
+              module: API
+              format: JSON
+              token_auth: "{{ matomo_token_auth }}"
+              method: UsersManager.userExists
+              userLogin: "{{ matomo_login }}"
+          register: matomo_api_user_exists
+
+        - name: Debug matomo_api_user_exists
+          debug:
+            var: matomo_api_user_exists
+            verbosity: 2
+
+        - name: Debug fail
+          fail:
+            msg: Debug
 
         - name: "Check the if the Matomo {{ matomo_login }} account exists"
           shell: "IFS=$'\n' ; for u in $(php console user:list --no-ansi -n); do echo $u | awk '{ print $2 }' ; done | grep -q ^{{ matomo_login }}$ && echo true || echo false"
@@ -93,7 +116,7 @@
           include_tasks: updateuser.yml
           when: ( matomo_login_present is defined ) and ( matomo_login_present )
 
-      when: ( matomo_login_email != matomo_login_email_present ) or ( not matomo_login_email_present )
+      when: ( matomo_login_email_present is defined ) and ( not matomo_login_email_present ) 
 
   tags:
     - matomo
