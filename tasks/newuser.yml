@@ -29,7 +29,7 @@
           module: API
           format: JSON
           token_auth: "{{ matomo_token_auth }}"
-          method: addUser
+          method: UsersManager.addUser
           userLogin: "{{ matomo_login }}"
           password: "{{ matomo_login_password }}"
           email: "{{ matomo_login_email }}"
