@@ -24,47 +24,38 @@
         var: matomo_api_get_site_urls_from_id
         verbosity: 2
 
-    - name: Debug matomo_api_get_site_urls_from_id
+    - name: Print the Matomo existing site URLs
       debug:
-        var: matomo_api_get_site_urls_from_id.json
-        verbosity: 2
-
-    - name: Set an array for the Matomo site url's
-      set_fact:
-        matomo_idsite_urls: "{{ matomo_idsite_urls }} + [ '{{ url }}' ]"
-      loop: "{{ matomo_api_get_site_urls_from_id.json.split(', ') | list }}"
-      loop_control:
-        loop_var: url
-
-    - name: Print the Matomo existing site url's
-      debug:
-        msg: "Matomo site url's: {{ matomo_idsite_urls }}"
+        msg: "Matomo site url's: {{ matomo_api_get_site_urls_from_id.json }}"
         verbosity: 1
 
     - name: Get the difference between the matomo_site_urls and the Apache Aliases
       set_fact:
-        matomo_missing_urls: "{{ matomo_site_urls | difference(matomo_idsite_urls) }}"
+        matomo_missing_urls: "{{ matomo_site_urls | difference(matomo_api_get_site_urls_from_id.json) }}"
 
     - name: "Print the missing URLs for site ID: {{ matomo_idsite }}"
       debug:
         msg: "matomo_missing_urls: {{ matomo_missing_urls }}"
         verbosity: 1
 
-    - name: Debug
-      fail:
-        msg: debug
+    - name: Add missing URLs 
+      uri:
+        url: "{{ matomo_url }}"
+        method: POST
+        body_format: form-urlencoded
+        body:
+          module: API 
+          format: JSON
+          token_auth: "{{ matomo_token_auth }}"
+          method: SitesManager.addSiteAliasUrls
+          idSite: "{{ matomo_idsite }}"
+          urls: "{{ matomo_missing_urls }}"
+      register: matomo_api_add_site_alias_urls
 
-    - name: Add missing Apache Aliases to the matomo_site_main_url idsite urls table
-      # command: 'mysql {{ matomo_dbname | quote }} --skip-column-names --batch -e "INSERT INTO {{ matomo_table_prefix }}site_url VALUES (\"{{ matomo_idsite | quote }}\", \"{{ url | quote }}\")"'
-      command: "php console site:url --no-ansi -n --id={{ matomo_idsite | quote }} --url={{ url | quote }}"
-      args:
-        chdir: "{{ matomo_html }}"
-      become: true
-      become_user: "{{ matomo_user }}"
-      loop: "{{ matomo_missing_urls }}"
-      loop_control:
-        loop_var: url
-      when: ( matomo_missing_urls is defined ) and ( matomo_missing_urls | length > 0 )
+    - name: Debug matomo_api_add_site_alias_urls
+      debug:
+        var: matomo_api_add_site_alias_urls
+        verbosity: 2
 
   tags:
     - matomo
