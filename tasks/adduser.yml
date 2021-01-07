@@ -62,8 +62,18 @@
               module: API
               format: JSON
               token_auth: "{{ matomo_token_auth }}"
-              method: UsersManager.getUser
-              userLogin: "{{ test&format=JSON&token_auth=anonymous
+              method: UsersManager.getUserLoginFromUserEmail
+              userEmail: "{{ matomo_login_email }}"
+          register: matomo_api_get_user_login_from_user_email
+
+        - name: Debug matomo_api_get_user_login_from_user_email
+          debug:
+            var: matomo_api_get_user_login_from_user_email.content
+            verbosity: 1
+
+        - name: Debug fail
+          fail:
+            msg: Debug
 
         - name: "Set a variable based on Matomo username for {{ matomo_login_email }}"
           set_fact:
