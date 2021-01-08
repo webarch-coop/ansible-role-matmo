@@ -98,7 +98,7 @@
         - name: "Notification date recorded in {{ matomo_home }}/.notify_matomo_passwd file"
           lineinfile:
             path: "{{ matomo_home }}/.notify_matomo_passwd"
-            line: "{{ lookup('pipe', 'date +%Y-%m-%d-%H-%M-%S')}} : {{ matomo_first_user | quote  }} <{{ matomo_first_user_email }}>"
+            line: "{{ lookup('pipe', 'date +%Y-%m-%d-%H-%M-%S') }} : {{ matomo_first_user | quote  }} <{{ matomo_first_user_email }}>"
             create: true
             state: present
             insertafter: EOF

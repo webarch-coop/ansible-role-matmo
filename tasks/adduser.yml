@@ -102,7 +102,7 @@
           include_tasks: updateuser.yml
           when: ( matomo_login_present is defined ) and ( matomo_login_present )
 
-      when: ( matomo_login_email_present is defined ) and ( not matomo_login_email_present ) 
+      when: ( matomo_login_email_present is defined ) and ( not matomo_login_email_present )
 
   tags:
     - matomo

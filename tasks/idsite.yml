@@ -1,10 +1,10 @@
 ---
 - name: Get Mation site id
   block:
- 
+
     - name: "Update the matomo_sites list"
       include_tasks: list_sites.yml
-    
+
     - name: "Get the idsite for {{ matomo_site_name }}"
       set_fact:
         matomo_idsite: "{{ site.idsite }}"

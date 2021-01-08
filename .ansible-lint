@@ -3,7 +3,11 @@
 skip_list:
   # Lines should be no longer than 160 chars
   - "204"
+  # Commands should not change things if nothing needs doing
+  - "301"
   # rsync used in place of synchronize module
   - "303"
+  # Use shell only when shell functionality is required
+  - "305"
 # vim: syntax=yaml
 ...

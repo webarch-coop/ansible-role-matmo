@@ -101,7 +101,7 @@
               debug:
                 var: matomo_api_update_user_password
                 verbosity: 2
- 
+
             - name: Fail if password reset generated an error
               fail:
                 msg: "{{ matomo_api_update_user_password.json.message }}"

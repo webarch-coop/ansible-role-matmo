@@ -38,13 +38,13 @@
         msg: "matomo_missing_urls: {{ matomo_missing_urls }}"
         verbosity: 1
 
-    - name: Add missing URLs 
+    - name: Add missing URLs
       uri:
         url: "{{ matomo_url }}"
         method: POST
         body_format: form-urlencoded
         body:
-          module: API 
+          module: API
           format: JSON
           token_auth: "{{ matomo_token_auth }}"
           method: SitesManager.addSiteAliasUrls
