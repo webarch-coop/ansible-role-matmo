@@ -61,7 +61,7 @@
 
       when: matomo_login_email != matomo_old_login_email
 
-    - name: When matomo_notify_passwd is true and matomo_login_home variable is set
+    - name: Matomo account password notification
       block:
 
         - name: "Check for existance of {{ matomo_login_home }}/.notify_matomo_passwd file"
