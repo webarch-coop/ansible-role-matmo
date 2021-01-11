@@ -24,6 +24,7 @@
           hasSuperUserAccess: true
           passwordConfirmation: "{{ matomo_password }}"
       register: matomo_api_set_super_user_access
+      changed_when: ( matomo_api_set_super_user_access.json.result != "success" )
 
     - name: Debug matomo_api_set_super_user_access
       debug:
