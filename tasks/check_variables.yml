@@ -77,11 +77,25 @@
           - ( matomo_git is defined )
           - ( matomo_autoupdate is defined )
 
-    - name: Check that matomo_token_auth and matomo_password are correct if defined
-      include_tasks: check_auth.yml
-      when:
-        - ( matomo_password is defined ) and ( matomo_password | length > 0 )
-        - ( matomo_token_auth is defined ) and ( matomo_token_auth | length > 0 )
+    - name: Check for config.ini.php
+      stat:
+        path: "{{ matomo_html }}/config/config.ini.php"
+      register: matomo_config_check
+
+    - name: "Check Matomo version"
+      block: 
+
+        - name: Include Matomo version check
+          include_tasks: check_version.yml
+
+        - name: Check that matomo_token_auth and matomo_password are correct if defined
+          include_tasks: check_auth.yml
+          when:
+            - ( matomo_installed is defined ) and ( matomo_installed is version('3.14.1', '>=') )
+            - ( matomo_password is defined ) and ( matomo_password | length > 0 )
+            - ( matomo_token_auth is defined ) and ( matomo_token_auth | length > 0 )
+
+      when: ( matomo_config_check is defined ) and ( matomo_config_check.stat.exists )
 
   tags:
     - matomo
