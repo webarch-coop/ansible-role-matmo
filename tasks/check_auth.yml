@@ -24,12 +24,20 @@
           hasSuperUserAccess: true
           passwordConfirmation: "{{ matomo_password }}"
       register: matomo_api_set_super_user_access
-      failed_when: matomo_api_set_super_user_access.json.result != "success"
 
     - name: Debug matomo_api_set_super_user_access
       debug:
         var: matomo_api_set_super_user_access
         verbosity: 2
+
+    - name: Set variable based on result of superuser token_auth and password check
+      set_fact:
+        matomo_super_user_access: "{% if matomo_api_set_super_user_access.json.result == 'success' %}True{% else %}False{% endif %}"
+
+    - name: Variables need setting
+      debug:
+        msg: Please check the matomo_token_auth and matomo_password are correct for the Matmom superuser
+      when: not matomo_super_user_access 
 
   tags:
     - munin
