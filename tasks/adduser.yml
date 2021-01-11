@@ -114,6 +114,10 @@
             - not matomo_api_user_exists.failed
             - matomo_api_user_exists.json is defined
 
+        - name: Debug fail
+          fail:
+            msg: Debug
+
         - name: Add Matomo user
           include_tasks: newuser.yml
           when: ( matomo_login_present is defined ) and ( not matomo_login_present )
