@@ -38,6 +38,34 @@
         var: matomo_api_add_user
         verbosity: 2
 
+    - name: Save the password to the matomo_password_file path if it is defined
+      block:
+
+        - name: "Ensure that the {{ matomo_password_file }} exists"
+          blockinfile:
+            path: "{{ matomo_password_file }}"
+            block: |
+              ---
+              matomo_email_addresses:
+            insertbefore: BOF
+            marker: # Ansible managed Matomo email addresses {mark}
+            mode: 0600
+            owner: root
+            group: root
+
+        - name: "Password for {{ matomo_login_email }} present in {{ matomo_password_file }}"
+          blockinfile:
+            path: "{{ matomo_password_file }}"
+            block: |
+              - email: {{ matomo_login_email }}
+                password: {{ matomo_login_password }}
+            marker: # {{ matomo_login_email }} {mark}
+            mode: 0600
+            owner: root
+            group: root
+
+      when: ( matomo_password_file is defined ) and ( matomo_password_file | length > 0 )
+
     - name: Matomo password notification
       block:
 
