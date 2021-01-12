@@ -10,9 +10,6 @@
           - matomo_login_home is defined
           - matomo_login_password is defined
 
-    # The problem here is that there could be several accounts with the same email
-    # address and we don't know which one has the ~/.matomo.password file...
-
   tags:
-    - munin
+    - matomo
 ...
