@@ -124,5 +124,23 @@ Also for example for `addsite.yml`:
     loop_var: vhost
 ```
 
+## Storing passwords
+
+Since a users password is needed to generate a `token_auth` which is needed to
+automatically configure the Matomo WordPress plugin this role will optionally
+store a record or passwords (but doesn't prevent using from changing them) and
+reset them when needs be in a YAML file format based on the results of the
+`UsersManager.getUsersPlusRole` API method:
+
+```yml
+---
+matomo_accounts:
+  - login: user 
+    email: user@example.org
+    password: XXX
+    superuser_access: false
+    role: noaccess
+    capabilities: []
+```
 
 
