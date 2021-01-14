@@ -1,0 +1,96 @@
+---
+- name: Matomo user present
+  block:
+
+    - name: Check variables
+      assert:
+        that:
+          - ( matomo_login is defined ) and ( matomo_login is regex("^[a-zA-Z0-9-]{2,14}$")
+          - ( matomo_login_email is defined ) and ( matomo_login_email is regex("^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$") )
+          - ( matomo_token_auth is defined )
+          - ( matomo_password is defined )
+          - ( matomo_url is defined )
+
+    - name: "Check if a Matomo login named {{ matomo_login }} exists using the API"
+      uri:
+        url: "{{ matomo_url }}"
+        method: POST
+        body_format: form-urlencoded
+        body:
+          module: API
+          format: JSON
+          token_auth: "{{ matomo_token_auth }}"
+          method: UsersManager.userExists
+          userLogin: "{{ matomo_login }}"
+      register: matomo_api_user_exists
+
+    - name: Debug matomo_api_user_exists
+      debug:
+        var: matomo_api_user_exists
+        verbosity: 2
+
+    - name: "Check if a Matomo login with the email address {{ matomo_login_email }} exists using the API"
+      uri:
+        url: "{{ matomo_url }}"
+        method: POST
+        body_format: form-urlencoded
+        body:
+          module: API
+          format: JSON
+          token_auth: "{{ matomo_token_auth }}"
+          method: UsersManager.getUserLoginFromUserEmail
+          userEmail: "{{ matomo_login_email }}"
+      register: matomo_api_get_user_login_from_user_email
+
+    - name: Debug matomo_api_get_user_login_from_user_email
+      debug:
+        var: matomo_api_get_user_login_from_user_email
+        verbosity: 2
+
+    - name: If matomo_accounts_file is defined 
+      block:
+
+        - name: "Stat {{ matomo_accounts_file }}" 
+          stat:
+            path: "{{ matomo_accounts_file }}"
+          register: matomo_accounts_file_path
+
+        - name: "Read account details from {{ matomo_accounts_file }}"
+          block:
+
+            - name: "Read account information from {{ matomo_accounts_file }}"
+              include_vars: "{{ matomo_accounts_file }}"
+
+            - name: Debug matomo_accounts
+              debug:
+                var: matomo_accounts
+                verbosity: 2
+
+          when: ( matomo_accounts_file_path is defined ) and ( matomo_accounts_file_path.stat.exists )
+
+      when: ( matomo_accounts_file is defined ) and ( matomo_accounts_file | length > 0 )
+
+    - name: Debug fail
+      fail:
+        msg: Debug
+
+#    - name: "Update Matomo email address for {{ matomo_login_email }}"
+#      # when:
+#      #   - matomo_api_user_exists.json.value # check for "success" ?
+#      #   - matomo_api_get_user_login_from_user_email.json # check that the email address doesn't already exist
+#
+#
+#
+#  
+#    - name: Account exists and account file matches
+#      when:
+#        
+#
+#    
+#            - name: "Check for a Matomo login for {{ matomo_login }} in {{ matomo_accounts_file }}"
+#    
+#            - name: "Check for a Matomo login with the email address {{ matomo_login_email }} in {{ matomo_accounts_file }}"
+
+  tags:
+    - matomo
+...
