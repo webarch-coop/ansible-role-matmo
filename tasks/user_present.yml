@@ -42,6 +42,12 @@
           userEmail: "{{ matomo_login_email }}"
       register: matomo_api_get_user_login_from_user_email
 
+    # When a login exists the username is returned:
+    # matomo_api_get_user_login_from_user_email.json.value == "login"
+    #
+    # When a login doesn't exist:
+    # matomo_api_get_user_login_from_user_email.json.result == "error"
+
     - name: Debug matomo_api_get_user_login_from_user_email
       debug:
         var: matomo_api_get_user_login_from_user_email
@@ -78,6 +84,7 @@
         - ( not matomo_api_user_exists.json.value )
         - ( matomo_api_get_user_login_from_user_email is defined )
         - ( matomo_api_get_user_login_from_user_email.json is defined )
+        - ( matomo_api_get_user_login_from_user_email.json.value is not defined )
         - ( matomo_api_get_user_login_from_user_email.json.result is defined )
         - ( matomo_api_get_user_login_from_user_email.json.result == "error" )
         - ( matomo_api_get_user_login_from_user_email.json.message is regex("^.*doesn\'t\ exist\.$") )
