@@ -38,7 +38,7 @@
     - name: Variables need setting
       debug:
         msg: Please check the matomo_token_auth and matomo_password are correct for the Matmom superuser
-      when: not matomo_super_user_access 
+      when: not matomo_super_user_access
 
   tags:
     - munin

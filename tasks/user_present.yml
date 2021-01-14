@@ -47,10 +47,10 @@
         var: matomo_api_get_user_login_from_user_email
         verbosity: 2
 
-    - name: If matomo_accounts_file is defined 
+    - name: If matomo_accounts_file is defined
       block:
 
-        - name: "Stat {{ matomo_accounts_file }}" 
+        - name: "Stat {{ matomo_accounts_file }}"
           stat:
             path: "{{ matomo_accounts_file }}"
           register: matomo_accounts_file_path
@@ -81,14 +81,14 @@
 #
 #
 #
-#  
+#
 #    - name: Account exists and account file matches
 #      when:
-#        
 #
-#    
+#
+#
 #            - name: "Check for a Matomo login for {{ matomo_login }} in {{ matomo_accounts_file }}"
-#    
+#
 #            - name: "Check for a Matomo login with the email address {{ matomo_login_email }} in {{ matomo_accounts_file }}"
 
   tags:

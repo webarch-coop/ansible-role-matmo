@@ -48,7 +48,7 @@
               ---
               matomo_email_addresses:
             insertbefore: BOF
-            marker: # Ansible managed Matomo email addresses {mark}
+            marker: "# Ansible managed Matomo email addresses {mark}"
             mode: 0600
             owner: root
             group: root
@@ -59,7 +59,7 @@
             block: |
               - email: {{ matomo_login_email }}
                 password: {{ matomo_login_password }}
-            marker: # {{ matomo_login_email }} {mark}
+            marker: "# {{ matomo_login_email }} {mark}"
             mode: 0600
             owner: root
             group: root

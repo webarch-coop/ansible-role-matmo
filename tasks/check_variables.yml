@@ -83,7 +83,7 @@
       register: matomo_config_check
 
     - name: "Check Matomo version"
-      block: 
+      block:
 
         - name: Include Matomo version check
           include_tasks: check_version.yml
