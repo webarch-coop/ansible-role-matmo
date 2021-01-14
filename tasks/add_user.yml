@@ -57,7 +57,7 @@
           blockinfile:
             path: "{{ matomo_accounts_file }}"
             block: |
-              - login: {{ matomo_login | quote }} 
+              - login: {{ matomo_login | quote }}
                 email: {{ matomo_login_email | quote }}
                 password: {{ matomo_login_password | quote }}
             marker: "# {{ matomo_login }} <{{ matomo_login_email }}> {mark}"
