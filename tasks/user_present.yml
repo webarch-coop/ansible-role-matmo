@@ -89,20 +89,25 @@
         - ( matomo_api_get_user_login_from_user_email.json.result == "error" )
         - ( matomo_api_get_user_login_from_user_email.json.message is regex("^.*doesn\'t\ exist\.$") )
 
-    # - name: Include update Matomo user tasks
+    # - name: Include update Matomo user login tasks when the email address is used by another account
+
+    - name: Include update Matomo user email address tasks when the email address isn't used by an existing account
+      include_tasks: update_email.yml
+      when:
+        - ( matomo_api_user_exists.json is defined )
+        - ( matomo_api_user_exists.json.value is defined )
+        - ( matomo_api_user_exists.json.value )
+        - ( matomo_api_get_user_login_from_user_email is defined )
+        - ( matomo_api_get_user_login_from_user_email.json is defined )
+        - ( matomo_api_get_user_login_from_user_email.json.value is not defined )
+        - ( matomo_api_get_user_login_from_user_email.json.result is defined )
+        - ( matomo_api_get_user_login_from_user_email.json.result == "error" )
+        - ( matomo_api_get_user_login_from_user_email.json.message is regex("^.*doesn\'t\ exist\.$") )
 
     - name: Debug fail
       fail:
         msg: Debug
 
-#    - name: "Update Matomo email address for {{ matomo_login_email }}"
-#      # when:
-#      #   - matomo_api_user_exists.json.value # check for "success" ?
-#      #   - matomo_api_get_user_login_from_user_email.json # check that the email address doesn't already exist
-#
-#
-#
-#
 #    - name: Account exists and account file matches
 #      when:
 #

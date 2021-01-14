@@ -1,0 +1,96 @@
+---
+- name: Update Matomo user account email address
+  block:
+
+    - name: "Get the existing email address for the Matomo {{ matomo_login }} user using the API"
+      uri:
+        url: "{{ matomo_url }}"
+        method: POST
+        body_format: form-urlencoded
+        body:
+          module: API
+          format: JSON
+          token_auth: "{{ matomo_token_auth }}"
+          method: UsersManager.getUser
+          userLogin: "{{ matomo_login }}"
+      register: matomo_api_get_user
+
+    # The existing email address is returned as matomo_api_get_user.json.email
+
+    - name: Debug matomo_api_get_user
+      debug:
+        var: matomo_api_get_user
+        verbosity: 2
+
+    - name: "Update the email address for {{ matomo_login }} using the API"
+      uri:
+        url: "{{ matomo_url }}"
+        method: POST
+        body_format: form-urlencoded
+        body:
+          module: API
+          format: JSON
+          token_auth: "{{ matomo_token_auth }}"
+          method: UsersManager.updateUser
+          userLogin: "{{ matomo_login }}"
+          email: "{{ matomo_login_email }}"
+      register: matomo_api_update_user_email
+
+    - name: Debug matomo_api_update_user_email
+      debug:
+        var: matomo_api_update_user_email
+        verbosity: 2
+
+    - name: Update the email address in the matomo_accounts_file
+      block:
+
+        - name: Update the email address in the block start
+          lineinfile:
+            path: "{{ matomo_accounts_file }}"
+            line: "# {{ matomo_login }} <{{ matomo_login_email }}> BEGIN"
+            regexp: "^# {{ matomo_login }} "
+            state: present
+            create: false
+            mode: 0600
+            owner: "{{ matomo_user }}"
+            group: "{{ matomo_group }}"
+
+        - name: Update the email address in the block
+          lineinfile:
+            path: "{{ matomo_accounts_file }}"
+            line: "    email: {{ matomo_login_email }}"
+            regexp: "^    email: {{ matomo_api_get_user.json.email }}"
+            state: present
+            create: false
+            mode: 0600
+            owner: "{{ matomo_user }}"
+            group: "{{ matomo_group }}"
+
+        - name: Update the email address in the block end
+          lineinfile:
+            path: "{{ matomo_accounts_file }}"
+            line: "# {{ matomo_login }} <{{ matomo_login_email }}> END"
+            regexp: "^# {{ matomo_login }} "
+            state: present
+            create: false
+            mode: 0600
+            owner: "{{ matomo_user }}"
+            group: "{{ matomo_group }}"
+
+      when:
+        - ( matomo_accounts_file is defined ) and ( matomo_accounts_file | length > 0 )
+        - ( matomo_accounts_file_path is defined ) and ( matomo_accounts_file_path.stat.exists )
+
+    - name: "Email address update notification email sent to {{ matomo_login_email }}"
+      mail:
+        from: "{{ matomo_email_from | default('Webarchitects') }} <root@{{ inventory_hostname }}>"
+        to: "{{ matomo_login_email }}"
+        subject: "[{{ matomo_email_subject_tag | default('webarchitects') }}] Matomo email address updated for {{ matomo_login }} on {{ matomo_url }}"
+        headers: "{{ matomo_notify_headers }}"
+        # https://github.com/ansible/ansible/issues/58543
+        charset: us-ascii
+        body: "{{ lookup('template', 'templates/notify_matomo_email.j2') }}"
+        host: localhost
+        port: 25
+        secure: never
+...

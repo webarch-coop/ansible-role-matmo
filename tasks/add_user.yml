@@ -51,8 +51,8 @@
             insertbefore: BOF
             marker: "# Ansible managed Matomo email addresses {mark}"
             mode: 0600
-            owner: root
-            group: root
+            owner: "{{ matomo_user }}"
+            group: "{{ matomo_group }}"
 
         - name: "Password for {{ matomo_login_email }} present in {{ matomo_accounts_file }}"
           blockinfile:
