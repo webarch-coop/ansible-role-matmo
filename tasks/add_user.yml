@@ -44,6 +44,7 @@
         - name: "Ensure that the {{ matomo_accounts_file }} exists"
           blockinfile:
             path: "{{ matomo_accounts_file }}"
+            create: true
             block: |
               ---
               matomo_accounts:
