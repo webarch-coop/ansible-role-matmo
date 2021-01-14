@@ -1,0 +1,102 @@
+---
+- name: Add new Matomo account
+  block:
+
+    - name: Generate a random password for the Matomo user
+      block:
+
+        - name: Generate a random string for Matomo password
+          command: pwgen -n 20 1
+          register: matomo_login_password_gen
+          no_log: true
+
+        - name: Set a variable with the random password
+          set_fact:
+            matomo_login_password: "{{ matomo_login_password_gen.stdout }}"
+          no_log: true
+
+      when: ( matomo_login_password is not defined ) or ( matomo_login_password | length == 0 )
+
+    - name: Add Matomo user account using the API
+      uri:
+        url: "{{ matomo_url }}"
+        method: POST
+        body_format: form-urlencoded
+        body:
+          module: API
+          format: JSON
+          token_auth: "{{ matomo_token_auth }}"
+          method: UsersManager.addUser
+          userLogin: "{{ matomo_login }}"
+          password: "{{ matomo_login_password }}"
+          email: "{{ matomo_login_email }}"
+      register: matomo_api_add_user
+      failed_when: matomo_api_add_user.json.result != "success"
+
+    - name: Debug matomo_api_add_user
+      debug:
+        var: matomo_api_add_user
+        verbosity: 2
+
+    - name: Save the password to the matomo_accounts_file path if it is defined
+      block:
+
+        - name: "Ensure that the {{ matomo_accounts_file }} exists"
+          blockinfile:
+            path: "{{ matomo_accounts_file }}"
+            block: |
+              ---
+              matomo_accounts:
+            insertbefore: BOF
+            marker: "# Ansible managed Matomo email addresses {mark}"
+            mode: 0600
+            owner: root
+            group: root
+
+        - name: "Password for {{ matomo_login_email }} present in {{ matomo_accounts_file }}"
+          blockinfile:
+            path: "{{ matomo_accounts_file }}"
+            block: |
+              - login: {{ matomo_login | quote }} 
+                email: {{ matomo_login_email | quote }}
+                password: {{ matomo_login_password | quote }}
+            marker: "# {{ matomo_login }} <{{ matomo_login_email }}> {mark}"
+            mode: 0600
+            owner: "{{ matomo_user }}"
+            group: "{{ matomo_group }}"
+
+      when: ( matomo_accounts_file is defined ) and ( matomo_accounts_file | length > 0 )
+
+    - name: Matomo password notification
+      block:
+
+        - name: "Password notification email sent to {{ matomo_login_email }}"
+          mail:
+            from: "{{ matomo_email_from | default('Webarchitects') }} <root@{{ ansible_fqdn }}>"
+            to: "{{ matomo_login_email }}"
+            subject: "[{{ matomo_email_subject_tag | default('webarchitects') }}] Matomo {{ matomo_login }} account details for {{ matomo_url }}"
+            headers: "{{ matomo_notify_headers }}"
+            # https://github.com/ansible/ansible/issues/58543
+            charset: us-ascii
+            body: "{{ lookup('template', 'templates/notify_matomo_passwd.j2') }}"
+            host: localhost
+            port: 25
+            secure: never
+
+        - name: "Notification date recorded in {{ matomo_login_home }}/.notify_matomo_passwd file"
+          lineinfile:
+            path: "{{ matomo_login_home }}/.notify_matomo_passwd"
+            line: "{{ lookup('pipe', 'date +%Y-%m-%d-%H-%M-%S') }} : {{ matomo_login }} <{{ matomo_login_email }}>"
+            create: true
+            state: present
+            insertafter: EOF
+            owner: root
+            group: "{{ matomo_login }}"
+            mode: 0640
+          when: ( matomo_login_home is defined ) and ( matomo_login_home | length > 0 )
+
+      when: matomo_api_add_user.json.result == "success"
+
+  tags:
+    - matomo
+...
