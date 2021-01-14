@@ -77,7 +77,7 @@
         - ( matomo_api_user_exists.json.value == "false" )
         - ( matomo_api_get_user_login_from_user_email.json is defined )
         - ( matomo_api_get_user_login_from_user_email.json.result == "error" )
-        - ( matomo_api_get_user_login_from_user_email.json.message == "User '{{ matomo_login_email }}' doesn't exist." )
+        - ( matomo_api_get_user_login_from_user_email.json.message is regex("^.*doesn\'t\ exist\.$") )
 
     - name: Debug fail
       fail:
