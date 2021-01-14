@@ -70,35 +70,19 @@
 
       when: ( matomo_accounts_file is defined ) and ( matomo_accounts_file | length > 0 )
 
-    - name: Debug matomo_api_user_exists.json
-      debug:
-        var: matomo_api_user_exists.json
-      when:
-        - ( matomo_api_user_exists.json is defined )
-        - ( not matomo_api_user_exists.json.value )
-
-    - name: Debug matomo_api_get_user_login_from_user_email.json.result
-      debug:
-        var: matomo_api_get_user_login_from_user_email.json.result
-      when:
-        - ( matomo_api_get_user_login_from_user_email.json is defined )
-        - ( matomo_api_get_user_login_from_user_email.json.result == "error" )
-
-    - name: Debug matomo_api_get_user_login_from_user_email.json.message
-      debug:
-        var: matomo_api_get_user_login_from_user_email.json.message
-      when:
-        - ( matomo_api_get_user_login_from_user_email.json is defined )
-        - ( matomo_api_get_user_login_from_user_email.json.message is regex("^.*doesn\'t\ exist\.$") )
-
-    - name: Include add user tasks
+    - name: Include add Matomo user tasks
       include_tasks: add_user.yml
       when:
         - ( matomo_api_user_exists.json is defined )
+        - ( matomo_api_user_exists.json.value is defined )
         - ( not matomo_api_user_exists.json.value )
+        - ( matomo_api_get_user_login_from_user_email is defined )
         - ( matomo_api_get_user_login_from_user_email.json is defined )
+        - ( matomo_api_get_user_login_from_user_email.json.result is defined )
         - ( matomo_api_get_user_login_from_user_email.json.result == "error" )
         - ( matomo_api_get_user_login_from_user_email.json.message is regex("^.*doesn\'t\ exist\.$") )
+
+    # - name: Include update Matomo user tasks
 
     - name: Debug fail
       fail:
