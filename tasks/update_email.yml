@@ -38,7 +38,8 @@
           userLogin: "{{ matomo_login }}"
           email: "{{ matomo_login_email }}"
       register: matomo_api_update_user_email
-      failed_when: ( matomo_api_update_user_email.json is not defined ) or ( matomo_api_update_user_email.json is defined and matomo_api_update_user_email.json == "error" )
+      changed_when: ( matomo_api_update_user_email.json is defined ) and ( matomo_api_update_user_email.json.result == "success" ) 
+      failed_when: ( matomo_api_update_user_email.json is not defined ) or ( matomo_api_update_user_email.json is defined and matomo_api_update_user_email.json.result == "error" )
 
     - name: Debug matomo_api_update_user_email
       debug:
