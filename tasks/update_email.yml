@@ -15,12 +15,14 @@
           userLogin: "{{ matomo_login }}"
       register: matomo_api_get_user
 
-    # The existing email address is returned as matomo_api_get_user.json.email
-
     - name: Debug matomo_api_get_user
       debug:
         var: matomo_api_get_user
         verbosity: 2
+
+    - name: Set a variable for the existing email address
+      set_fact:
+        matomo_old_login_email: "{{ matomo_api_get_user.json.email }}"
 
     - name: "Update the email address for {{ matomo_login }} using the API"
       uri:
@@ -30,11 +32,13 @@
         body:
           module: API
           format: JSON
-          token_auth: "{{ matomo_token_auth }}"
+          token_auth: "{{ matomo_token_auth }}" 
+          passwordConfirmation: "{{ matomo_password }}"
           method: UsersManager.updateUser
           userLogin: "{{ matomo_login }}"
           email: "{{ matomo_login_email }}"
       register: matomo_api_update_user_email
+      failed_when: ( matomo_api_update_user_email.json is not defined ) or ( matomo_api_update_user_email.json is defined and matomo_api_update_user_email.json == "error" )
 
     - name: Debug matomo_api_update_user_email
       debug:
