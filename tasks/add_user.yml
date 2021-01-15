@@ -47,9 +47,8 @@
             create: true
             block: |
               ---
-              matomo_accounts:
             insertbefore: BOF
-            marker: "# Ansible managed Matomo email addresses {mark}"
+            marker: "# Ansible managed Matomo accounts {mark}"
             mode: 0600
             owner: "{{ matomo_user }}"
             group: "{{ matomo_group }}"

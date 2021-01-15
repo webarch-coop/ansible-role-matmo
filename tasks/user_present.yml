@@ -71,7 +71,7 @@
 
             - name: "Set a fact for the account details in {{ matomo_accounts_file }}"
               set_fact:
-                matomo_accounts: "{{ matomo_accounts_file_b64encoded['content'] | b64decode }}"
+                matomo_accounts: "{{ matomo_accounts_file_b64encoded['content'] | b64decode | from_yaml }}"
 
             - name: Debug matomo_accounts
               debug:
