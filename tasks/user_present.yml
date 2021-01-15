@@ -93,10 +93,10 @@
                 method: POST
                 body_format: form-urlencoded
                 body:
-                  - [ module, Login ]
-                  - [ action, logme ]
-                  - [ login, {{ matomo_login }} ]
-                  - [ password, {{ matomo_account_login_password | hash('md5') }} ]
+                  module: Login
+                  action: logme
+                  login: "{{ matomo_login }}"
+                  password: "{{ matomo_account_login_password | hash('md5') }}"
               register: matomo_logme
 
             - name: Debug matomo_logme
