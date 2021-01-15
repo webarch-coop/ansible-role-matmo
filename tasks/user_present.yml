@@ -64,9 +64,13 @@
         - name: "Read account details from {{ matomo_accounts_file }}"
           block:
 
-            - name: "Read account information from {{ matomo_accounts_file }}"
-              include_vars: "{{ matomo_accounts_file }}"
-              remote_src: true
+            - name: "Slurp account information from {{ matomo_accounts_file }}"
+              slurp:
+                src: "{{ matomo_accounts_file }}"
+              register: matomo_accounts_file_b64enc
+
+            - name: "Set a fact for the account details in {{ matomo_accounts_file }}"
+                matomo_accounts: "{{ matomo_accounts_file_b64enc['content'] | b64decode"
 
             - name: Debug matomo_accounts
               debug:
