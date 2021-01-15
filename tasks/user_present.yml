@@ -86,8 +86,8 @@
               loop_control:
                 loop_var: account
 
-             # https://matomo.org/faq/how-to/faq_30/
-            - name: Check that the matomo_account_login_password is correct
+            # https://matomo.org/faq/how-to/faq_30/
+            - name: GET a login cookie to check that the matomo_account_login_password is correct
               uri:
                 url: "{{ matomo_url }}"
                 method: POST
@@ -104,6 +104,28 @@
             - name: Debug matomo_logme
               debug:
                 var: matomo_logme
+                verbosity: 2
+
+            - name: Set a variable for the MATOMO_SESSID cookie
+              set_fact:
+                matomo_session_cookie: "MATOMO_SESSID={{ cookie.value }}"
+              when: cookie.key == "MATOMO_SESSID"
+              loop: "{{ matomo_logme.cookies | dict2items }}"
+              loop_control:
+                loop_var: cookie
+
+            - name: Get the main Matomo page
+              uri:
+                url: "{{ matomo_url }}"
+                method: GET
+                headers:
+                  Cookie: "{{ matomo_session_cookie }}"
+                return_content: true 
+              register: matomo_front_page
+
+            - name: Debug matomo_front_page
+              debug:
+                var: matomo_front_page
                 verbosity: 2
 
             - name: Debug fail
