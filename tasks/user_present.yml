@@ -59,7 +59,7 @@
         - name: "Stat {{ matomo_accounts_file }}"
           stat:
             path: "{{ matomo_accounts_file }}"
-          register: matomo_accounts_file_b64enc
+          register: matomo_accounts_file_path
 
         - name: "Read account details from {{ matomo_accounts_file }}"
           block:
@@ -67,11 +67,11 @@
             - name: "Slurp account information from {{ matomo_accounts_file }}"
               slurp:
                 src: "{{ matomo_accounts_file }}"
-              register: matomo_accounts_file_b64enc
+              register: matomo_accounts_file_b64encoded
 
             - name: "Set a fact for the account details in {{ matomo_accounts_file }}"
               set_fact:
-                matomo_accounts: "{{ matomo_accounts_file_b64enc['content'] | b64decode"
+                matomo_accounts: "{{ matomo_accounts_file_b64encoded['content'] | b64decode }}"
 
             - name: Debug matomo_accounts
               debug:
