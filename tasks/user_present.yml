@@ -110,7 +110,7 @@
               set_fact:
                 matomo_session_cookie: "{{ cookie }}"
               when: cookie is regex("^MATOMO_SESSID=.*$")
-              loop: "{{ matomo_logme.set_cookies.split(', ') }}"
+              loop: "{{ matomo_logme.set_cookie.split(', ') }}"
               loop_control:
                 loop_var: cookie
 
