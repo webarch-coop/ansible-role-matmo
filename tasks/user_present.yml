@@ -108,11 +108,16 @@
 
             - name: Set a variable for the MATOMO_SESSID cookie
               set_fact:
-                matomo_session_cookie: "MATOMO_SESSID={{ cookie.value }}"
-              when: cookie.key == "MATOMO_SESSID"
-              loop: "{{ matomo_logme.cookies | dict2items }}"
+                matomo_session_cookie: "{{ cookie }}"
+              when: cookie is regex("^MATOMO_SESSID=.*$")
+              loop: "{{ matomo_logme.set_cookies.split(', ') }}"
               loop_control:
                 loop_var: cookie
+
+            - name: Debug matomo_session_cookie
+              debug:
+                var: matomo_session_cookie
+                verbosity: 2
 
             - name: Get the main Matomo page
               uri:
