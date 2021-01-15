@@ -66,6 +66,7 @@
 
             - name: "Read account information from {{ matomo_accounts_file }}"
               include_vars: "{{ matomo_accounts_file }}"
+              remote_src: true
 
             - name: Debug matomo_accounts
               debug:
