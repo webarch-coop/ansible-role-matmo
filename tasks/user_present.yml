@@ -120,7 +120,7 @@
                 method: GET
                 headers:
                   Cookie: "{{ matomo_session_cookie }}"
-                return_content: true 
+                return_content: true
               register: matomo_front_page
 
             - name: Debug matomo_front_page
