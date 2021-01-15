@@ -38,7 +38,7 @@
         var: matomo_api_add_user
         verbosity: 2
 
-    - name: Save the password to the matomo_accounts_file path if it is defined
+    - name: Save the password to the matomo_accounts_file path if it is defined and this isn't the first user
       block:
 
         - name: "Ensure that the {{ matomo_accounts_file }} exists"
@@ -66,7 +66,10 @@
             owner: "{{ matomo_user }}"
             group: "{{ matomo_group }}"
 
-      when: ( matomo_accounts_file is defined ) and ( matomo_accounts_file | length > 0 )
+      when:
+        - ( matomo_login != matomo_first_user )
+        - ( matomo_login_email != matomo_first_user_email )
+        - ( matomo_accounts_file is defined ) and ( matomo_accounts_file | length > 0 )
 
     - name: Matomo password notification
       block:
