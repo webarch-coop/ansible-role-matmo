@@ -70,6 +70,7 @@
               register: matomo_accounts_file_b64enc
 
             - name: "Set a fact for the account details in {{ matomo_accounts_file }}"
+              set_fact:
                 matomo_accounts: "{{ matomo_accounts_file_b64enc['content'] | b64decode"
 
             - name: Debug matomo_accounts
