@@ -59,7 +59,7 @@
         - name: "Stat {{ matomo_accounts_file }}"
           stat:
             path: "{{ matomo_accounts_file }}"
-          register: matomo_accounts_file_path
+          register: matomo_accounts_file_b64enc
 
         - name: "Read account details from {{ matomo_accounts_file }}"
           block:
