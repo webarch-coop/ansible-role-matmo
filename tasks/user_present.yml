@@ -82,7 +82,7 @@
               set_fact:
                 matomo_account_login_password: "{{ account.password }}"
               when: account.login == matomo_login
-              loop: matomo_accounts
+              loop: "{{ matomo_accounts }}"
               loop_control:
                 loop_var: account
 
