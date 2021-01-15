@@ -78,6 +78,36 @@
                 var: matomo_accounts
                 verbosity: 2
 
+            - name: Set a fact for the matomo_login_password
+              set_fact:
+                matomo_account_login_password: "{{ account.password }}"
+              when: account.login == matomo_login
+              loop: matomo_accounts
+              loop_control:
+                loop_var: account
+
+             # https://matomo.org/faq/how-to/faq_30/
+            - name: Check that the matomo_account_login_password is correct
+              uri:
+                url: "{{ matomo_url }}"
+                method: POST
+                body_format: form-urlencoded
+                body:
+                  - [ module, Login ]
+                  - [ action, logme ]
+                  - [ login, {{ matomo_login }} ]
+                  - [ password, {{ matomo_account_login_password | hash('md5') }} ]
+              register: matomo_logme
+
+            - name: Debug matomo_logme
+              debug:
+                var: matomo_logme
+                verbosity: 2
+
+            - name: Debug fail
+              fail:
+                msg: debug
+
           when: ( matomo_accounts_file_path is defined ) and ( matomo_accounts_file_path.stat.exists )
 
       when: ( matomo_accounts_file is defined ) and ( matomo_accounts_file | length > 0 )
@@ -118,21 +148,6 @@
         - ( matomo_api_user_exists.json.value is defined )
         - ( not matomo_api_user_exists.json.value )
         - ( matomo_api_get_user_login_from_user_email.json.value is defined )
-
-    # Set a fact for the matomo_login password when matomo_accounts is defined
-
-    - name: Debug fail
-      fail:
-        msg: Debug
-
-#    - name: Account exists and account file matches
-#      when:
-#
-#
-#
-#            - name: "Check for a Matomo login for {{ matomo_login }} in {{ matomo_accounts_file }}"
-#
-#            - name: "Check for a Matomo login with the email address {{ matomo_login_email }} in {{ matomo_accounts_file }}"
 
   tags:
     - matomo
