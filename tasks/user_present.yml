@@ -97,6 +97,8 @@
                   action: logme
                   login: "{{ matomo_login }}"
                   password: "{{ matomo_account_login_password | hash('md5') }}"
+                status_code: 302
+                return_content: true
               register: matomo_logme
 
             - name: Debug matomo_logme
