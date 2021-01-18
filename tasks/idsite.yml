@@ -1,5 +1,5 @@
 ---
-- name: Get Mation site id
+- name: Get Matomo site id
   block:
 
     - name: "Update the matomo_sites list"

@@ -52,11 +52,18 @@
               siteName: "{{ matomo_site_name }}"
               urls: "{{ matomo_urls }}"
           register: matomo_api_add_site
+          changed_when: not matomo_api_add_site.failed
 
         - name: Debug matomo_api_add_site
           debug:
             var: matomo_api_add_site
             verbosity: 2
+
+        - name: Set the matomo_idsite variable
+          set_fact:
+            matomo_idsite: "{{ matomo_api_add_site.json.value }}"
+          when:
+            - ( not matomo_api_add_site.failed )
 
       when: matomo_site_name not in matomo_sites_names
 
