@@ -34,7 +34,7 @@
 
     - name: Add all URLs to site_urls variable
       set_fact:
-        site_urls: "{{ site_urls | default('') }}, {{ site_url }}"
+        site_urls: "{{ site_url }}, {{ site_urls }}"
       loop: "{{ users_matomo_get_site_urls_from_id.json }}"
       loop_control:
         loop_var: site_url
@@ -51,7 +51,6 @@
       set_fact:
         matomo_existing_site_urls: "{{ site_urls.split(', ') | list }}"
       when:
-        - ( site_urls is defined ) and ( site_urls != [] )
         - ( users_matomo_get_site_urls_from_id.json is defined )
         - ( users_matomo_get_site_urls_from_id.json != [] )
 
