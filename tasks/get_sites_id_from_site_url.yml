@@ -2,6 +2,13 @@
 - name: Get Matomo site IDs from URLs using the API
   block:
 
+    - name: Check that required variables are defined
+      assert:
+        that:
+          - ( matomo_url is defined ) and ( matomo_url | length > 0 )
+          - ( matomo_token_auth is defined ) and ( matomo_token_auth | length > 0 )
+          - ( url is defined ) and ( url | length > 0 )
+
     - name: "Check if a Matomo ID exists for {{ url }}"
       uri:
         url: "{{ matomo_url }}"

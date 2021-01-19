@@ -28,23 +28,37 @@
         var: users_matomo_get_site_urls_from_id
         verbosity: 2
 
-#    - name: Add URLs to matomo_existing_site_urls
-#      set_fact:
-#        matomo_existing_site_urls: "{{ matomo_existing_site_urls | default([]) }} + [ '{{ url }}' ]"
-#      loop: "{{ users_matomo_get_sites_id_from_siteurl.json }}"
-#      loop_control:
-#        loop_var: site_url
-#        label: id.idsite
-#      when:
-#        - ( id.idsite not in matomo_existing_site_ids )
-#        - ( users_matomo_get_sites_id_from_siteurl.json is defined )
-#        - ( users_matomo_get_sites_id_from_siteurl.json != [] )
-#
-#    - name: Debug matomo_existing_site_ids
-#      debug:
-#        var: matomo_existing_site_ids
-#        verbosity: 2
+    - name: Set site_urls to an empty array
+      set_fact:
+        site_urls: []
 
+    - name: Add 
+      set_fact:
+        site_urls: "{{ site_urls | default('') }}, {{ site_url }}" 
+      loop: "{{ users_matomo_get_site_urls_from_id.json }}"
+      loop_control:
+        loop_var: site_url
+      when:
+        - ( users_matomo_get_site_urls_from_id.json is defined )
+        - ( users_matomo_get_site_urls_from_id.json != [] )
+
+    - name: Debug site_urls
+      debug:
+        var: site_urls
+        verbosity: 2
+
+    - name: Create an array for matomo_existing_site_urls  
+      set_fact:
+        matomo_existing_site_urls: "{{ site_urls.split(', ') | list }}"
+      when:
+        - ( site_urls is defiend ) and ( site_urls != [] )
+        - ( users_matomo_get_site_urls_from_id.json is defined )
+        - ( users_matomo_get_site_urls_from_id.json != [] )
+
+    - name: Debug matomo_existing_site_urls
+      debug:
+        var: matomo_existing_site_urls
+        verbosity: 2
 
   tags:
     - matomo
