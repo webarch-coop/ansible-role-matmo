@@ -37,7 +37,7 @@
             matomo_existing_site_urls: []
 
         - name: For each site ID
-          include_tasks: get_site_urls_from_id.yml 
+          include_tasks: get_site_urls_from_id.yml
           loop: "{{ matomo_existing_site_ids }}"
           loop_control:
             loop_var: id

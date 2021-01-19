@@ -1,0 +1,51 @@
+---
+- name: Get Matomo site URLs from Site ID using the API
+  block:
+
+    - name: Check that required variables are defined
+      assert:
+        that:
+          - ( matomo_url is defined ) and ( matomo_url | length > 0 )
+          - ( matomo_token_auth is defined ) and ( matomo_token_auth | length > 0 )
+          - ( id is defined ) and ( id | length > 0 )
+
+    - name: "Check if Matomo URLs exists for idSite {{ id }}"
+      uri:
+        url: "{{ matomo_url }}"
+        method: POST
+        body_format: form-urlencoded
+        body:
+          module: API
+          format: JSON
+          token_auth: "{{ matomo_token_auth }}"
+          method: SitesManager.getSiteUrlsFromId
+          idSite: "{{ id }}"
+          return_content: true
+      register: users_matomo_get_site_urls_from_id
+
+    - name: Debug users_matomo_get_site_urls_from_id
+      debug:
+        var: users_matomo_get_site_urls_from_id
+        verbosity: 2
+
+#    - name: Add URLs to matomo_existing_site_urls
+#      set_fact:
+#        matomo_existing_site_urls: "{{ matomo_existing_site_urls | default([]) }} + [ '{{ url }}' ]"
+#      loop: "{{ users_matomo_get_sites_id_from_siteurl.json }}"
+#      loop_control:
+#        loop_var: site_url
+#        label: id.idsite
+#      when:
+#        - ( id.idsite not in matomo_existing_site_ids )
+#        - ( users_matomo_get_sites_id_from_siteurl.json is defined )
+#        - ( users_matomo_get_sites_id_from_siteurl.json != [] )
+#
+#    - name: Debug matomo_existing_site_ids
+#      debug:
+#        var: matomo_existing_site_ids
+#        verbosity: 2
+
+
+  tags:
+    - matomo
+...
