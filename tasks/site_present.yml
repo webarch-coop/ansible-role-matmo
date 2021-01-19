@@ -23,16 +23,26 @@
       loop: "{{ matomo_site_urls }}"
       loop_control:
         loop_var: url
-      when:
-        - ( matomo_site_urls is defined ) and ( matomo_site_urls != [] )
+      when: ( matomo_site_urls is defined ) and ( matomo_site_urls != [] )
 
     - name: Print the matomo_existing_site_ids
       debug:
         var: matomo_existing_site_ids
 
-    # - name: Set matomo_existing_site_urls to an empty array
+    - name: Check and update URLs
+      block:
 
-    # - name: For each site ID
+        - name: Set matomo_existing_site_urls to an empty array
+          set_fact:
+            matomo_existing_site_urls: []
+
+        - name: For each site ID
+          include_tasks: get_site_urls_from_id.yml 
+          loop: "{{ matomo_existing_site_ids }}"
+          loop_control:
+            loop_var: id
+
+      when: ( matomo_existing_site_ids != [] )
 
   tags:
     - matomo
