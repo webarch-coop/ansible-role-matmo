@@ -23,10 +23,11 @@
 
     - name: Add IDs to matomo_existing_site_ids array
       set_fact:
-        matomo_existing_site_ids: "{{ matomo_existing_site_ids | default([]) }} + [ '{{ id }}' ]"
-      loop: users_matomo_get_sites_id_from_siteurl.json
+        matomo_existing_site_ids: "{{ matomo_existing_site_ids | default([]) }} + [ '{{ id.idsite }}' ]"
+      loop: "{{ users_matomo_get_sites_id_from_siteurl.json }}"
       loop_control:
         loop_var: id
+        label: id.idsite
       when:
         - ( users_matomo_get_sites_id_from_siteurl.json is defined )
         - ( users_matomo_get_sites_id_from_siteurl.json != [] )
