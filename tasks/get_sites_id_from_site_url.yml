@@ -29,6 +29,7 @@
         loop_var: id
         label: id.idsite
       when:
+        - ( id.idsite not in matomo_existing_site_ids )
         - ( users_matomo_get_sites_id_from_siteurl.json is defined )
         - ( users_matomo_get_sites_id_from_siteurl.json != [] )
 
