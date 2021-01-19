@@ -1,0 +1,38 @@
+---
+- name: Ensure that a Matomo site is present
+  block:
+
+    - name: Check that required variables are defined
+      assert:
+        that:
+          - ( matomo_url is defined ) and ( matomo_url | length > 0 )
+          - ( matomo_token_auth is defined ) and ( matomo_token_auth | length > 0 )
+          - ( matomo_site_main_url is defined ) and ( matomo_site_main_url | length > 0 )
+
+    - name: Set matomo_existing_site_ids to an empty array
+      set_fact:
+        matomo_existing_site_ids: []
+
+    - name: "Check if there is a Matomo site ID for {{ matomo_site_main_url }}"
+      include_tasks: get_sites_id_from_site_url.yml
+      vars:
+        url: "{{ matomo_site_main_url }}"
+
+    - name: "Check if there is a Matomo site ID for site URLs other than the main one"
+      include_tasks: get_sites_id_from_site_url.yml
+      loop: "{{ matomo_site_urls.split(', ') | list }}"
+      loop_control:
+        loop_var: url
+
+    - name: Print the matomo_existing_site_ids
+      debug:
+        var: matomo_existing_site_ids
+
+    # - name: Set matomo_existing_site_urls to an empty array
+
+    # - name: For each site ID 
+
+
+  tags:
+    - matomo
+...
