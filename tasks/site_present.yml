@@ -30,8 +30,7 @@
 
     # - name: Set matomo_existing_site_urls to an empty array
 
-    # - name: For each site ID 
-
+    # - name: For each site ID
 
   tags:
     - matomo
