@@ -30,11 +30,11 @@
 
     - name: Set site_urls to an empty variable
       set_fact:
-        site_urls: ""
+        site_urls: ''
 
     - name: Add all URLs to site_urls variable
       set_fact:
-        site_urls: "{{ site_url }}, {{ site_urls }}"
+        site_urls: "{{ site_url }}{% if site_urls != '' %}, {{ site_urls }}{% endif %}"
       loop: "{{ users_matomo_get_site_urls_from_id.json }}"
       loop_control:
         loop_var: site_url
