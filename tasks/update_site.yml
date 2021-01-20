@@ -1,5 +1,5 @@
 ---
-- name: Add Matomo site
+- name: Update an existing Matomo site
   block:
 
     - name: Check that required variables are defined
@@ -7,6 +7,7 @@
         that:
           - ( matomo_url is defined ) and ( matomo_url | length > 0 ) and ( matomo_url is regex("^http[s]*:\/\/.*$") )
           - ( matomo_token_auth is defined ) and ( matomo_token_auth | length > 0 )
+          - ( matomo_site_id is defined ) and ( matomo_site_id is regex("^[0-9]{1,9}$") )
           - ( matomo_site_name is defined ) and ( matomo_site_name | length > 0 )
           - ( matomo_site_main_url is defined ) and ( matomo_site_main_url | length > 0 )
 
@@ -39,7 +40,7 @@
         var: url
         verbosity: 2
 
-    - name: "Add Matomo site {{ matomo_site_name }} with main URL {{ matomo_site_main_url }}"
+    - name: "Update Matomo site {{ matomo_site_name }} with main URL {{ matomo_site_main_url }}"
       uri:
         url: "{{ matomo_url }}"
         method: POST
@@ -48,17 +49,18 @@
           module: API
           format: JSON
           token_auth: "{{ matomo_token_auth }}"
-          method: SitesManager.addSite
+          method: SitesManager.updateSite
           siteName: "{{ matomo_site_name }}"
+          idSite: "{{ matomo_site_id }}"
           urls: "{{ urls }}"
           status: 200
           return_content: true
-      register: users_matomo_add_site
-      failed_when: ( users_matomo_add_site.failed is defined ) and ( users_matomo_add_site.failed )
+      register: users_matomo_update_site
+      failed_when: ( users_matomo_update_site.failed is defined ) and ( users_matomo_update_site.failed )
 
-    - name: Debug users_matomo_add_site
+    - name: Debug users_matomo_update_site
       debug:
-        var: users_matomo_add_site
+        var: users_matomo_update_site
         verbosity: 2
 
   tags:
