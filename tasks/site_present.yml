@@ -73,13 +73,12 @@
 
         - name: Debug existing URLs
           debug:
-            msg:
-              matomo_existing_site_urls_sorted
+            var: matomo_existing_site_urls_sorted
             verbosity: 2
 
         - name: Debug matomo_proposed_site_urls_sorted
           debug:
-            var: matomo_proposed_site_urls
+            var: matomo_proposed_site_urls_sorted
             verbosity: 2
 
         - name: Include update Matomo site tasks when existing URLs don't match the proposed ones
