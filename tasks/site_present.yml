@@ -46,7 +46,7 @@
     - name: Test for non-empty array
       debug:
         var: matomo_existing_site_ids
-      when: matomo_existing_site_ids != [] 
+      when: matomo_existing_site_ids != []
 
     - name: This Ansible role only supports having one Matomo site per URL
       fail:
