@@ -66,19 +66,25 @@
           vars:
             id: "{{ matomo_existing_site_ids[0] }}"
 
-        - name: Debug matomo_existing_site_urls
+        - name: Set variables for the sorted and unique existing and proposed URL
+          set_fact:
+            matomo_existing_site_urls_sorted: "{{ matomo_existing_site_urls | sort | unique }}"
+            matomo_proposed_site_urls_sorted: "{{ matomo_proposed_site_urls | sort | unique }}"
+
+        - name: Debug existing URLs
           debug:
-            var: matomo_existing_site_urls
+            msg:
+              matomo_existing_site_urls_sorted
             verbosity: 2
 
-        - name: Debug matomo_proposed_site_urls
+        - name: Debug matomo_proposed_site_urls_sorted
           debug:
             var: matomo_proposed_site_urls
             verbosity: 2
 
-        - name: Include update Matomo site tasks when existing URLs don't match the
+        - name: Include update Matomo site tasks when existing URLs don't match the proposed ones
           include_tasks: update_site.yml
-          when: ( matomo_existing_site_urls | sort | difference(matomo_proposed_site_urls | sort) | length > 0 ) or ( matomo_proposed_site_urls | sort | difference(matomo_existing_site_urls | sort) | length > 0 )
+          when: ( matomo_existing_site_urls_sorted | difference(matomo_proposed_site_urls_sorted) | length > 0 ) or ( matomo_proposed_site_urls_sorted | difference(matomo_existing_site_urls_sorted) | length > 0 )
 
       when: ( matomo_existing_site_ids is defined ) and ( matomo_existing_site_ids[0] is regex("^[0-9]{1,9}$") )
 
