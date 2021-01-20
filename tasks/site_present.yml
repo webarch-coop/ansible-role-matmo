@@ -33,10 +33,10 @@
       debug:
         var: matomo_existing_site_ids[0]
 
-    - name: Test for number via int
+    - name: Test for number via regex
       debug:
         var: matomo_existing_site_ids[0]
-      when: matomo_existing_site_id[0] | int
+      when: matomo_existing_site_id[0] is regex("^[0-9]{1,9}$)
 
     - name: Test for length
       debug:
