@@ -29,11 +29,11 @@
       debug:
         var: matomo_existing_site_ids
 
-    - name: This role only supports having one Matomo ID per site
+    - name: This Ansible role only supports having one Matomo site per URL
       fail:
         msg:
           - "There appears to be more than one Matomo site with the same URL"
-          - "Please check these site IDs: {{ matomo_existing_site_ids }}"
+          - "Please login and check these site IDs: {{ matomo_existing_site_ids }}"
           - "and this main URL {{ matomo_site_main_url }}"
           - "{% if matomo_site_urls is defined %}and these other URLs {{ matomo_site_urls }}{% endif %}"
       when: ( matomo_existing_site_ids[1] is defined ) and ( matomo_existing_site_ids[1] is number )
@@ -45,18 +45,38 @@
     - name: Check and update URLs
       block:
 
-        - name: Set matomo_existing_site_urls to an empty array
+        - name: Set arrays for Matomo existing and proposed site URLs
           set_fact:
             matomo_existing_site_urls: []
+            matomo_proposed_site_urls:
+              - "{{ matomo_url }}"
 
-        - name: For each site ID
+        - name: Add URLs to Matomo site proposed URLs
+          set_fact:
+            matomo_proposed_site_urls: "{{ matomo_proposed_site_urls }} + [ '{{ url }}' ]"
+          loop: "{{ matomo_site_urls }}"
+          loop_control:
+            loop_var: url
+          when: ( matomo_site_urls is defined ) and ( matomo_site_urls != [] )
+
+        - name: "Get the existing Matomo site URLs for idSite {{ matomo_existing_site_ids[0] }}"
           include_tasks: get_site_urls_from_id.yml
           vars:
             id: "{{ matomo_existing_site_ids[0] }}"
 
-          # loop: "{{ matomo_existing_site_ids }}"
-          # loop_control:
-          #   loop_var: id
+        - name: Debug matomo_existing_site_urls
+          debug:
+            var: matomo_existing_site_urls
+            verbosity: 2
+
+        - name: Debug matomo_proposed_site_urls
+          debug:
+            var: matomo_proposed_site_urls
+            verbosity: 2
+
+        - name: Include update Matomo site tasks when existing URLs don't match the
+          include_tasks: update_site.yml
+          when: ( matomo_existing_site_urls | difference(matomo_proposed_site_urls) | length > 0 ) or ( ( matomo_proposed_site_urls | difference(matomo_existing_site_urls) | length > 0 )
 
       when: ( matomo_existing_site_ids is defined ) and ( matomo_existing_site_id[0] is number )
 
