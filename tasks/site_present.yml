@@ -86,7 +86,7 @@
           include_tasks: update_site.yml
           when: ( matomo_existing_site_urls_sorted | difference(matomo_proposed_site_urls_sorted) | length > 0 ) or ( matomo_proposed_site_urls_sorted | difference(matomo_existing_site_urls_sorted) | length > 0 )
 
-      when: ( matomo_existing_site_ids is defined ) and ( matomo_existing_site_ids[0] is regex("^[0-9]{1,9}$") )
+      when: ( matomo_existing_site_ids is defined ) and ( matomo_existing_site_ids[0] is defined )
 
   tags:
     - matomo

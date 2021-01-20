@@ -61,12 +61,16 @@
           status: 200
           return_content: true
       register: users_matomo_add_site
-      failed_when: ( users_matomo_add_site.failed is defined ) and ( users_matomo_add_site.failed )
+      failed_when: ( users_matomo_add_site.failed is defined and users_matomo_add_site.failed ) or ( users_matomo_add_site.json is defined and users_matomo_add_site.json.value is not regex("^[0-9]{1,6}$") )
 
     - name: Debug users_matomo_add_site
       debug:
         var: users_matomo_add_site
         verbosity: 2
+
+    - name: Set a variable for the ID of the added site
+      set_fact:
+        matomo_site_id: "{{ users_matomo_add_site.json.value }}"
 
   tags:
     - matomo
