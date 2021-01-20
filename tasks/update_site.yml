@@ -26,10 +26,6 @@
           loop_control:
             loop_var: url
 
-        # - name: Set a fact for all the site URLs
-        #   set_fact:
-        #     urls: "{{ urls }}{% for url in matomo_site_urls %}, {{ url }}{% endfor %}"
-
         - name: Debug all the site URLs
           debug:
             msg: "{{ url }}, {{ urls }}"
@@ -67,7 +63,7 @@
           status: 200
           return_content: true
       register: users_matomo_update_site
-      failed_when: ( users_matomo_update_site.failed is defined ) and ( users_matomo_update_site.failed )
+      failed_when: ( users_matomo_update_site.failed is defined and users_matomo_update_site.failed ) or ( users_matomo_update_site.json.result is defined and users_matomo_update_site.json.result != "success" )
 
     - name: Debug users_matomo_update_site
       debug:
