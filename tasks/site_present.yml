@@ -49,7 +49,7 @@
 
         - name: Set the matomo_site_id and set arrays for Matomo existing and proposed site URLs
           set_fact:
-            matomo_site_id: "{{ matomo_existing_site_ids[0] | int }}"
+            matomo_site_id: "{{ matomo_existing_site_ids[0] }}"
             matomo_existing_site_urls: []
             matomo_proposed_site_urls:
               - "{{ matomo_site_main_url }}"
