@@ -1,5 +1,5 @@
 ---
-- name: Get Matomo site IDs from URLs using the API
+- name: Get existing Matomo site IDs from URLs using the API
   block:
 
     - name: Check that required variables are defined
@@ -20,8 +20,10 @@
           token_auth: "{{ matomo_token_auth }}"
           method: SitesManager.getSitesIdFromSiteUrl
           url: "{{ url }}"
+          status: 200
           return_content: true
       register: users_matomo_get_sites_id_from_siteurl
+      failed_when: ( users_matomo_get_sites_id_from_siteurl.failed is defined ) and ( users_matomo_get_sites_id_from_siteurl.failed )
 
     - name: Debug users_matomo_get_sites_id_from_siteurl
       debug:

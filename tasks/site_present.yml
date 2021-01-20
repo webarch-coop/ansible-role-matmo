@@ -29,6 +29,19 @@
       debug:
         var: matomo_existing_site_ids
 
+    - name: This role only supports having one Matomo ID per site
+      fail:
+        msg:
+          - "There appears to be more than one Matomo site with the same URL"
+          - "Please check these site IDs: {{ matomo_existing_site_ids }}"
+          - "and this main URL {{ matomo_site_main_url }}"
+          - "{% if matomo_site_urls is defined %}and these other URLs {{ matomo_site_urls }}{% endif %}"
+      when: ( matomo_existing_site_ids[1] is defined ) and ( matomo_existing_site_ids[1] is number )
+
+    - name: Add new site to Matomo server
+      include_tasks: add_site.yml
+      when: ( matomo_existing_site_ids is not defined ) or ( matomo_existing_site_ids | length == 0 ) or ( matomo_existing_site_ids == [] )
+
     - name: Check and update URLs
       block:
 
@@ -38,11 +51,14 @@
 
         - name: For each site ID
           include_tasks: get_site_urls_from_id.yml
-          loop: "{{ matomo_existing_site_ids }}"
-          loop_control:
-            loop_var: id
+          vars:
+            id: "{{ matomo_existing_site_ids[0] }}"
 
-      when: ( matomo_existing_site_ids != [] )
+          # loop: "{{ matomo_existing_site_ids }}"
+          # loop_control:
+          #   loop_var: id
+
+      when: ( matomo_existing_site_ids is defined ) and ( matomo_existing_site_id[0] is number )
 
   tags:
     - matomo

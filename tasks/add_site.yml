@@ -1,0 +1,66 @@
+---
+- name: Add Matomo site
+  block:
+
+    - name: Check that required variables are defined
+      assert:
+        that:
+          - ( matomo_url is defined ) and ( matomo_url | length > 0 ) and ( matomo_url is regex("^http[s]*:\/\/.*$") )
+          - ( matomo_token_auth is defined ) and ( matomo_token_auth | length > 0 )
+          - ( matomo_site_name is defined ) and ( matomo_site_name | length > 0 )
+          - ( matomo_site_main_url is defined ) and ( matomo_site_main_url | length > 0 )
+
+    - name: Set a fact for the site URL
+      set_fact:
+        urls: "{{ matomo_site_main_url }}"
+
+    - name: Check that the optional variable matomo_site_urls is valid if defined
+      block:
+
+        - name: Ensure that matomo_site_urls start with http(s)://
+          assert:
+            that:
+              - ( url is regex("^http[s]*:\/\/.*$") )
+          loop: "{{ matomo_site_urls }}"
+          loop_control:
+            loop_var: url
+
+        - name: Set a fact for all the site URLs
+          set_fact:
+            urls: "{{ urls }}, {{ url }}{% if not loop.last %}, {% endif %}"
+          loop: "{{ matomo_site_urls }}"
+          loop_control:
+            loop_var: url
+
+      when: ( matomo_site_urls is defined ) and ( matomo_site_urls | length > 0 ) and ( matomo_site_urls[0] is defined )
+
+    - name: Debug URL variable
+      debug:
+        var: url
+        verbosity: 2
+
+    - name: "Add Matomo site {{ matomo_site_name }} with mail URL {{ matomo_site_main_url }}"
+      uri:
+        url: "{{ matomo_url }}"
+        method: POST
+        body_format: form-urlencoded
+        body:
+          module: API
+          format: JSON
+          token_auth: "{{ matomo_token_auth }}"
+          method: SitesManager.addSite
+          siteName: "{{ matomo_site_name }}"
+          urls: "{{ urls }}"
+          status: 200
+          return_content: true
+      register: users_matomo_add_site
+      failed_when: ( users_matomo_add_site.failed is defined ) and ( users_matomo_add_site.failed )
+
+    - name: Debug users_matomo_add_site
+      debug:
+        var: users_matomo_add_site
+        verbosity: 2
+
+  tags:
+    - matomo
+...
