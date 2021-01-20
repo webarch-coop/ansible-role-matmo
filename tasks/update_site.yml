@@ -26,19 +26,23 @@
           loop_control:
             loop_var: url
 
-        - name: Debug all the site URLs
-          debug:
-            msg: "{{ urls }}, {{ url }}{% if not loop.last %}, {% endif %}"
-          loop: "{{ matomo_site_urls }}"
-          loop_control:
-            loop_var: url
-
         - name: Set a fact for all the site URLs
           set_fact:
-            urls: "{{ urls }}, {{ url }}{% if not loop.last %}, {% endif %}"
-          loop: "{{ matomo_site_urls }}"
-          loop_control:
-            loop_var: url
+            urls: "{{ urls }}{% for url in matomo_site_urls %}, {{ url }}{% endfor %}"
+
+#        - name: Debug all the site URLs
+#          debug:
+#            msg: "{{ urls }}, {{ url }}{% if not loop.last %}, {% endif %}"
+#          loop: "{{ matomo_site_urls }}"
+#          loop_control:
+#            loop_var: url
+#
+#        - name: Set a fact for all the site URLs
+#          set_fact:
+#            urls: "{{ urls }}, {{ url }}{% if not loop.last %}, {% endif %}"
+#          loop: "{{ matomo_site_urls }}"
+#          loop_control:
+#            loop_var: url
 
       when: ( matomo_site_urls is defined ) and ( matomo_site_urls[0] is defined )
 
