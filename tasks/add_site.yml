@@ -36,7 +36,7 @@
 
     - name: Debug URL variable
       debug:
-        var: url
+        var: urls
         verbosity: 2
 
     - name: "Add Matomo site {{ matomo_site_name }} with main URL {{ matomo_site_main_url }}"
