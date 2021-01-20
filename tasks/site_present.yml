@@ -29,6 +29,25 @@
       debug:
         var: matomo_existing_site_ids
 
+    - name: Print the matomo_existing_site_ids[0]
+      debug:
+        var: matomo_existing_site_ids[0]
+
+    - name: Test for number
+      debug:
+        var: matomo_existing_site_ids[0]
+      when: matomo_existing_site_id[0] is number
+
+    - name: Test for length
+      debug:
+        var: matomo_existing_site_ids
+      when: matomo_existing_site_ids | length == 0
+
+    - name: Test for non-empty array
+      debug:
+        var: matomo_existing_site_ids
+      when: matomo_existing_site_ids != [] 
+
     - name: This Ansible role only supports having one Matomo site per URL
       fail:
         msg:
