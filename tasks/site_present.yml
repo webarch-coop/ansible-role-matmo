@@ -78,7 +78,7 @@
 
         - name: Include update Matomo site tasks when existing URLs don't match the
           include_tasks: update_site.yml
-          when: ( matomo_existing_site_urls | difference(matomo_proposed_site_urls) | length > 0 ) or ( matomo_proposed_site_urls | difference(matomo_existing_site_urls) | length > 0 )
+          when: ( matomo_existing_site_urls | sort | difference(matomo_proposed_site_urls | sort) | length > 0 ) or ( matomo_proposed_site_urls | sort | difference(matomo_existing_site_urls | sort) | length > 0 )
 
       when: ( matomo_existing_site_ids is defined ) and ( matomo_existing_site_ids[0] is regex("^[0-9]{1,9}$") )
 
