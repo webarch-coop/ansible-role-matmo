@@ -28,6 +28,8 @@
     - name: Print the matomo_existing_site_ids
       debug:
         var: matomo_existing_site_ids
+        verbosity: 2
+      when: matomo_existing_site_ids is defined
 
     - name: Print the matomo_existing_site_ids[0]
       debug:
@@ -36,7 +38,7 @@
     - name: Test for number via regex
       debug:
         var: matomo_existing_site_ids[0]
-      when: matomo_existing_site_id[0] is regex("^[0-9]{1,9}$)
+      when: matomo_existing_site_id[0] is regex("^[0-9]{1,9}$")
 
     - name: Test for length
       debug:
@@ -55,11 +57,11 @@
           - "Please login and check these site IDs: {{ matomo_existing_site_ids }}"
           - "and this main URL {{ matomo_site_main_url }}"
           - "{% if matomo_site_urls is defined %}and these other URLs {{ matomo_site_urls }}{% endif %}"
-      when: ( matomo_existing_site_ids[1] is defined ) and ( matomo_existing_site_ids[1] is number )
+      when: ( matomo_existing_site_ids is defined ) and ( matomo_existing_site_ids[1] is defined )
 
     - name: Add new site to Matomo server
       include_tasks: add_site.yml
-      when: ( matomo_existing_site_ids is not defined ) or ( matomo_existing_site_ids | length == 0 ) or ( matomo_existing_site_ids == [] )
+      when: ( matomo_existing_site_ids is not defined ) or ( matomo_existing_site_ids[0] is not defined )
 
     - name: Check and update URLs
       block:
@@ -97,7 +99,7 @@
           include_tasks: update_site.yml
           when: ( matomo_existing_site_urls | difference(matomo_proposed_site_urls) | length > 0 ) or ( ( matomo_proposed_site_urls | difference(matomo_existing_site_urls) | length > 0 )
 
-      when: ( matomo_existing_site_ids is defined ) and ( matomo_existing_site_id[0] is number )
+      when: ( matomo_existing_site_ids is defined ) and ( matomo_existing_site_id[0] is regex("^[0-9]{1,9}$") )
 
   tags:
     - matomo
