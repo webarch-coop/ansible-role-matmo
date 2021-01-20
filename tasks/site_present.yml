@@ -33,10 +33,10 @@
       debug:
         var: matomo_existing_site_ids[0]
 
-    - name: Test for number
+    - name: Test for number via int
       debug:
         var: matomo_existing_site_ids[0]
-      when: matomo_existing_site_id[0] | int is number
+      when: matomo_existing_site_id[0] | int
 
     - name: Test for length
       debug:
