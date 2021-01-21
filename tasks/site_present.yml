@@ -41,10 +41,6 @@
         verbosity: 2
       when: matomo_existing_site_ids is defined
 
-    - name: Debug fail
-      fail:
-        msg: Debug
-
     - name: This Ansible role only supports having one Matomo site per URL
       fail:
         msg:
@@ -53,6 +49,10 @@
           - "and this main URL {{ matomo_site_main_url }}"
           - "{% if matomo_site_urls is defined %}and these other URLs {{ matomo_site_urls }}{% endif %}"
       when: ( matomo_existing_site_ids is defined ) and ( matomo_existing_site_ids[1] is defined )
+
+    - name: Debug fail
+      fail:
+        msg: Debug
 
     - name: Add new site to Matomo server
       include_tasks: add_site.yml
