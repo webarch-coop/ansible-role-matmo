@@ -28,6 +28,15 @@
         var: matomo_get_all_sites
         verbosity: 2
 
+    - name: Debug matomo_get_all_sites.json type
+      debug:
+        msg: "The matomo_get_all_sites.json variable type: {{ matomo_get_all_sites.json | type_debug }}"
+        verbosity: 2
+
+    - name: Fail
+      fail:
+        msg: Debug
+
   tags:
     - matomo
 ...
