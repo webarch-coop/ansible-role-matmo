@@ -53,19 +53,19 @@
     - name: Check and update URLs
       block:
 
-        - name: Set a matomo_existing_site_urls array
-          set_fact:
-            matomo_existing_site_urls: "{{ site.main_url.split(', ') | list }}" 
-          when: matomo_site_id == site.siteid
-          loop: "{{ matomo_get_all_sites.json }}"
-          loop_control:
-            loop_var: site
-
         - name: Set a matomo_site_id variable and add the matomo_site_main_url to a matomo_proposed_site_urls array
           set_fact:
             matomo_site_id: "{{ matomo_existing_site_ids[0] }}"
             matomo_proposed_site_urls:
               - "{{ matomo_site_main_url }}"
+
+        - name: Set a matomo_existing_site_urls array
+          set_fact:
+            matomo_existing_site_urls: "{{ site.main_url.split(', ') | list }}"
+          when: matomo_site_id == site.siteid
+          loop: "{{ matomo_get_all_sites.json }}"
+          loop_control:
+            loop_var: site
 
         - name: Add matomo_site_urls URLs to Matomo site proposed URLs
           set_fact:
