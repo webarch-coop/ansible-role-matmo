@@ -1,0 +1,33 @@
+---
+- name: Get a JSON array of all sites using the Matomo API
+  block:
+
+    - name: Check that required variables are defined
+      assert:
+        that:
+          - ( matomo_url is defined ) and ( matomo_url | length > 0 )
+          - ( matomo_token_auth is defined ) and ( matomo_token_auth | length > 0 )
+
+    - name: Matomo API POST request to SitesManager.getAllSites
+      uri:
+        url: "{{ matomo_url }}"
+        method: POST
+        body_format: form-urlencoded
+        body:
+          module: API
+          format: JSON
+          token_auth: "{{ matomo_token_auth }}"
+          method: SitesManager.getAllSites
+          status: 200
+          return_content: true
+      register: matomo_get_all_sites
+      failed_when: ( matomo_get_all_sites.failed is defined ) and ( matomo_get_all_sites.failed )
+
+    - name: Debug matomo_get_all_sites
+      debug:
+        var: matomo_get_all_sites 
+        verbosity: 2
+
+  tags:
+    - matomo
+...

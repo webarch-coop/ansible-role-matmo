@@ -7,11 +7,32 @@
         that:
           - ( matomo_url is defined ) and ( matomo_url | length > 0 )
           - ( matomo_token_auth is defined ) and ( matomo_token_auth | length > 0 )
-          - ( matomo_site_main_url is defined ) and ( matomo_site_main_url | length > 0 )
+          - ( matomo_site_name is defined ) and ( matomo_site_name | length > 0 )
+          - ( matomo_site_main_url is defined ) and ( matomo_site_main_url is regex("^http:\/\/.*$") )
 
-    - name: Set matomo_existing_site_ids to an empty array
+    - name: Include Matomo getAllSites API tasks
+      include_tasks: get_all_sites.yml
+
+    - name: Set matomo_site_ids to an empty array
       set_fact:
         matomo_existing_site_ids: []
+
+    - name: "Create an array of idSite numbers that have {{ matomo_site_main_url }} as a URL" 
+      set_fact: "{{ matomo_site_ids }} + [ '{{ site.id }}' ]"
+      when: matomo_site_main_url in site.main_url 
+      loop: "{{ matomo_get_all_sites.json }}"
+      loop_control:
+        loop_var: site
+
+    - name: Print the matomo_existing_site_ids
+      debug:
+        var: matomo_existing_site_ids
+        verbosity: 2
+      when: matomo_existing_site_ids is defined
+
+    - name: Debug fail
+      fail:
+        msg: Debug
 
     - name: "Check if there is a Matomo site ID for {{ matomo_site_main_url }}"
       include_tasks: get_sites_id_from_site_url.yml
