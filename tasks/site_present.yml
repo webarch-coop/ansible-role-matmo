@@ -62,7 +62,7 @@
         - name: Set a matomo_existing_site_urls array
           set_fact:
             matomo_existing_site_urls: "{{ site.value.main_url.split(', ') | list }}"
-          when: matomo_site_id == site.siteid
+          when: matomo_site_id == site.idsite
           loop: "{{ matomo_get_all_sites.json | dict2items }}"
           loop_control:
             loop_var: site
