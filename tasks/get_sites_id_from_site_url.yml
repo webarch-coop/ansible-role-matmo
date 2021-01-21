@@ -8,12 +8,11 @@
           - ( matomo_url is defined ) and ( matomo_url | length > 0 )
           - ( matomo_token_auth is defined ) and ( matomo_token_auth | length > 0 )
           - ( matomo_get_all_sites.json is defined ) and ( matomo_get_all_sites.json | length > 0 )
-          - ( matomo_existing_site_ids is defined ) and ( existing_site_ids | length > 0 )
           - ( matomo_proposed_url is defined ) and ( matomo_proposed_url is regex("^http:\/\/.*$") )
 
     - name: Loop thought the existing sites
       set_fact:
-        matomo_existing_site_ids: "{{ matomo_existing_site_ids }} + [ '{{ site.idsite }}' ]"
+        matomo_existing_site_ids: "{{ matomo_existing_site_ids | default([]) }} + [ '{{ site.idsite }}' ]"
       when:
         - ( site.id not in matomo_existing_site_ids )
         - ( matomo_proposed_url in site.main_url )
