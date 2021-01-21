@@ -14,7 +14,7 @@
       include_tasks: check_main_url.yml
       vars:
         matomo_existing_id: "{{ site.idsite }}"
-        matomo_existing_main_urls: "{{ site.main_url..split(', ') }}"
+        matomo_existing_main_urls: "{{ site.main_url.split(', ') }}"
       loop: "{{ matomo_get_all_sites.json }}"
       loop_control:
         loop_var: site
