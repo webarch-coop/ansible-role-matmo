@@ -30,11 +30,9 @@
 
     - name: "Check if there is a Matomo site ID for site URLs other than the main one"
       include_tasks: get_sites_id_from_site_url.yml
-      vars:
-        matomo_proposed_url: "{{ url }}"
       loop: "{{ matomo_site_urls }}"
       loop_control:
-        loop_var: url
+        loop_var: matomo_proposed_url
       when: ( matomo_site_urls is defined ) and ( matomo_site_urls != [] )
 
     - name: Print the matomo_existing_site_ids

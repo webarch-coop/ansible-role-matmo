@@ -25,8 +25,9 @@
     - name: Debug Loop thought the matomo_existing_main_urls
       debug:
         msg:
-          - "matomo_proposed_url: {{ matomo_proposed_url }}"
+          - "matomo_existing_id: {{ matomo_existing_id }}"
           - "url: {{ url }}"
+          - "matomo_proposed_url: {{ matomo_proposed_url }}"
       loop: "{{ matomo_existing_main_urls }}"
       loop_control:
         loop_var: url
