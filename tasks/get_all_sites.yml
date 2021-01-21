@@ -25,7 +25,7 @@
 
     - name: Debug matomo_get_all_sites
       debug:
-        var: matomo_get_all_sites 
+        var: matomo_get_all_sites
         verbosity: 2
 
   tags:

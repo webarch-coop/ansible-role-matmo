@@ -1,5 +1,5 @@
 ---
-- name: Get existing Matomo site IDs from URLs using the API
+- name: Get existing Matomo site IDs from proposed URLs using the results of a SitesManager.getAllSites API query
   block:
 
     - name: Check that required variables are defined
@@ -7,40 +7,19 @@
         that:
           - ( matomo_url is defined ) and ( matomo_url | length > 0 )
           - ( matomo_token_auth is defined ) and ( matomo_token_auth | length > 0 )
-          - ( url is defined ) and ( url | length > 0 )
+          - ( matomo_get_all_sites.json is defined ) and ( matomo_get_all_sites.json | length > 0 )
+          - ( matomo_existing_site_ids is defined ) and ( existing_site_ids | length > 0 )
+          - ( matomo_proposed_url is defined ) and ( matomo_proposed_url is regex("^http:\/\/.*$") )
 
-    - name: "Check if a Matomo ID exists for {{ url }}"
-      uri:
-        url: "{{ matomo_url }}"
-        method: POST
-        body_format: form-urlencoded
-        body:
-          module: API
-          format: JSON
-          token_auth: "{{ matomo_token_auth }}"
-          method: SitesManager.getSitesIdFromSiteUrl
-          url: "{{ url }}"
-          status: 200
-          return_content: true
-      register: users_matomo_get_sites_id_from_siteurl
-      failed_when: ( users_matomo_get_sites_id_from_siteurl.failed is defined ) and ( users_matomo_get_sites_id_from_siteurl.failed )
-
-    - name: Debug users_matomo_get_sites_id_from_siteurl
-      debug:
-        var: users_matomo_get_sites_id_from_siteurl
-        verbosity: 2
-
-    - name: Add IDs to matomo_existing_site_ids array
+    - name: Loop thought the existing sites
       set_fact:
-        matomo_existing_site_ids: "{{ matomo_existing_site_ids | default([]) }} + [ '{{ id.idsite }}' ]"
-      loop: "{{ users_matomo_get_sites_id_from_siteurl.json }}"
-      loop_control:
-        loop_var: id
-        label: id.idsite
+        matomo_existing_site_ids: "{{ matomo_existing_site_ids }} + [ '{{ site.idsite }}' ]"
       when:
-        - ( id.idsite not in matomo_existing_site_ids )
-        - ( users_matomo_get_sites_id_from_siteurl.json is defined )
-        - ( users_matomo_get_sites_id_from_siteurl.json != [] )
+        - ( site.id not in matomo_existing_site_ids )
+        - ( matomo_proposed_url in site.main_url )
+      loop: "{{ matomo_get_all_sites.json }}"
+      loop_control:
+        loop_var: site
 
     - name: Debug matomo_existing_site_ids
       debug:
