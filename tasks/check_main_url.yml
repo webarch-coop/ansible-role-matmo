@@ -12,15 +12,24 @@
           - ( matomo_existing_id is defined ) and ( matomo_existing_id is regex("^[0-9]{1,6}$") )
           - ( matomo_existing_main_urls is defined ) and ( matomo_existing_main_urls[0] is defined )
 
+    - name: Debug matomo_existing_main_urls
+      debug:
+        var: matomo_existing_main_urls
+        verbosity: 2
+
     - name: Debug matomo_proposed_url
       debug:
         var: matomo_proposed_url
         verbosity: 2
 
-    - name: Debug matomo_existing_main_urls
+    - name: Debug Loop thought the matomo_existing_main_urls
       debug:
-        var: matomo_existing_main_urls
-        verbosity: 2
+        msg:
+          - "matomo_proposed_url: {{ matomo_proposed_url }}"
+          - "url: {{ url }}"
+      loop: "{{ matomo_existing_main_urls }}"
+      loop_control:
+        loop_var: url
 
     - name: Loop thought the matomo_existing_main_urls
       set_fact:
