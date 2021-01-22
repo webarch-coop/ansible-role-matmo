@@ -19,6 +19,9 @@
           - ( matomo_login_email != matomo_first_user_email )
         msg: "Please use a different email address (or alias) and login username for the Matomo superuser and regular users"
 
+    # TODO Use the UsersManager.getUsers API call with userLogins set to matomo_login to check that the matomo_login_email
+    # matches the result, if it does than the get Matomo user login from email address tasks can be skipped
+
     - name: Include the get Matomo user login from email address tasks to potentially set matomo_login
       include_tasks: get_user_login_from_user_email.yml
 
