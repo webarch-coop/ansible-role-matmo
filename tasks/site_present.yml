@@ -134,7 +134,7 @@
           set_fact:
             matomo_existing_role: "{{ user.role }}"
           when: user.login == matomo_login
-          loop: matomo_api_get_users_plus_role.json
+          loop: "{{ matomo_api_get_users_plus_role.json }}"
           loop_control:
             loop_var: user
 
