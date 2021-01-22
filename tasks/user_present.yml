@@ -10,35 +10,17 @@
           - ( matomo_token_auth is defined )
           - ( matomo_password is defined )
           - ( matomo_url is defined )
+        msg: "Please ensure that all the required variables are defined"
 
-    - name: "Check if a Matomo login with the email address {{ matomo_login_email }} exists using the API"
-      uri:
-        url: "{{ matomo_url }}"
-        method: POST
-        body_format: form-urlencoded
-        body:
-          module: API
-          format: JSON
-          token_auth: "{{ matomo_token_auth }}"
-          method: UsersManager.getUserLoginFromUserEmail
-          userEmail: "{{ matomo_login_email }}"
-      register: matomo_api_get_user_login_from_user_email
+    - name: Check that a Matomo superuser isn't being configured
+      assert:
+        that:
+          - ( matomo_login != matomo_first_user )
+          - ( matomo_login_email != matomo_first_user_email )
+        msg: "Please use a different email address (or alias) and login username for the Matomo superuser and regular users"
 
-    - name: Debug matomo_api_get_user_login_from_user_email
-      debug:
-        var: matomo_api_get_user_login_from_user_email
-        verbosity: 2
-
-    - name: Set the matomo_login when a Matomo account with a matching email address already exists
-      set_fact:
-        matomo_login: "{{ matomo_api_get_user_login_from_user_email.json.value }}"
-      when:
-        - ( matomo_login != matomo_first_user )
-        - ( matomo_login_email != matomo_first_user_email )
-        - ( matomo_api_user_exists.json is defined )
-        - ( matomo_api_user_exists.json.value is defined )
-        - ( not matomo_api_user_exists.json.value )
-        - ( matomo_api_get_user_login_from_user_email.json.value is defined )
+    - name: Include the get Matomo user login from email address tasks to potentially set matomo_login
+      include_tasks: get_user_login_from_user_email.yml
 
     - name: "Check if a Matomo login named {{ matomo_login }} exists using the API"
       uri:
@@ -89,8 +71,6 @@
     - name: Include update Matomo user email address tasks when the email address isn't used by an existing account
       include_tasks: update_email.yml
       when:
-        - ( matomo_login != matomo_first_user )
-        - ( matomo_login_email != matomo_first_user_email )
         - ( matomo_api_user_exists.json is defined )
         - ( matomo_api_user_exists.json.value is defined )
         - ( matomo_api_user_exists.json.value )
@@ -104,8 +84,6 @@
     - name: Include add Matomo user tasks
       include_tasks: add_user.yml
       when:
-        - ( matomo_login != matomo_first_user )
-        - ( matomo_login_email != matomo_first_user_email )
         - ( matomo_api_user_exists.json is defined )
         - ( matomo_api_user_exists.json.value is defined )
         - ( not matomo_api_user_exists.json.value )
