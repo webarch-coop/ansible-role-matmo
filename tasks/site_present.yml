@@ -159,7 +159,7 @@
             var: matomo_api_set_user_access
             verbosity: 2
 
-          when: matomo_existing_role != "admin"
+        #  when: matomo_existing_role != "admin"
 
       when: ( matomo_login_email is defined ) and ( matomo_login_email | length > 0 )
 
