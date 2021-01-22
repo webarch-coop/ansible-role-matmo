@@ -60,7 +60,7 @@
       when:
         - ( matomo_login != matomo_first_user )
         - ( matomo_login_email != matomo_first_user_email )
-        - ( matomo_accounts_file_path is defined ) and ( matomo_accounts_file_path.stat is defind ) and ( matomo_accounts_file_path.stat.exists )
+        - ( matomo_accounts_file_path is defined ) and ( matomo_accounts_file_path.stat is defined ) and ( matomo_accounts_file_path.stat.exists )
         - ( matomo_api_user_exists.json is defined )
         - ( matomo_api_user_exists.json.value is defined )
         - ( matomo_api_user_exists.json.value )
