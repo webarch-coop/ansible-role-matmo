@@ -133,10 +133,10 @@
         - name: "Set a variable for the role for Matomo login {{ matomo_login }}"
           set_fact:
             matomo_existing_role: "{{ user.role }}"
-          when: user.login == matomo_login
+          when: matomo_user.login == matomo_login
           loop: "{{ matomo_api_get_users_plus_role.json }}"
           loop_control:
-            loop_var: user
+            loop_var: matomo_user
 
         - name: "Set the role to admin for {{ matomo_login }} on site ID {{ matomo_site_id }}"
           uri:
