@@ -34,7 +34,7 @@
           userLogin: "{{ matomo_login }}"
           password: "{{ matomo_login_password }}"
           email: "{{ matomo_login_email }}"
-        status: 200
+        status_code: 200
       register: matomo_api_add_user
       failed_when: ( matomo_api_add_user.json is not defined ) or ( matomo_api_add_user.json.result != "success" )
       changed_when: ( matomo_api_add_user.json is defined ) or ( matomo_api_add_user.json.result == "success" )

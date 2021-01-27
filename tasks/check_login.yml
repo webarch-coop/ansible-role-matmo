@@ -21,7 +21,7 @@
           token_auth: "{{ matomo_token_auth }}"
           method: UsersManager.userExists
           userLogin: "{{ matomo_login }}"
-        status: 200
+        status_code: 200
         return_content: true
       register: matomo_api_user_exists
       failed_when:

@@ -130,7 +130,7 @@
                   token_auth: "{{ matomo_token_auth }}"
                   method: UsersManager.getUsersPlusRole
                   idSite: "{{ matomo_site_id }}"
-                  status: 200
+                  status_code: 200
               register: matomo_api_get_users_plus_role
     
             - name: Debug matomo_api_get_users_plus_role
@@ -159,7 +159,7 @@
                   userLogin: "{{ matomo_login_existing }}"
                   access: "admin"
                   idSites: "{{ matomo_site_id }}"
-                  status: 200
+                  status_code: 200
               register: matomo_api_set_user_access
     
             - name: Debug matomo_api_set_user_access

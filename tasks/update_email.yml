@@ -21,7 +21,7 @@
           token_auth: "{{ matomo_token_auth }}"
           method: UsersManager.getUser
           userLogin: "{{ matomo_login }}"
-        status: 200
+        status_code: 200
         return_content: true
       register: matomo_api_get_user
 
@@ -47,7 +47,7 @@
           method: UsersManager.updateUser
           userLogin: "{{ matomo_login }}"
           email: "{{ matomo_login_email }}"
-        status: 200
+        status_code: 200
         return_content: true
       register: matomo_api_update_user_email
       changed_when: ( matomo_api_update_user_email.json is defined ) and ( matomo_api_update_user_email.json.result == "success" )

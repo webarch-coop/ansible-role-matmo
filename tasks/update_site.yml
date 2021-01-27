@@ -60,7 +60,7 @@
           siteName: "{{ matomo_site_name }}"
           idSite: "{{ matomo_site_id }}"
           urls: "{{ urls }}"
-          status: 200
+          status_code: 200
           return_content: true
       register: users_matomo_update_site
       failed_when: ( users_matomo_update_site.failed is defined and users_matomo_update_site.failed ) or ( users_matomo_update_site.json.result is defined and users_matomo_update_site.json.result != "success" )

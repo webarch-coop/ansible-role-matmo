@@ -18,7 +18,7 @@
           format: JSON
           token_auth: "{{ matomo_token_auth }}"
           method: SitesManager.getAllSites
-          status: 200
+          status_code: 200
           return_content: true
       register: matomo_get_all_sites
       failed_when: ( matomo_get_all_sites.failed is defined ) and ( matomo_get_all_sites.failed )
