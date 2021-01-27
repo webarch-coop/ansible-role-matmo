@@ -185,7 +185,8 @@
                   idSites: "{{ matomo_site_id }}"
                   status_code: 200
               register: matomo_api_set_user_access
-
+              failed_when: ( matomo_api_set_user_access.json is not defined ) or ( matomo_api_set_user_access.json is defined and matomo_api_set_user_access.json.result != "success" )
+    
             - name: Debug matomo_api_set_user_access
               debug:
                 var: matomo_api_set_user_access

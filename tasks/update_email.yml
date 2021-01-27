@@ -5,7 +5,7 @@
     - name: Check variables
       assert:
         that:
-          - ( matomo_login is defined ) and ( matomo_logink is regex("^[a-zA-Z0-9-]{2,14}$") )
+          - ( matomo_login is defined ) and ( matomo_login is regex("^[a-zA-Z0-9-]{2,14}$") )
           - ( matomo_login_email is defined ) and ( matomo_login_email is regex("^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$") )
           - ( matomo_accounts_file is defined )
           - ( matomo_url is defined )
