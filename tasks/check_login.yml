@@ -46,7 +46,7 @@
 
     - name: Add a new user account when there is no match for the matomo_login or matomo_login_email address
       include_tasks: add_user.yml
-      when: 
+      when:
         - ( matomo_api_user_exists.json is defined )
         - ( matomo_api_user_exists.json.value is defined )
         - ( not matomo_api_user_exists.json.value )

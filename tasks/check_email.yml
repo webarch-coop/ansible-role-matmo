@@ -30,7 +30,7 @@
         var: matomo_api_get_user_login_from_user_email
         verbosity: 2
 
-    - name: "Include check for the {{ matomo_login }} existing when the {{ matomo_login_email }} doesn't exist"  
+    - name: "Include check for the {{ matomo_login }} existing when the {{ matomo_login_email }} doesn't exist"
       include_tasks: check_login.yml
       vars:
         matomo_login_check: "{{ matomo_login }}"
@@ -42,7 +42,7 @@
         - name: "Set the matomo_login_existing variable to {{ matomo_api_get_user_login_from_user_email.json.value }} as a Matomo account with a matching email address exists"
           set_fact:
             matomo_login_existing: "{{ matomo_api_get_user_login_from_user_email.json.value }}"
-    
+
         - name: "Include the check password tasks when a user with the email address {{ matomo_login_email }} does exist"
           include_tasks: check_password.yml
 

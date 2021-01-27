@@ -118,7 +118,7 @@
               debug:
                 var: matomo_login_existing
                 verbosity: 2
-    
+
             - name: "Get users and their roles for Matomo site with ID {{ matomo_site_id }}"
               uri:
                 url: "{{ matomo_url }}"
@@ -132,12 +132,12 @@
                   idSite: "{{ matomo_site_id }}"
                   status_code: 200
               register: matomo_api_get_users_plus_role
-    
+
             - name: Debug matomo_api_get_users_plus_role
               debug:
                 var: matomo_api_get_users_plus_role
                 verbosity: 2
-    
+
             - name: "Set a variable for the role for Matomo login {{ matomo_login }}"
               set_fact:
                 matomo_existing_role: "{{ login_and_role.role  }}"
@@ -145,7 +145,7 @@
               loop: "{{ matomo_api_get_users_plus_role.json }}"
               loop_control:
                 loop_var: login_and_role
-    
+
             - name: "Set the role to admin for {{ matomo_login_existing }} on site ID {{ matomo_site_id }}"
               uri:
                 url: "{{ matomo_url }}"
@@ -161,12 +161,12 @@
                   idSites: "{{ matomo_site_id }}"
                   status_code: 200
               register: matomo_api_set_user_access
-    
+
             - name: Debug matomo_api_set_user_access
               debug:
                 var: matomo_api_set_user_access
                 verbosity: 2
-    
+
             #  when: matomo_existing_role != "admin"
 
           when: ( matomo_login_existing is defined ) and ( matomo_login_existing | length > 0 )

@@ -90,7 +90,7 @@
             subject: "[{{ matomo_notify_subject_tag | default('webarchitects') }}] Matomo superuser password for {{ matomo_first_user }} on {{ vhost.value.users_apache_server_name }}"
             # https://github.com/ansible/ansible/issues/58543
             charset: us-ascii
-            body: "{{ lookup('template', 'templates/notify_matomo_install_passwd.j2') }}"
+            body: "{{ lookup('template', 'notify_matomo_install_passwd.j2') }}"
             host: localhost
             port: 25
             secure: never
