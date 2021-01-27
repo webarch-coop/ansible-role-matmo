@@ -1,5 +1,5 @@
 ---
-- name: Check if a Matomo login exists
+- name: Check if a Matomo login exists when there is no match for the matomo_login_email address
   block:
 
     - name: Check variables
@@ -39,8 +39,14 @@
 
     - name: Update the email address
       include_tasks: update_email.yml
-
       when:
+        - ( matomo_api_user_exists.json is defined )
+        - ( matomo_api_user_exists.json.value is defined )
+        - ( matomo_api_user_exists.json.value )
+
+    - name: Add a new user account when there is no match for the matomo_login or matomo_login_email address
+      include_tasks: add_user.yml
+      when: 
         - ( matomo_api_user_exists.json is defined )
         - ( matomo_api_user_exists.json.value is defined )
         - ( not matomo_api_user_exists.json.value )

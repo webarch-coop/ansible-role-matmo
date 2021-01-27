@@ -2,20 +2,24 @@
 - name: Add new Matomo account
   block:
 
-    - name: Generate a random password for the Matomo user
-      block:
+    - name: Check variables
+      assert:
+        that:
+          - ( matomo_url is defined )
+          - ( matomo_password is defined )
+          - ( matomo_token_auth is defined )
+          - ( matomo_login is defined ) and ( matomo_logink is regex("^[a-zA-Z0-9-]{2,14}$") )
+          - ( matomo_login_email is defined ) and ( matomo_login_email is regex("^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$") )
 
-        - name: Generate a random string for Matomo password
-          command: pwgen -n 20 1
-          register: matomo_login_password_gen
-          no_log: true
+    - name: Generate a random string for Matomo password
+      command: pwgen -n 20 1
+      register: matomo_login_password_gen
+      no_log: true
 
-        - name: Set a variable with the random password
-          set_fact:
-            matomo_login_password: "{{ matomo_login_password_gen.stdout }}"
-          no_log: true
-
-      when: ( matomo_login_password is not defined ) or ( matomo_login_password | length == 0 )
+    - name: Set a variable with the random password
+      set_fact:
+        matomo_login_password: "{{ matomo_login_password_gen.stdout }}"
+      no_log: true
 
     - name: Add Matomo user account using the API
       uri:
@@ -30,8 +34,10 @@
           userLogin: "{{ matomo_login }}"
           password: "{{ matomo_login_password }}"
           email: "{{ matomo_login_email }}"
+        status: 200
       register: matomo_api_add_user
-      failed_when: matomo_api_add_user.json.result != "success"
+      failed_when: ( matomo_api_add_user.json is not defined ) or ( matomo_api_add_user.json.result != "success" )
+      changed_when: ( matomo_api_add_user.json is defined ) or ( matomo_api_add_user.json.result == "success" )
 
     - name: Debug matomo_api_add_user
       debug:
@@ -75,13 +81,13 @@
 
         - name: "Password notification email sent to {{ matomo_login_email }}"
           mail:
-            from: "{{ matomo_email_from | default('Webarchitects') }} <root@{{ ansible_fqdn }}>"
+            from: "{{ matomo_email_from | default('Webarchitects') | quote }} <root@{{ ansible_fqdn }}>"
             to: "{{ matomo_login_email }}"
             subject: "[{{ matomo_email_subject_tag | default('webarchitects') }}] Matomo {{ matomo_login }} account details for {{ matomo_url }}"
             headers: "{{ matomo_notify_headers }}"
             # https://github.com/ansible/ansible/issues/58543
             charset: us-ascii
-            body: "{{ lookup('template', 'templates/notify_matomo_passwd.j2') }}"
+            body: "{{ lookup('template', 'notify_matomo_passwd.j2') }}"
             host: localhost
             port: 25
             secure: never

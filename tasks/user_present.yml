@@ -5,11 +5,11 @@
     - name: Check variables
       assert:
         that:
+          - ( matomo_url is defined )
+          - ( matomo_password is defined )
+          - ( matomo_token_auth is defined )
           - ( matomo_login is defined ) and ( matomo_login is regex("^[a-zA-Z0-9-]{2,14}$") )
           - ( matomo_login_email is defined ) and ( matomo_login_email is regex("^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$") )
-          - ( matomo_token_auth is defined )
-          - ( matomo_password is defined )
-          - ( matomo_url is defined )
         msg: "Please ensure that all the required variables are defined"
 
     - name: Check that a Matomo superuser isn't being configured
