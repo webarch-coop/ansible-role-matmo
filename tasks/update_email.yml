@@ -25,6 +25,8 @@
         status_code: 200
         return_content: true
       register: matomo_api_get_user
+      changed_when: false
+      failed_when: ( matomo_api_get_user.json is not defined ) or ( matomo_api_get_user.json.result is defined and matomo_api_get_user.json.result == "error" )
 
     - name: Debug matomo_api_get_user
       debug:
@@ -33,7 +35,7 @@
 
     - name: Set a variable for the existing email address
       set_fact:
-        matomo_old_login_email: "{{ matomo_api_get_user.json.email }}"
+        matomo_login_email_existing: "{{ matomo_api_get_user.json.email }}"
 
     - name: "Update the email address for {{ matomo_login }} using the API"
       uri:
