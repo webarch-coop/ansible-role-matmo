@@ -147,6 +147,7 @@ matomo_accounts:
 
 This ASCII flowchart explains the logic used when the `user_present.yml` tasks are run:
 
+```
 +--------------------------+  YES, there is a        +-------------------------------+  YES, the password is
 |                          |  matching email         |                               |  correct
 |  user_present.yml        |  address                | check_password.yml            |
@@ -186,4 +187,4 @@ This ASCII flowchart explains the logic used when the `user_present.yml` tasks a
 |  address                 |                                 |                |
 |                          |                                 +----------------+
 +--------------------------+
-
+```
