@@ -24,13 +24,8 @@
         status_code: 200
         return_content: true
       register: matomo_api_user_exists
-      failed_when:
-        - ( matomo_api_user_exists.result is defined )
-        - ( matomo_api_user_exists.result == "error" )
-      changed_when:
-        - ( matomo_api_user_exists.json is defined )
-        - ( matomo_api_user_exists.json.value is defined )
-        - ( not matomo_api_user_exists.json.value )
+      failed_when: ( matomo_api_user_exists.result is not defined ) or ( matomo_api_user_exists.result is defined and matomo_api_user_exists.result == "error" )
+      changed_when: ( matomo_api_user_exists.json is defined ) and ( matomo_api_user_exists.json.value is defined ) and ( not matomo_api_user_exists.json.value )
 
     - name: Debug matomo_api_user_exists
       debug:

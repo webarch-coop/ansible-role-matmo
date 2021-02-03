@@ -143,4 +143,47 @@ matomo_accounts:
     capabilities: []
 ```
 
+## Matomo user present
+
+This ASCII flowchart explains the logic used when the `user_present.yml` tasks are run:
+
++--------------------------+  YES, there is a        +-------------------------------+  YES, the password is
+|                          |  matching email         |                               |  correct
+|  user_present.yml        |  address                | check_password.yml            |
+|                          |                         |                               |
+|  Check if a Matomo login +------------------------>+ Check if the password on file +----------------------+
+|  exists with an email    |  Set a variable for     | is correct for the user with  |                      |
+|  address that matches    |  the existing login     | the matomo_login_existing     |                      |
+|  matomo_login_email      |  matomo_login_existing  |                               |                      |
+|                          |                         |                               |                      |
++----------+---------------+                         +--------------+----------------+                      |
+           |                                                        |                                       |
+           |  No, there is not an                                   | No, the password                      |
+           |  existing matching                                     | is incorrect                          |
+           |  email address                                         |                                       |
+           v                                                        v                                       |
++----------+---------------+                         +--------------+----------------+                      |
+|                          |                         |                               |                      |
+|  check_login.yml         |                         |  update_password.yml          |                      |
+|                          |                         |                               |                      |
+|  Check if a Matomo login |                         |  Update the password for      |                      |
+|  exists with a username  |                         |  matomo_login_existing        |                      |
+|  that matches            |                         |                               |                      |
+|  matomo_login            |                         |                               |                      |
+|                          |                         |                               |                      |
++----------+---------------+                         +--------------+----------------+                      |
+           |                                                        |                                       |
+           |  YES, an existing account                              |                                       |
+           |  with a matching login                                 |                                       |
+           |  exists                                                |                                       |
+           |                                                        |                                       |
+           v                                                        v                                       |
++----------+---------------+                                 +------+---------+                             |
+|                          |                                 |                |                             |
+|  update_email.yml        |                                 |  End, tasks    |                             |
+|                          +-------------------------------->+  complete      +<----------------------------+
+|  Update the email        |                                 |                |
+|  address                 |                                 |                |
+|                          |                                 +----------------+
++--------------------------+
 

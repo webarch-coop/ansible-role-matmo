@@ -23,65 +23,42 @@
       set_fact:
         matomo_login_existing: ""
 
-    # TODO Use the UsersManager.getUsers API call with userLogins set to matomo_login to check that the matomo_login_email
-    # matches the result, if it does than the get Matomo user login from email address tasks can be skipped
+    - name: "Check if a Matomo login with the email address {{ matomo_login_email }} exists using the API"
+      uri:
+        url: "{{ matomo_url }}"
+        method: POST
+        body_format: form-urlencoded
+        body:
+          module: API
+          format: JSON
+          token_auth: "{{ matomo_token_auth }}"
+          method: UsersManager.getUserLoginFromUserEmail
+          userEmail: "{{ matomo_login_email }}"
+        status_code: 200
+        return_content: true
+      register: matomo_api_get_user_login_from_user_email
+      changed_when: ( matomo_api_get_user_login_from_user_email.json.value is not defined )
 
-    - name: Include tasks to check the Matomo user login using the matomo_login_email and set matomo_login_existing to the login if it exists
-      include_tasks: check_email.yml
+    - name: Debug matomo_api_get_user_login_from_user_email
+      debug:
+        var: matomo_api_get_user_login_from_user_email
+        verbosity: 2
 
-#     - name: Include tasks to check if a Matomo user login exists when matomo_login_existing is not set
-#       include_tasks: check_login.yml
-#       vars:
-#         matomo_login_check: "{{ matomo_login }}"
-#       when: ( matomo_login_existing | length == 0 )
-# 
-#     - name: Include update Matomo user email address tasks when the email address isn't used by an existing account
-#       include_tasks: update_email.yml
-#       when:
-#         - ( matomo_api_user_exists.json is defined )
-#         - ( matomo_api_user_exists.json.value is defined )
-#         - ( matomo_api_user_exists.json.value )
-#         - ( matomo_api_get_user_login_from_user_email is defined )
-#         - ( matomo_api_get_user_login_from_user_email.json is defined )
-#         - ( matomo_api_get_user_login_from_user_email.json.value is not defined )
-#         - ( matomo_api_get_user_login_from_user_email.json.result is defined )
-#         - ( matomo_api_get_user_login_from_user_email.json.result == "error" )
-#         - ( matomo_api_get_user_login_from_user_email.json.message is regex("^.*doesn\'t\ exist\.$") )
-# 
-#     - name: "Stat {{ matomo_accounts_file }}"
-#       stat:
-#         path: "{{ matomo_accounts_file }}"
-#       register: matomo_accounts_file_path
-#       when:
-#         - (matomo_login_existing | length > 0 )
-#         - ( matomo_accounts_file is defined ) and ( matomo_accounts_file | length > 0 )
-# 
-#     - name: Include check Matomo user password tasks
-#       include_tasks: check_password.yml
-#       when:
-#         - (matomo_login_existing | length > 0 )
-#         - ( matomo_accounts_file_path is defined ) and ( matomo_accounts_file_path.stat is defined ) and ( matomo_accounts_file_path.stat.exists )
-# 
-#     # When a login exists the username is returned:
-#     # matomo_api_get_user_login_from_user_email.json.value == "login"
-#     #
-#     # When a login doesn't exist:
-#     # matomo_api_get_user_login_from_user_email.json.result == "error"
-# 
-#     - name: Include add Matomo user tasks
-#       include_tasks: add_user.yml
-#       when:
-#         - ( matomo_api_user_exists.json is defined )
-#         - ( matomo_api_user_exists.json.value is defined )
-#         - ( not matomo_api_user_exists.json.value )
-#         - ( matomo_api_get_user_login_from_user_email is defined )
-#         - ( matomo_api_get_user_login_from_user_email.json is defined )
-#         - ( matomo_api_get_user_login_from_user_email.json.value is not defined )
-#         - ( matomo_api_get_user_login_from_user_email.json.result is defined )
-#         - ( matomo_api_get_user_login_from_user_email.json.result == "error" )
-#         - ( matomo_api_get_user_login_from_user_email.json.message is regex("^.*doesn\'t\ exist\.$") )
+    - name: "Include check for the {{ matomo_login }} existing when the {{ matomo_login_email }} doesn't exist"
+      include_tasks: check_login.yml
+      when: ( matomo_api_get_user_login_from_user_email.json.value is not defined )
 
-    # - name: Include update Matomo user login tasks when the email address is used by another account
+    - name: Set matomo_login_existing and include password checks when the user exists
+      block:
+
+        - name: "Set the matomo_login_existing variable to {{ matomo_api_get_user_login_from_user_email.json.value }} as a Matomo account with a matching email address exists"
+          set_fact:
+            matomo_login_existing: "{{ matomo_api_get_user_login_from_user_email.json.value }}"
+
+        - name: "Include the check password tasks when a user with the email address {{ matomo_login_email }} does exist"
+          include_tasks: check_password.yml
+
+      when: ( matomo_api_get_user_login_from_user_email.json.value is defined )
 
   tags:
     - matomo
