@@ -35,9 +35,9 @@
       set_fact:
         matomo_super_user_access: "{% if matomo_api_set_super_user_access.json.result == 'success' %}True{% else %}False{% endif %}"
 
-    - name: Variables need setting
-      debug:
-        msg: Please check the matomo_token_auth and matomo_password are correct for the Matmom superuser
+    - name: Matomo super user auth token and / or password variables check
+      fail:
+        msg: Please check the matomo_token_auth and matomo_password are correct for the Matomo superuser
       when: not matomo_super_user_access
 
   tags:
