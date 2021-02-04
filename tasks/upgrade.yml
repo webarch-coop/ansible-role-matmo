@@ -4,11 +4,6 @@
 
     - name: Matomo download tgz tasks included
       include_tasks: download.yml
-      when: ( matomo_git is not defined ) or ( not matomo_git )
-
-    - name: Matomo git clone tasks included
-      include_tasks: git.yml
-      when: ( matomo_git is defined ) and ( matomo_git )
 
     - name: Backup up the Matomo config file
       copy:
@@ -33,18 +28,6 @@
         chdir: "{{ matomo_html }}"
       become: true
       become_user: "{{ matomo_user }}"
-
-    - name: Matomo Extra Tools tasks included
-      include_tasks: extratools.yml
-      when:
-        - ( matomo_extratools is defined ) and ( matomo_extratools != "skip" )
-        - ( matomo_extratools == "force" ) or ( matomo_extratools == "install" )
-
-    - name: Matomo User Console tasks included
-      include_tasks: userconsole.yml
-      when:
-        - ( matomo_userconsole is defined ) and ( matomo_userconsole != "skip" )
-        - ( matomo_userconsole == "force" ) or ( matomo_userconsole == "install" )
 
     - name: Get the installed Matomo version number
       command: "php console core:update --no-ansi -n --version"

@@ -1,5 +1,5 @@
 ---
-- name: Check the version of Matomo and if the ExtraTools and UserConsole are installed and activated
+- name: Check the version of Matomo
   block:
 
     - name: Get the installed Matomo version number
@@ -20,60 +20,6 @@
       debug:
         msg: "The installed version of Matomo is {{ matomo_installed | quote }}"
         verbosity: 1
-
-    - name: Check if ExtraTools plugin is present
-      stat:
-        path: "{{ matomo_html }}/plugins/ExtraTools"
-      register: matomo_extratools_path
-
-    - name: Debug matomo_extratools_path
-      debug:
-        var: matomo_extratools_path
-        verbosity: 2
-      when: matomo_extratools_path is defined
-
-    - name: Check if Extra Tools is activated
-      shell: "php console --no-ansi plugin:activate ExtraTools || echo FAIL"
-      args:
-        executable: /bin/bash
-        chdir: "{{ matomo_html }}"
-      check_mode: false
-      become: true
-      become_user: "{{ matomo_user }}"
-      register: matomo_extratools_check
-      changed_when: '"ExtraTools is already activated" not in matomo_extratools_check.stdout'
-      when: ( matomo_extratools_path is defined ) and ( matomo_extratools_path.stat.exists )
-
-    - name: Set matomo_extratools_enabled variable
-      set_fact:
-        matomo_extratools_enabled: "{% if matomo_extratools_check.stdout is defined and matomo_extratools_check.stdout != 'FAIL' %}true{% else %}false{% endif %}"
-
-    - name: Check if UserConsole plugin is present
-      stat:
-        path: "{{ matomo_html }}/plugins/UserConsole"
-      register: matomo_userconsole_path
-
-    - name: Debug matomo_userconsole_path
-      debug:
-        var: matomo_userconsole_path
-        verbosity: 2
-      when: matomo_userconsole_path is defined
-
-    - name: Check if User Console is activated
-      shell: "php console --no-ansi plugin:activate UserConsole || echo FAIL"
-      args:
-        executable: /bin/bash
-        chdir: "{{ matomo_html }}"
-      check_mode: false
-      become: true
-      become_user: "{{ matomo_user }}"
-      register: matomo_userconsole_check
-      changed_when: '"UserConsole is already activated" not in matomo_userconsole_check.stdout'
-      when: ( matomo_userconsole_path is defined ) and ( matomo_userconsole_path.stat.exists )
-
-    - name: Set matomo_userconsole_enabled variable
-      set_fact:
-        matomo_userconsole_enabled: "{% if matomo_extratools_check.stdout is defined and matomo_extratools_check.stdout != 'FAIL' %}true{% else %}false{% endif %}"
 
   tags:
     - matomo

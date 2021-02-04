@@ -2,13 +2,50 @@
 - name: Install Matomo
   block:
 
-    - name: Matomo download tgz tasks included
-      include_tasks: download.yml
-      when: ( matomo_git is not defined ) or ( not matomo_git )
+    - name: Required Matomo GPG signature downloaded
+      get_url:
+        url: "https://builds.matomo.org/matomo-{{ matomo_required }}.tar.gz.asc"
+        dest: "{{ matomo_private }}/matomo-{{ matomo_required }}.tar.gz.asc"
+        force: true
+        owner: "{{ matomo_user }}"
+        group: "{{ matomo_group }}"
+        mode: 0640
 
-    - name: Matomo git clone tasks included
-      include_tasks: git.yml
-      when: ( matomo_git is defined ) and ( matomo_git )
+    - name: Required Matomo downloaded
+      get_url:
+        url: "https://builds.matomo.org/matomo-{{ matomo_required }}.tar.gz"
+        dest: "{{ matomo_private }}/matomo-{{ matomo_required }}.tar.gz"
+        force: true
+        owner: "{{ matomo_user }}"
+        group: "{{ matomo_group }}"
+        mode: 0640
+
+    - name: Matomo GPG signature checked
+      command: >
+        gpg --no-tty --verify --logger-fd 1
+        "{{ matomo_private }}/matomo-{{ matomo_required }}.tar.gz.asc"
+        "{{ matomo_private }}/matomo-{{ matomo_required }}.tar.gz"
+      register: matomo_signature_check
+      become: true
+      become_user: "{{ matomo_user }}"
+
+    - name: Debug GPG signature check
+      debug:
+        var: matomo_signature_check.stdout_lines
+        verbosity: 2
+
+    - name: Private directory for Matomo to be unarchived into absent
+      file:
+        path: "{{ matomo_private }}/matomo"
+        state: absent
+
+    - name: Required Matomo unarchived into private directory
+      unarchive:
+        remote_src: true
+        src: "{{ matomo_private }}/matomo-{{ matomo_required }}.tar.gz"
+        dest: "{{ matomo_private }}"
+        owner: "{{ matomo_user }}"
+        group: "{{ matomo_group }}"
 
     - name: Matomo files rsynced into place
       shell: "rsync -aq {{ matomo_private }}/matomo/ {{ matomo_html }}/"
@@ -16,18 +53,6 @@
         executable: /bin/bash
       become: true
       become_user: "{{ matomo_user }}"
-
-    - name: Matomo extratools tasks included
-      include_tasks: extratools.yml
-      when:
-        - ( matomo_extratools is defined) and ( matomo_extratools != "skip" )
-        - ( matomo_extratools == "force" ) or ( matomo_extratools == "install" )
-
-    - name: Matomo userconsole tasks included
-      include_tasks: userconsole.yml
-      when:
-        - ( matomo_userconsole is defined ) and ( matomo_userconsole != "skip" )
-        - ( matomo_userconsole == "force" ) or ( matomo_userconsole == "install" )
 
     - block:
 
@@ -72,13 +97,8 @@
 
       when: ( matomo_first_user_pass is not defined ) or ( matomo_first_user_pass | length == 0 )
 
-    - name: Include extratools install tasks
-      include_tasks: install_extratools.yml
-      when: matomo_install == "extratools"
-
     - name: Include web install tasks
       include_tasks: install_web.yml
-      when: matomo_install == "web"
 
     - name: Matomo admin password notification
       block:

@@ -6,17 +6,6 @@ matomo_autoupdate: false
 # false
 # https://github.com/matomo-org/matomo/releases
 matomo_version: 4.1.0
-# The matomo_install options are web for a HTTP install or extratools for
-# a CLI install process
-matomo_install: web
-# The Extra Tools and User Console plugins are required, these
-# variables can be set to "install", "force" or "skip"
-# ExtraTools doesn't install for Matomo 4.x
-matomo_extratools: skip
-matomo_extratools_version: 4.0.0-beta2
-# UserConsole doesn't install for Matomo 4.x
-matomo_userconsole: skip
-matomo_userconsole_version: 4.0.0
 # The system user name for the account (for example www-data), matomo_user is
 # also used for the Matomo super user acount username
 matomo_user: stats
@@ -50,12 +39,6 @@ matomo_notify_headers:
  - "Reply-To={{ matomo_notify_reply_to }}"
 matomo_notify_subject_tag: webarchitects
 matomo_notify_passwd_signature: Webarch Co-operative Limited\nhttps://www.webarch.coop/
-# The following two variables can be set to force or skip but without these
-# plugins tasks like installing and adding users will not work.
-# matomo_extratools: force
-# matomo_userconsole: force
-# Set to true to download using a git clone rather than the tgz archive
-matomo_git: false
 # Set matomo_cron to true to setup cron archiving
 matomo_cron: false
 ...

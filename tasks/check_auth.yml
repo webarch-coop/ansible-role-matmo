@@ -41,5 +41,5 @@
       when: not matomo_super_user_access
 
   tags:
-    - munin
+    - matomo
 ...
