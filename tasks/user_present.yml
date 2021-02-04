@@ -37,7 +37,8 @@
         status_code: 200
         return_content: true
       register: matomo_api_get_user_login_from_user_email
-      changed_when: ( matomo_api_get_user_login_from_user_email.json.value is not defined )
+      changed_when: false
+      failed_when: ( matomo_api_get_user_login_from_user_email.json is not defined )
 
     - name: Debug matomo_api_get_user_login_from_user_email
       debug:
