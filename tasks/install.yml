@@ -2,57 +2,8 @@
 - name: Install Matomo
   block:
 
-    - name: Required Matomo GPG signature downloaded
-      get_url:
-        url: "https://builds.matomo.org/matomo-{{ matomo_required }}.tar.gz.asc"
-        dest: "{{ matomo_private }}/matomo-{{ matomo_required }}.tar.gz.asc"
-        force: true
-        owner: "{{ matomo_user }}"
-        group: "{{ matomo_group }}"
-        mode: 0640
-
-    - name: Required Matomo downloaded
-      get_url:
-        url: "https://builds.matomo.org/matomo-{{ matomo_required }}.tar.gz"
-        dest: "{{ matomo_private }}/matomo-{{ matomo_required }}.tar.gz"
-        force: true
-        owner: "{{ matomo_user }}"
-        group: "{{ matomo_group }}"
-        mode: 0640
-
-    - name: Matomo GPG signature checked
-      command: >
-        gpg --no-tty --verify --logger-fd 1
-        "{{ matomo_private }}/matomo-{{ matomo_required }}.tar.gz.asc"
-        "{{ matomo_private }}/matomo-{{ matomo_required }}.tar.gz"
-      register: matomo_signature_check
-      become: true
-      become_user: "{{ matomo_user }}"
-
-    - name: Debug GPG signature check
-      debug:
-        var: matomo_signature_check.stdout_lines
-        verbosity: 2
-
-    - name: Private directory for Matomo to be unarchived into absent
-      file:
-        path: "{{ matomo_private }}/matomo"
-        state: absent
-
-    - name: Required Matomo unarchived into private directory
-      unarchive:
-        remote_src: true
-        src: "{{ matomo_private }}/matomo-{{ matomo_required }}.tar.gz"
-        dest: "{{ matomo_private }}"
-        owner: "{{ matomo_user }}"
-        group: "{{ matomo_group }}"
-
-    - name: Matomo files rsynced into place
-      shell: "rsync -aq {{ matomo_private }}/matomo/ {{ matomo_html }}/"
-      args:
-        executable: /bin/bash
-      become: true
-      become_user: "{{ matomo_user }}"
+    - name: Matomo download tgz tasks included
+      include_tasks: download.yml
 
     - block:
 
