@@ -170,7 +170,7 @@
               loop_control:
                 loop_var: login_and_role
 
-            - name: "Set the role to admin for {{ matomo_login_existing }} on site ID {{ matomo_site_id }}"
+            - name: "Set the role to view for {{ matomo_login_existing }} on site ID {{ matomo_site_id }}"
               uri:
                 url: "{{ matomo_url }}"
                 method: POST
@@ -181,7 +181,7 @@
                   token_auth: "{{ matomo_token_auth }}"
                   method: UsersManager.setUserAccess
                   userLogin: "{{ matomo_login_existing }}"
-                  access: "admin"
+                  access: "view"
                   idSites: "{{ matomo_site_id }}"
                   status_code: 200
               register: matomo_api_set_user_access
