@@ -106,6 +106,10 @@
 
       when: matomo_api_add_user.json.result == "success"
 
+    - name: "Set the matomo_login_existing variables to {{ matomo_login }}"
+      set_fact:
+        matomo_login_existing: "{{ matomo_login }}"
+
   tags:
     - matomo
 ...
