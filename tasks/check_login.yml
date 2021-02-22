@@ -32,8 +32,16 @@
         var: matomo_api_user_exists
         verbosity: 2
 
-    - name: Update the email address
-      include_tasks: update_email.yml
+    - name: Tasks when the matomo_login account exists
+      block:
+
+        - name: Update the email address
+          include_tasks: update_email.yml
+
+        - name: "Set the matomo_login_existing variables to {{ matomo_login }}"
+          set_fact:
+            matomo_login_existing: "{{ matomo_login }}"
+
       when:
         - ( matomo_api_user_exists.json is defined )
         - ( matomo_api_user_exists.json.value is defined )
