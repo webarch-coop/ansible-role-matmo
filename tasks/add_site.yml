@@ -19,9 +19,13 @@
         loop_var: url
       when: ( matomo_site_urls is defined ) and ( matomo_site_urls[0] is defined )
 
-    - name: Debug the add site POST data
+    - name: Set a fact for the add site POST data
+      set_fact:
+        matomo_add_site_json: "{{ lookup('template', 'add_site.yml.j2') | from_yaml }}"
+
+    - name: Debug add site POST data
       debug:
-        msg: "{{ lookup('template', 'add_site.yml.j2') | to_json }}"
+        var: matomo_add_site_json
         verbosity: 2
 
     - name: "Add Matomo site {{ matomo_site_name }} with main URL {{ matomo_site_main_url }}"
@@ -29,18 +33,18 @@
         url: "{{ matomo_url }}"
         method: POST
         body_format: json
-        body: "{{ lookup('template', 'add_site.yml.j2') | to_json }}"
-      register: users_matomo_add_site
-      failed_when: ( users_matomo_add_site.failed is defined and users_matomo_add_site.failed ) or ( users_matomo_add_site.json is defined and users_matomo_add_site.json.value is not regex("^[0-9]{1,6}$") )
+        body: "{{ matomo_add_site_json }}"
+      register: matomo_add_site
+      failed_when: ( matomo_add_site.failed is defined and matomo_add_site.failed ) or ( matomo_add_site.json is defined and matomo_add_site.json.value is not regex("^[0-9]{1,6}$") )
 
-    - name: Debug users_matomo_add_site
+    - name: Debug matomo_add_site
       debug:
-        var: users_matomo_add_site
+        var: matomo_add_site
         verbosity: 2
 
     - name: Set a variable for the ID of the added site
       set_fact:
-        matomo_site_id: "{{ users_matomo_add_site.json.value }}"
+        matomo_site_id: "{{ matomo_add_site.json.value }}"
 
   tags:
     - matomo
