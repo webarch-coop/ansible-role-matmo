@@ -33,7 +33,7 @@
 
     - name: "Update Matomo site {{ matomo_site_name }} with main URL {{ matomo_site_main_url }}"
       uri:
-        url: "{{ matomo_url }}"
+        url: "{{ matomo_api }}"
         method: POST
         body_format: json
         body: "{{ matomo_update_site_json }}"
