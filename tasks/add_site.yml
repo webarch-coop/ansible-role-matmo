@@ -21,7 +21,7 @@
 
     - name: Set a fact for the add site POST data
       set_fact:
-        matomo_add_site_json: "{{ lookup('template', 'add_site.yml.j2') | from_yaml }}"
+        matomo_add_site_json: "{{ lookup('template', 'add_site.yml.j2') | to_json }}"
 
     - name: Debug add site POST data
       debug:
@@ -34,6 +34,8 @@
         method: POST
         body_format: json
         body: "{{ matomo_add_site_json }}"
+        status_code: 200
+        return_content: true
       register: matomo_add_site
       failed_when: ( matomo_add_site.failed is defined and matomo_add_site.failed ) or ( matomo_add_site.json is defined and matomo_add_site.json.value is not regex("^[0-9]{1,6}$") )
 
