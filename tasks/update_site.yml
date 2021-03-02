@@ -20,9 +20,9 @@
         loop_var: url
       when: ( matomo_site_urls is defined ) and ( matomo_site_urls[0] is defined )
 
-    - name: Debug URL variable
+    - name: Debug the update site POST data
       debug:
-        var: matomo_urls
+        msg: "{{ lookup('template', 'update_site.yml.j2') | to_json }}"
         verbosity: 2
 
     - name: "Update Matomo site {{ matomo_site_name }} with main URL {{ matomo_site_main_url }}"
