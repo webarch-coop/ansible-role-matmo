@@ -21,7 +21,7 @@
 
     - name: Set a fact for the add site POST data
       set_fact:
-        matomo_add_site_json: "{{ lookup('template', 'add_site.yml.j2') | to_json }}"
+        matomo_add_site_json: "{{ lookup('template', 'add_site.json.j2') | from_json }}"
 
     - name: Debug add site POST data
       debug:
