@@ -10,11 +10,13 @@
           - ( matomo_site_id is defined ) and ( matomo_site_id is regex("^[0-9]{1,9}$") )
           - ( matomo_site_name is defined ) and ( matomo_site_name | length > 0 )
           - ( matomo_site_main_url is defined ) and ( matomo_site_main_url | length > 0 )
+        quiet: true
 
     - name: Ensure that matomo_site_urls start with http(s)://
       assert:
         that:
           - ( url is regex("^http[s]*:\/\/.*$") )
+        quiet: true
       loop: "{{ matomo_site_urls }}"
       loop_control:
         loop_var: url
