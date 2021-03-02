@@ -22,7 +22,7 @@
 
     - name: Set a fact for the update site POST data
       set_fact:
-        matomo_update_site_json: "{{ lookup('template', 'update_site.json.j2') | from_json }}"
+        matomo_update_site_json: "{{ lookup('template', 'update_site.json.j2') }}"
 
     - name: Debug the update site POST data
       debug:
