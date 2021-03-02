@@ -11,9 +11,12 @@
           - ( matomo_site_name is defined ) and ( matomo_site_name | length > 0 )
           - ( matomo_site_main_url is defined ) and ( matomo_site_main_url | length > 0 )
 
-    - name: Set a fact for the site URL
-      set_fact:
-        urls: "{{ matomo_site_main_url }}"
+# TODO Rewrite for this
+# https://developer.matomo.org/api-reference/reporting-api#passing-an-array-of-data-as-a-parameter
+
+    - name: Set an empty variable for the site URLs
+      set_fact: 
+        matomo_urls: ""
 
     - name: Check that the optional variable matomo_site_urls is valid if defined
       block:
@@ -26,25 +29,29 @@
           loop_control:
             loop_var: url
 
-        - name: Debug all the site URLs
+        - name: Debug all the site URLs backwards
           debug:
-            msg: "{{ url }}, {{ urls }}"
-          loop: "{{ matomo_site_urls }}"
+            msg: "{{ url }}, {{ matomo_urls }}"
+          loop: "{{ matomo_site_urls | reverse | list }}"
           loop_control:
             loop_var: url
 
         - name: Set a fact for all the site URLs
-          set_fact:
-            urls: "{{ url }}, {{ urls }}"
-          loop: "{{ matomo_site_urls }}"
+          set_fact: 
+            matomo_urls: "{{ url }}, {{ matomo_urls }}"
+          loop: "{{ matomo_site_urls | reverse | list }}"
           loop_control:
             loop_var: url
 
       when: ( matomo_site_urls is defined ) and ( matomo_site_urls[0] is defined )
 
+    - name: Add the mail URL to the start of the URLs list
+      set_fact:    
+        matomo_urls: "{{ matomo_site_main_url }}{% if matomo_urls | length > 0 %}, {{ matomo_urls }}{% endif %}"
+
     - name: Debug URL variable
       debug:
-        var: urls
+        var: matomo_urls
         verbosity: 2
 
     - name: "Update Matomo site {{ matomo_site_name }} with main URL {{ matomo_site_main_url }}"

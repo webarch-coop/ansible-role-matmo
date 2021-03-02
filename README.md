@@ -1,6 +1,6 @@
 # Ansible Matomo
 
-This repository contains an Ansible role for installing and upgrading [Matomo](https://matomo.org/) servers, based on the [ExtraTools plugin](https://github.com/digitalist-se/extratools) for the install and the [manual upgrade steps](https://matomo.org/docs/update/#the-manual-three-step-update).
+This repository contains an Ansible role for installing and upgrading [Matomo](https://matomo.org/) servers, 
 
 This role also contains tasks to add delete users using the [UserConsole](https://github.com/digitalist-se/userconsole) plugin and also tasks to add and update sites, however there isn't yet a delete site set of tasks due to the [lack of a `site:delete` command](https://github.com/digitalist-se/extratools/issues/7) in ExtraTools.
 
