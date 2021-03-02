@@ -1,4 +1,3 @@
----
 module: API
 format: JSON
 token_auth: "{{ matomo_token_auth }}"
@@ -12,5 +11,3 @@ url[0]: "{{ matomo_site_main_url }}"
 url[{{ loop.index }}]: {{ u }}
 {% endfor %}
 {% endif %}
-# vim: ft=yaml
-...
