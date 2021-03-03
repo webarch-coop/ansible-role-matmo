@@ -28,12 +28,12 @@
 
     - name: Debug the update site POST data
       debug:
-        msg: matomo_update_site_json
+        var: matomo_update_site_json
         verbosity: 2
 
     - name: "Update Matomo site {{ matomo_site_name }} with main URL {{ matomo_site_main_url }}"
       uri:
-        url: "{{ matomo_url }}&module=API"
+        url: "{{ matomo_url }}"
         method: POST
         body_format: form-urlencoded
         body: "{{ matomo_update_site_json }}"
