@@ -30,15 +30,6 @@
         var: matomo_add_site_json
         verbosity: 2
 
-    - name: Set a fact for the add site POST data YAML
-      set_fact:
-        matomo_add_site_yaml: "{{ lookup('template', 'add_site.yml.j2') }}"
-
-    - name: Debug add site POST data YAML
-      debug:
-        var: matomo_add_site_yaml
-        verbosity: 2
-
     - name: "Add Matomo site {{ matomo_site_name }} with main URL {{ matomo_site_main_url }}"
       uri:
         url: "{{ matomo_url }}"

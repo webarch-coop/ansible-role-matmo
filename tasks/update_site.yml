@@ -35,7 +35,7 @@
       uri:
         url: "{{ matomo_url }}&module=API"
         method: POST
-        body_format: json
+        body_format: form-urlencoded
         body: "{{ matomo_update_site_json }}"
         status_code: 200
         return_content: true
