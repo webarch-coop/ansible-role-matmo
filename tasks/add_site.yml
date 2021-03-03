@@ -44,7 +44,7 @@
         url: "{{ matomo_url }}"
         method: POST
         body_format: form-urlencoded
-        body: "{{ matomo_add_site_yaml }}"
+        body: "{{ matomo_add_site_json }}"
         status_code: 200
         return_content: true
       register: matomo_add_site
