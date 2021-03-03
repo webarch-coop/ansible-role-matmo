@@ -3,8 +3,6 @@ format: JSON
 token_auth: "{{ matomo_token_auth }}"
 method: SitesManager.addSite
 siteName: "{{ matomo_site_name }}"
-status_code: 200
-return_content: true
 url[0]: "{{ matomo_site_main_url }}"
 {% if matomo_site_urls is defined and matomo_site_urls != [] %}
 {% for u in matomo_site_urls %}

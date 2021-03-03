@@ -21,21 +21,30 @@
         loop_var: url
       when: ( matomo_site_urls is defined ) and ( matomo_site_urls[0] is defined )
 
-    - name: Set a fact for the add site POST data
+    - name: Set a fact for the add site POST data in JSON
       set_fact:
         matomo_add_site_json: "{{ lookup('template', 'add_site.json.j2') }}"
 
-    - name: Debug add site POST data
+    - name: Debug add site POST data JSON
       debug:
         var: matomo_add_site_json
         verbosity: 2
 
+    - name: Set a fact for the add site POST data YAML
+      set_fact:
+        matomo_add_site_yaml: "{{ lookup('template', 'add_site.yaml.j2') }}"
+
+    - name: Debug add site POST data YAML
+      debug:
+        var: matomo_add_site_yaml
+        verbosity: 2
+
     - name: "Add Matomo site {{ matomo_site_name }} with main URL {{ matomo_site_main_url }}"
       uri:
-        url: "{{ matomo_url }}&module=API"
+        url: "{{ matomo_url }}"
         method: POST
-        body_format: json
-        body: "{{ matomo_add_site_json }}"
+        body_format: form-urlencoded
+        body: "{{ matomo_add_site_yaml }}"
         status_code: 200
         return_content: true
       register: matomo_add_site
