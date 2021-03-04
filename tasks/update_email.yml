@@ -69,7 +69,7 @@
     - name: Update the email address in the matomo_accounts_file
       block:
 
-        - name: Set a fact for the escaped existing email address 
+        - name: Set a fact for the escaped existing email address
           set_fact:
             matomo_login_email_existing_escaped: "{{ matomo_login_email_existing | regex_escape() }}"
 
