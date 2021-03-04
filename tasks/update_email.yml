@@ -61,10 +61,15 @@
         var: matomo_api_update_user_email
         verbosity: 2
 
+    - name: "Stat {{ matomo_accounts_file }}"
+      stat:
+        path: "{{ matomo_accounts_file }}"
+      register: matomo_accounts_file_path
+
     - name: Update the email address in the matomo_accounts_file
       block:
 
-        - name: Set a fact for the escaped extsing email address 
+        - name: Set a fact for the escaped existing email address 
           set_fact:
             matomo_login_email_existing_escaped: "{{ matomo_login_email_existing | regex_escape() }}"
 
