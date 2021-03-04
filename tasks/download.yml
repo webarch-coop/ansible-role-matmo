@@ -2,6 +2,14 @@
 - name: Download Matomo TGZ and check GPG signature
   block:
 
+    - name: GNU Privacy Guard directory present
+      file:
+        path: "{{ matomo_home }}/.gnupg"
+        state: directory
+        owner: "{{ matomo_user }}"
+        group: "{{ matomo_user }}"
+        mode: 0700
+
     # https://builds.matomo.org/signature.asc
     - name: The Matomo GPG public key is present
       copy:

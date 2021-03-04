@@ -1,6 +1,42 @@
 # Ansible Matomo
 
-This repository contains an Ansible role for installing and upgrading [Matomo](https://matomo.org/) servers, 
+This repository contains an Ansible role for installing and upgrading
+[Matomo](https://matomo.org/) servers using the command line and web based
+installer.
+
+By default only these tasks are run:
+
+```
+main.yml
+  |
+  \-- check_variables.yml
+  |     |
+  |     \-- check_version.yml
+  |     |
+  |     \-- check_auth.yml
+  |     |
+  |     \-- check_latest_version.yml
+  |
+  \-- upgrade.yml
+  |
+  \-- install.yml
+  |    |
+  |    \-- download.yml
+  |    |
+  |    \-- install_web.yml
+  |
+  \-- geolocation.yml
+  |
+  \-- settings.yml
+  |
+  \-- cron.yml
+```
+
+If a superuser username, password and token authentication string are provided
+(these can be sorted encrypted using Ansible vault on the Ansible contyroller)
+then this role can also be used to add Matomo user accounts and sites using
+the Matomo API.
+
 
 This role also contains tasks to add delete users using the [UserConsole](https://github.com/digitalist-se/userconsole) plugin and also tasks to add and update sites, however there isn't yet a delete site set of tasks due to the [lack of a `site:delete` command](https://github.com/digitalist-se/extratools/issues/7) in ExtraTools.
 

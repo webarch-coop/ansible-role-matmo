@@ -96,6 +96,14 @@
 
       when: ( matomo_config_check is defined ) and ( matomo_config_check.stat.exists )
 
+    # Set matomo_latest to the latest available version of Matomo
+    - name: Include latest version check
+      include_tasks: check_latest_version.yml
+
+    - name: Set the matomo_required variable
+      set_fact:
+        matomo_required: "{% if matomo_autoupdate %}{{ matomo_latest }}{% else %}{{ matomo_version }}{% endif %}"
+
   tags:
     - matomo
 ...

@@ -1,42 +1,9 @@
 ---
-- name: Include variables checks
-  include_tasks: check_variables.yml
-  tags:
-    - matomo
-
-- name: Only install or upgrade Matomo if the user account is present
+- name: Install, configure and upgrade Matomo
   block:
 
-    - name: Required directories present
-      file:
-        path: "{{ matomo_home }}/{{ dir }}"
-        state: directory
-        owner: "{{ matomo_user }}"
-        group: "{{ matomo_user }}"
-        mode: 0700
-      loop:
-        - .ansible
-        - .gnupg
-      loop_control:
-        loop_var: dir
-
-    # Set matomo_latest to the latest available version of Matomo
-    - name: Include latest version check
-      include_tasks: check_latest_version.yml
-
-    - name: Set the matomo_required variable
-      set_fact:
-        matomo_required: "{% if matomo_autoupdate %}{{ matomo_latest }}{% else %}{{ matomo_version }}{% endif %}"
-
-    - name: Check for config.ini.php
-      stat:
-        path: "{{ matomo_html }}/config/config.ini.php"
-      register: matomo_config_check
-
-    # Set matomo_installed to the installed version of Matomo
-    - name: Include version check
-      include_tasks: check_version.yml
-      when: ( matomo_config_check is defined ) and ( matomo_config_check.stat.exists )
+    - name: Include variables checks
+      include_tasks: check_variables.yml
 
     - name: Matomo upgrade
       block:
@@ -71,17 +38,16 @@
       include_tasks: install.yml
       when: ( matomo_config_check is defined ) and ( not matomo_config_check.stat.exists )
 
-    - name: Include cron tasks
-      include_tasks: cron.yml
-      when: ( matomo_cron is defined ) and ( matomo_cron )
+    - name: Include geolocation tasks
+      include_tasks: geolocation.yml
 
     - name: Include settings tasks
       include_tasks: settings.yml
 
-    - name: Include geolocation tasks
-      include_tasks: geolocation.yml
+    - name: Include cron tasks
+      include_tasks: cron.yml
+      when: ( matomo_cron is defined ) and ( matomo_cron )
 
-  when: matomo_user in getent_passwd
   tags:
     - matomo
 ...
