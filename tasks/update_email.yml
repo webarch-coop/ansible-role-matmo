@@ -117,16 +117,16 @@
             group: "{{ matomo_group }}"
           when: matomo_account_login_password | length > 0
 
-        - name: Set matomo_login_existing and include password checks when password couldn't be read from the matomo_accounts_file
+        - name: Set matomo_login_existing and include the update password tasks as the password couldn't be read from the matomo_accounts_file
           block:
-    
+
             - name: "Set the matomo_login_existing variable to {{ matomo_login }}"
               set_fact:
                 matomo_login_existing: "{{ matomo_login }}"
-    
-            - name: "Include the check password tasks" 
-              include_tasks: check_password.yml
-    
+
+            - name: Include the check password tasks
+              include_tasks: update_password.yml
+
           when: matomo_account_login_password | length == 0
 
       when:
