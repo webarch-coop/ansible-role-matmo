@@ -64,11 +64,15 @@
     - name: Update the email address in the matomo_accounts_file
       block:
 
+        - name: Set a fact for the escaped extsing email address 
+          set_fact:
+            matomo_login_email_existing_escaped: "{{ matomo_login_email_existing | regex_escape() }}"
+
         - name: Update the email address in the block start
           lineinfile:
             path: "{{ matomo_accounts_file }}"
             line: "# {{ matomo_login }} <{{ matomo_login_email }}> BEGIN"
-            regexp: "^# {{ matomo_login }} <{{ matomo_login_email_existing }}> BEGIN$"
+            regexp: "^# {{ matomo_login }} <{{ matomo_login_email_existing_escaped }}> BEGIN$"
             state: present
             create: false
             mode: 0600
@@ -79,7 +83,7 @@
           lineinfile:
             path: "{{ matomo_accounts_file }}"
             line: "    email: {{ matomo_login_email }}"
-            regexp: "^    email: {{ matomo_login_email_existing }}$"
+            regexp: "^    email: {{ matomo_login_email_existing_escaped }}$"
             state: present
             create: false
             mode: 0600
@@ -90,7 +94,7 @@
           lineinfile:
             path: "{{ matomo_accounts_file }}"
             line: "# {{ matomo_login }} <{{ matomo_login_email }}> END"
-            regexp: "^# {{ matomo_login }} "
+            regexp: "^# {{ matomo_login }} <{{ matomo_login_email_existing_escaped }}> END$"
             state: present
             create: false
             mode: 0600
@@ -113,4 +117,8 @@
         host: localhost
         port: 25
         secure: never
+
+    - name: Debug fail
+      fail:
+        msg: Debug
 ...
