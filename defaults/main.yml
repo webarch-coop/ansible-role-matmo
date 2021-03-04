@@ -15,7 +15,6 @@ matomo_html: "{{ matomo_home }}/sites/default"
 matomo_private: "{{ matomo_home }}/private"
 matomo_logs: "{{ matomo_private }}"
 matomo_db_username: "{{ matomo_user }}"
-# if matomo_db_pass is not set then it is read from ~/.my.cnf
 matomo_db_pass: ""
 matomo_db_host: localhost
 matomo_dbname: "{{ matomo_user }}"
@@ -27,8 +26,6 @@ matomo_first_site_url: "http://{{ inventory_hostname }}/"
 matomo_first_site_tz: "Europe/London"
 matomo_first_user: "{{ matomo_user }}"
 matomo_first_user_email: "root@{{ inventory_hostname }}"
-# if matomo_first_user_pass is not defined or empty a random one is generated
-matomo_first_user_pass: ""
 matomo_accounts_file: "{{ matomo_private }}/.matomo_accounts.yml"
 # if matomo_notify_passwd is true the random password is sent to matomo_first_user_email
 matomo_notify_passwd: true

@@ -1,0 +1,31 @@
+---
+- name: Matomo geolocation tasks
+  block:
+
+    - name: Check if a current DBIP City Lite database exists
+      stat:
+        path: "{{ matomo_private }}/dbip-city-lite-{{ lookup('pipe','date +%Y-%m') }}.mmdb.gz"
+      register: matomo_dbip_archive
+
+    - name: Current DBIP City Lite database archive present
+      get_url:
+        url: "https://download.db-ip.com/free/dbip-city-lite-{{ lookup('pipe','date +%Y-%m') }}.mmdb.gz"
+        dest: "{{ matomo_private }}/dbip-city-lite-{{ lookup('pipe','date +%Y-%m') }}.mmdb.gz"
+        owner: "{{ matomo_user }}"
+        group: "{{ matomo_group }}"
+        mode: 0640
+      register: matomo_dbip_download
+      when: not matomo_dbip_archive.stat.exists
+
+    - name: DBIP City Lite database in place
+      unarchive:
+        remote_src: true
+        src: "{{ matomo_private }}/dbip-city-lite-{{ lookup('pipe','date +%Y-%m') }}.mmdb.gz"
+        dest: "{{ matomo_html }}/misc/DBIP-City.mmdb"
+        owner: "{{ matomo_user }}"
+        group: "{{ matomo_group }}"
+        mode: 0644
+
+  tags:
+    - matomo
+...

@@ -5,9 +5,8 @@
     # TODO Use a dictionary to define settings
 
     - name: "Set force_ssl to true for {{ matomo_user }}"
-      shell: "php console config:set --no-ansi -n --section='General' --key='force_ssl' --value='1'"
+      command: php console --no-ansi -n config:set --section="General" --key="force_ssl" --value="1"
       args:
-        executable: /bin/bash
         chdir: "{{ matomo_html }}"
       become: true
       become_user: "{{ matomo_user }}"

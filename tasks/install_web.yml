@@ -38,28 +38,10 @@
         status_code: 200
       register: matomo_system_check
 
-    - name: Write the system check body to a file
-      copy:
-        content: "{{ matomo_system_check.content }}"
-        dest: "{{ matomo_private }}/matomo_system_check.html"
-        force: true
-        owner: "{{ matomo_user }}"
-        group: "{{ matomo_group }}"
-        mode: 0644
-
-    - name: Lynx dump the system check body
-      command: "lynx -dump {{ matomo_private }}/matomo_system_check.html"
-      register: matomo_system_check_dump
-
     - name: Debug System Check HTTP GET
       debug:
         var: matomo_system_check
         verbosity: 2
-
-    - name: Debug System Check HTTP GET
-      debug:
-        var: matomo_system_check_dump.stdout_lines
-        verbosity: 1
 
     - name: Pause
       pause:

@@ -5,48 +5,29 @@
     - name: Matomo download tgz tasks included
       include_tasks: download.yml
 
-    - block:
+    - name: Random passwd for Matomo admin generated
+      command: "pwgen -n {{ 24 | random(14) }} 1"
+      no_log: true
+      register: matomo_first_user_pass_gen
 
-        - name: "Check for {{ matomo_home }}/.my.cnf"
-          stat:
-            path: "{{ matomo_home }}/.my.cnf"
-          register: matomo_mycnf_check
+    - name: Fact set for Matomo admin password
+      set_fact:
+        matomo_first_user_pass: "{{ matomo_first_user_pass_gen.stdout | trim | quote }}"
+      when: ( matomo_first_user_pass_gen is defined ) and ( matomo_first_user_pass_gen | length > 0 )
+      no_log: true
 
-        - name: "MariaDB password read from {{ matomo_home }}/.my.cnf"
-          command: "my_print_defaults --defaults-file='.my.cnf' client"
-          args:
-            chdir: "{{ matomo_home }}"
-          register: matomo_my_print_defaults
-          changed_when: false
-          when: ( matomo_mycnf_check is defined ) and ( matomo_mycnf_check.stat.exists )
-          no_log: true
-
-        - name: Set a fact for the MariaDB password
-          set_fact:
-            matomo_db_pass: "{{ line | regex_replace('^--password=') | trim }}"
-          when: line is regex('^--password=')
-          loop: "{{ my_print_defaults.stdout_lines }}"
-          loop_control:
-            loop_var: line
-          no_log: true
-
-      when: ( matomo_db_pass is not defined ) or ( matomo_db_pass | length == 0 )
-
-    - name: Generate a password if matomo_first_user_pass is not defined
-      block:
-
-        - name: Random passwd for Matomo admin generated
-          command: pwgen -n 20 1
-          no_log: true
-          register: matomo_first_user_pass_gen
-
-        - name: Fact set for Matomo admin password
-          set_fact:
-            matomo_first_user_pass: "{{ matomo_first_user_pass_gen.stdout | trim | quote }}"
-          when: ( matomo_first_user_pass_gen is defined ) and ( matomo_first_user_pass_gen | length > 0 )
-          no_log: true
-
-      when: ( matomo_first_user_pass is not defined ) or ( matomo_first_user_pass | length == 0 )
+    - name: Check that required variables are defined
+      assert:
+        that:
+          - ( matomo_db_host is defined ) and ( matomo_db_host | length > 0 )
+          - ( matomo_dbname is defined ) and ( matomo_dbname | length > 0 )
+          - ( matomo_db_username is defined ) and ( matomo_db_username | length > 0 )
+          - ( matomo_db_pass is defined ) and ( matomo_db_pass | length > 0 )
+          - ( matomo_first_site_name is defined ) and ( matomo_first_site_name | length > 0 )
+          - ( matomo_first_site_url is defined ) and ( matomo_first_site_url | length > 0 )
+          - ( matomo_first_user is defined ) and ( matomo_first_user | length > 0 )
+          - ( matomo_first_user_email is defined ) and ( matomo_first_user_email | length > 0 )
+          - ( matomo_first_user_pass is defined ) and ( matomo_first_user_pass | length > 0 )
 
     - name: Include web install tasks
       include_tasks: install_web.yml
@@ -58,7 +39,7 @@
           mail:
             from: "{{ matomo_notify_from }}"
             to: '"{{ matomo_first_user | quote }}" <{{ matomo_first_user_email }}>'
-            subject: "[{{ matomo_notify_subject_tag | default('webarchitects') }}] Matomo superuser password for {{ matomo_first_user }} on {{ vhost.value.users_apache_server_name }}"
+            subject: "[{{ matomo_notify_subject_tag | default('webarchitects') }}] Matomo superuser password for {{ matomo_url }}"
             # https://github.com/ansible/ansible/issues/58543
             charset: us-ascii
             body: "{{ lookup('template', 'notify_matomo_install_passwd.j2') }}"
@@ -80,7 +61,7 @@
       when: ( matomo_notify_passwd is defined ) and ( matomo_notify_passwd )
 
     - name: Get the installed Matomo version number
-      command: "php console core:update --no-ansi -n --version"
+      command: php console --no-ansi -n core:update --version
       args:
         chdir: "{{ matomo_html }}"
       changed_when: false

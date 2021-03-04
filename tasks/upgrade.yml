@@ -22,21 +22,29 @@
       become_user: "{{ matomo_user }}"
 
     - name: Matomo database upgraded
-      shell: "php console --no-ansi -n core:update --yes"
+      shell: php console --no-ansi -n core:update --yes
       args:
         executable: /bin/bash
         chdir: "{{ matomo_html }}"
       become: true
       become_user: "{{ matomo_user }}"
 
-    - name: Get the installed Matomo version number
-      command: "php console core:update --no-ansi -n --version"
+    - name: Upgrade from Matomo 3.x
+      command: php console --no-ansi -n core:matomo4-migrate-token-auths
       args:
         chdir: "{{ matomo_html }}"
-      changed_when: false
-      check_mode: false
       become: true
       become_user: "{{ matomo_user }}"
+      when: matomo_installed is version('3.14.1', '<=')
+
+    - name: Get the installed Matomo version number
+      command: php console --no-ansi -n core:update --version
+      args:
+        chdir: "{{ matomo_html }}"
+      become: true
+      become_user: "{{ matomo_user }}"
+      changed_when: false
+      check_mode: false
       register: matomo_installed_check
 
     - name: Set a variable for the installed Matomo version number
