@@ -69,39 +69,45 @@
     - name: Update the email address in the matomo_accounts_file
       block:
 
-        - name: Set a fact for the escaped existing email address
+        - name: "Slurp account information from {{ matomo_accounts_file }}"
+          slurp:
+            src: "{{ matomo_accounts_file }}"
+          register: matomo_accounts_file_b64encoded
+
+        - name: "Set a fact for the account details in {{ matomo_accounts_file }}"
           set_fact:
-            matomo_login_email_existing_escaped: "{{ matomo_login_email_existing | regex_escape() }}"
+            matomo_accounts: "{{ matomo_accounts_file_b64encoded['content'] | b64decode | from_yaml | list }}"
 
-        - name: Update the email address in the block start
-          lineinfile:
+        - name: Debug matomo_accounts
+          debug:
+            var: matomo_accounts
+            verbosity: 2
+
+        - name: Set a fact for the matomo_login_password
+          set_fact:
+            matomo_account_login_password: "{{ matomo_account.password }}"
+          when: matomo_account.login == matomo_login
+          loop: "{{ matomo_accounts }}"
+          loop_control:
+            loop_var: matomo_account
+
+        - name: "Remove the account details for {{ matomo_login }} with {{ matomo_login_email_existing }} from {{ matomo_accounts_file }}"
+          blockinfile:
             path: "{{ matomo_accounts_file }}"
-            line: "# {{ matomo_login }} <{{ matomo_login_email }}> BEGIN"
-            regexp: "^# {{ matomo_login }} <{{ matomo_login_email_existing_escaped }}> BEGIN$"
-            state: present
-            create: false
+            block: ""
+            marker: "# {{ matomo_login }} <{{ matomo_login_email_existing }}> {mark}"
             mode: 0600
             owner: "{{ matomo_user }}"
             group: "{{ matomo_group }}"
 
-        - name: Update the email address in the block
-          lineinfile:
+        - name: "Matomo login, email address and password for {{ matomo_login }} present in {{ matomo_accounts_file }}"
+          blockinfile:
             path: "{{ matomo_accounts_file }}"
-            line: "    email: {{ matomo_login_email }}"
-            regexp: "^    email: {{ matomo_login_email_existing_escaped }}$"
-            state: present
-            create: false
-            mode: 0600
-            owner: "{{ matomo_user }}"
-            group: "{{ matomo_group }}"
-
-        - name: Update the email address in the block end
-          lineinfile:
-            path: "{{ matomo_accounts_file }}"
-            line: "# {{ matomo_login }} <{{ matomo_login_email }}> END"
-            regexp: "^# {{ matomo_login }} <{{ matomo_login_email_existing_escaped }}> END$"
-            state: present
-            create: false
+            block: |
+              - login: {{ matomo_login | quote }}
+                email: {{ matomo_login_email | quote }}
+                password: {{ matomo_account_login_password | quote }}
+            marker: "# {{ matomo_login }} <{{ matomo_login_email }}> {mark}"
             mode: 0600
             owner: "{{ matomo_user }}"
             group: "{{ matomo_group }}"
