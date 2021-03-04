@@ -68,7 +68,7 @@
           lineinfile:
             path: "{{ matomo_accounts_file }}"
             line: "# {{ matomo_login }} <{{ matomo_login_email }}> BEGIN"
-            regexp: "^# {{ matomo_login }} "
+            regexp: "^# {{ matomo_login }} <{{ matomo_login_email_existing }}> BEGIN$"
             state: present
             create: false
             mode: 0600
@@ -79,7 +79,7 @@
           lineinfile:
             path: "{{ matomo_accounts_file }}"
             line: "    email: {{ matomo_login_email }}"
-            regexp: "^    email: {{ matomo_api_get_user.json.email }}"
+            regexp: "^    email: {{ matomo_login_email_existing }}$"
             state: present
             create: false
             mode: 0600
