@@ -145,8 +145,4 @@
         host: localhost
         port: 25
         secure: never
-
-    - name: Debug fail
-      fail:
-        msg: Debug
 ...
