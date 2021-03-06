@@ -57,52 +57,6 @@ user_present.yml
         \-- update_password.yml
 ```
 
-This ASCII flowchart explains the logic used when the `user_present.yml` tasks are run:
-
-
-```
-+--------------------------+  YES, there is a                                       +-------------------------------+  YES, the password is
-|                          |  matching email                                        |                               |  correct
-|  user_present.yml        |  address                                               | check_password.yml            |
-|                          |                                                        |                               |
-|  Check if a Matomo login +------------------------------------------------------->+ Check if the password on file +----------------------+
-|  exists with an email    |  Set a variable for                                    | is correct for the user with  |                      |
-|  address that matches    |  the existing login                                    | the matomo_login_existing     |                      |
-|  matomo_login_email      |  matomo_login_existing                                 |                               |                      |
-|                          |                                                        |                               |                      |
-+----------+---------------+                                                        +--------------+----------------+                      |
-           |                                                                                       |                                       |
-           |  No, there is not an                                                                  | No, the password                      |
-           |  existing matching                                                                    | is incorrect                          |
-           |  email address                                                                        |                                       |
-           v                                                                                       v                                       |
-+----------+---------------+                           +-------------------+        +--------------+----------------+                      |
-|                          | NO, there is no existing  |                   |        |                               |                      |
-|  check_login.yml         | account                   | add_user.yml      |        |  update_password.yml          |                      |
-|                          |                           |                   |        |                               |                      |
-|  Check if a Matomo login +-------------------------->+ Add a new Matomo  |        |  Update the password for      |                      |
-|  exists with a username  |                           | user account      |        |  matomo_login_existing        |                      |
-|  that matches            |                           |                   |        |                               |                      |
-|  matomo_login            |                           |                   |        |                               |                      |
-|                          |                           |                   |        |                               |                      |
-+----------+---------------+                           +---------+---------+        +--------------+----------------+                      |
-           |                                                     |                                 |                                       |
-           |  YES, an existing account                           |                                 |                                       |
-           |  with a matching login                              |                                 |                                       |
-           |  exists                                             |                                 |                                       |
-           |                                                     |                                 |                                       |
-           v                                                     |                                 v                                       |
-+----------+---------------+                                     |                          +------+---------+                             |
-|                          |                                     +------------------------->+                |                             |
-|  update_email.yml        |                                                                |  End, tasks    |                             |
-|                          +--------------------------------------------------------------->+  complete      +<----------------------------+
-|  Update the email        |                                                                |                |
-|  address                 |                                                                |                |
-|                          |                                                                +----------------+
-+--------------------------+
-
-```
-
 Since a users password is needed to generate a `token_auth` which is in turn
 needed to automatically configure the Matomo WordPress plugin this role will
 optionally store a record of passwords (but doesn't prevent using from changing
@@ -122,5 +76,19 @@ matomo_accounts:
 
 ## Matomo sites
 
+To add a Matomo site include this role with tasks from `site_present.yml` and
+then these files will be used:
 
-
+```
+site_present.yml
+  |
+  \-- get_all_sites.yml
+  |
+  \-- get_sites_id_from_site_url.yml
+  |     |
+  |     \-- check_main_url.yml
+  |
+  \-- update_site.yml
+  |
+  \-- add_site.yml
+```

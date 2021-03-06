@@ -15,16 +15,13 @@
         mode: 0600
 
     - name: Required Matomo rsynced over last version
-      shell: "rsync -aq {{ matomo_private }}/matomo/ {{ matomo_html }}/"
-      args:
-        executable: /bin/bash
+      command: "rsync -aq {{ matomo_private }}/matomo/ {{ matomo_html }}/"
       become: true
       become_user: "{{ matomo_user }}"
 
     - name: Matomo database upgraded
-      shell: php console --no-ansi -n core:update --yes
+      command: php console --no-ansi -n core:update --yes
       args:
-        executable: /bin/bash
         chdir: "{{ matomo_html }}"
       become: true
       become_user: "{{ matomo_user }}"
