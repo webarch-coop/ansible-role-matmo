@@ -6,6 +6,10 @@ This repository contains an Ansible role for installing and upgrading
 [Matomo](https://matomo.org/) servers using the command line and web based
 installer.
 
+See the [defaults](defaults/main.yml) for the default options, please use a
+[release tag](https://git.coop/webarch/matomo/-/releases) in your
+`requirements.yml` file if you use this role.
+
 By default only these tasks are run:
 
 ```
