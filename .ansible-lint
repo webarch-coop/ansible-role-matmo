@@ -5,13 +5,5 @@ skip_list:
   - "204"
   # rsync used in place of synchronize module
   - "303"
-  # Commands should not change things if nothing needs doing
-  # - "301"
-  # chown used in place of argument owner to file module
-  -#  "302"
-  # Shells that use pipes should set the pipefail option
-  # - "306"
-  # Tasks that run when changed should likely be handlers
-  # - "503"
 # vim: syntax=yaml
 ...
