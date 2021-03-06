@@ -59,8 +59,8 @@ user_present.yml
 
 Since a users password is needed to generate a `token_auth` which is in turn
 needed to automatically configure the Matomo WordPress plugin this role will
-optionally store a record of passwords (but doesn't prevent using from changing
-them) and reset them when needs be in a YAML file format based on the results
+optionally store a record of passwords (but doesn't prevent users from changing
+them) and resets them when needs be, in a YAML file format based on the results
 of the `UsersManager.getUsersPlusRole` API method:
 
 ```yml
