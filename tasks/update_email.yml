@@ -1,0 +1,148 @@
+---
+- name: Update Matomo user account email address
+  block:
+
+    - name: Check variables
+      assert:
+        that:
+          - ( matomo_login is defined ) and ( matomo_login is regex("^[a-zA-Z0-9-]{2,14}$") )
+          - ( matomo_login_email is defined ) and ( matomo_login_email is regex("^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$") )
+          - ( matomo_accounts_file is defined )
+          - ( matomo_url is defined )
+          - ( matomo_token_auth is defined )
+
+    - name: "Get the existing email address for the Matomo {{ matomo_login }} user using the API"
+      uri:
+        url: "{{ matomo_url }}"
+        method: POST
+        body_format: form-urlencoded
+        body:
+          module: API
+          format: JSON
+          token_auth: "{{ matomo_token_auth }}"
+          method: UsersManager.getUser
+          userLogin: "{{ matomo_login }}"
+        status_code: 200
+        return_content: true
+      register: matomo_api_get_user
+      changed_when: false
+      failed_when: ( matomo_api_get_user.json is not defined ) or ( matomo_api_get_user.json.result is defined and matomo_api_get_user.json.result == "error" )
+
+    - name: Debug matomo_api_get_user
+      debug:
+        var: matomo_api_get_user
+        verbosity: 2
+
+    - name: Set a variable for the existing email address
+      set_fact:
+        matomo_login_email_existing: "{{ matomo_api_get_user.json.email }}"
+
+    - name: "Update the email address for {{ matomo_login }} using the API"
+      uri:
+        url: "{{ matomo_url }}"
+        method: POST
+        body_format: form-urlencoded
+        body:
+          module: API
+          format: JSON
+          token_auth: "{{ matomo_token_auth }}"
+          passwordConfirmation: "{{ matomo_password }}"
+          method: UsersManager.updateUser
+          userLogin: "{{ matomo_login }}"
+          email: "{{ matomo_login_email }}"
+        status_code: 200
+        return_content: true
+      register: matomo_api_update_user_email
+      changed_when: ( matomo_api_update_user_email.json is defined ) and ( matomo_api_update_user_email.json.result == "success" )
+      failed_when: ( matomo_api_update_user_email.json is not defined ) or ( matomo_api_update_user_email.json is defined and matomo_api_update_user_email.json.result == "error" )
+
+    - name: Debug matomo_api_update_user_email
+      debug:
+        var: matomo_api_update_user_email
+        verbosity: 2
+
+    - name: "Stat {{ matomo_accounts_file }}"
+      stat:
+        path: "{{ matomo_accounts_file }}"
+      register: matomo_accounts_file_path
+
+    - name: Update the email address in the matomo_accounts_file
+      block:
+
+        - name: Set the matomo_account_login_password to an empty variable
+          set_fact:
+            matomo_account_login_password: ""
+
+        - name: "Slurp account information from {{ matomo_accounts_file }}"
+          slurp:
+            src: "{{ matomo_accounts_file }}"
+          register: matomo_accounts_file_b64encoded
+
+        - name: "Set a fact for the account details in {{ matomo_accounts_file }}"
+          set_fact:
+            matomo_accounts: "{{ matomo_accounts_file_b64encoded.content | b64decode | from_yaml | list }}"
+
+        - name: Debug matomo_accounts
+          debug:
+            var: matomo_accounts
+            verbosity: 2
+
+        - name: Set a fact for the matomo_login_password
+          set_fact:
+            matomo_account_login_password: "{{ matomo_account.password }}"
+          when: matomo_account.login == matomo_login
+          loop: "{{ matomo_accounts }}"
+          loop_control:
+            loop_var: matomo_account
+
+        - name: "Remove the account details for {{ matomo_login }} with {{ matomo_login_email_existing }} from {{ matomo_accounts_file }}"
+          blockinfile:
+            path: "{{ matomo_accounts_file }}"
+            block: ""
+            marker: "# {{ matomo_login }} <{{ matomo_login_email_existing }}> {mark}"
+            mode: 0600
+            owner: "{{ matomo_user }}"
+            group: "{{ matomo_group }}"
+
+        - name: "Matomo login, email address and password for {{ matomo_login }} present in {{ matomo_accounts_file }}"
+          blockinfile:
+            path: "{{ matomo_accounts_file }}"
+            block: |
+              - login: {{ matomo_login | quote }}
+                email: {{ matomo_login_email | quote }}
+                password: {{ matomo_account_login_password | quote }}
+            marker: "# {{ matomo_login }} <{{ matomo_login_email }}> {mark}"
+            mode: 0600
+            owner: "{{ matomo_user }}"
+            group: "{{ matomo_group }}"
+          when: matomo_account_login_password | length > 0
+
+        - name: Set matomo_login_existing and include the update password tasks as the password couldn't be read from the matomo_accounts_file
+          block:
+
+            - name: "Set the matomo_login_existing variable to {{ matomo_login }}"
+              set_fact:
+                matomo_login_existing: "{{ matomo_login }}"
+
+            - name: Include the check password tasks
+              include_tasks: update_password.yml
+
+          when: matomo_account_login_password | length == 0
+
+      when:
+        - ( matomo_accounts_file is defined ) and ( matomo_accounts_file | length > 0 )
+        - ( matomo_accounts_file_path is defined ) and ( matomo_accounts_file_path.stat.exists )
+
+    - name: "Email address update notification email sent to {{ matomo_login_email }}"
+      mail:
+        from: "{{ matomo_email_from | default('Webarchitects') | quote }} <root@{{ inventory_hostname }}>"
+        to: "{{ matomo_login_email }}"
+        subject: "[{{ matomo_email_subject_tag | default('webarchitects') }}] Matomo email address updated for {{ matomo_login }} on {{ matomo_url }}"
+        headers: "{{ matomo_notify_headers }}"
+        # https://github.com/ansible/ansible/issues/58543
+        charset: us-ascii
+        body: "{{ lookup('template', 'notify_matomo_email.j2') }}"
+        host: localhost
+        port: 25
+        secure: never
+...

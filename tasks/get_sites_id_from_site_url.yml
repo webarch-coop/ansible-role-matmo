@@ -1,0 +1,29 @@
+---
+- name: Get existing Matomo site IDs from proposed URLs using the results of a SitesManager.getAllSites API query
+  block:
+
+    - name: Check that required variables are defined
+      assert:
+        that:
+          - ( matomo_url is defined ) and ( matomo_url | length > 0 )
+          - ( matomo_token_auth is defined ) and ( matomo_token_auth | length > 0 )
+          - ( matomo_get_all_sites.json is defined ) and ( matomo_get_all_sites.json | length > 0 )
+          - ( matomo_proposed_url is defined ) and ( matomo_proposed_url is regex("^http:\/\/.*$") )
+
+    - name: Loop thought the existing sites checking if the proposed URL is assigned to an existing Matomo site
+      include_tasks: check_main_url.yml
+      vars:
+        matomo_existing_id: "{{ site.idsite }}"
+        matomo_existing_main_urls: "{{ site.main_url.split(', ') }}"
+      loop: "{{ matomo_get_all_sites.json }}"
+      loop_control:
+        loop_var: site
+
+    - name: Debug matomo_existing_site_ids
+      debug:
+        var: matomo_existing_site_ids
+        verbosity: 2
+
+  tags:
+    - matomo
+...

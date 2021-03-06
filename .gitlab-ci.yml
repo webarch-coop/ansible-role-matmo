@@ -1,11 +1,16 @@
 ---
-image: registry.git.coop/webarch/containers/images/ansible:0.3
-
+image: registry.git.coop/webarch/containers/images/ansible:0.5.0
+variables:
+  PY_COLORS: "1"
+  ANSIBLE_FORCE_COLOR: "1"
+before_script:
+  - chmod 700 $(pwd)
 stages:
-  - check
-
-ansible-lint:
-  stage: check
+  - lint
+lint:
+  stage: lint
   script:
     - yamllint .
+    - molecule lint
+# vim: syntax=yaml
 ...

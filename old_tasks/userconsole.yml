@@ -4,6 +4,7 @@
   git:
     repo: https://github.com/digitalist-se/userconsole.git
     dest: "{{ matomo_html }}/plugins/UserConsole"
+    version: "{{ matomo_userconsole_version }}"
     clone: true
     update: true
     depth: 1
@@ -18,6 +19,7 @@
     executable: /bin/bash
     chdir: "{{ matomo_html }}"
   register: matomo_userconsole
+  ignore_errors: true
   changed_when: '"Activated plugin UserConsole" in matomo_userconsole.stdout'
   become: true
   become_user: "{{ matomo_user }}"

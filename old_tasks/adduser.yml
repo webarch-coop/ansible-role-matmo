@@ -1,0 +1,133 @@
+---
+- name: Add Matomo user using the API
+  block:
+
+    - name: Check variables
+      assert:
+        that:
+          - ( matomo_login is defined ) and ( matomo_login is regex("^[a-zA-Z0-9-]{2,14}$")
+          - ( matomo_login_email is defined ) and ( matomo_login_email is regex("^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$") )
+          - ( matomo_token_auth is defined )
+          - ( matomo_password is defined )
+          - ( matomo_url is defined )
+
+    - name: "Check if a Matomo account with email set to {{ matomo_login_email }} exists"
+      uri:
+        url: "{{ matomo_url }}"
+        method: POST
+        body_format: form-urlencoded
+        body:
+          module: API
+          format: JSON
+          token_auth: "{{ matomo_token_auth }}"
+          method: UsersManager.userEmailExists
+          userEmail: "{{ matomo_login_email }}"
+      register: matomo_api_user_email_exists
+
+    - name: Debug matomo_api_user_email_exists
+      debug:
+        var: matomo_api_user_email_exists
+        verbosity: 2
+
+    - name: "Set a variable based on the presence of a Matomo account with the email address {{ matomo_login_email }}"
+      set_fact:
+        matomo_login_email_present: "{{ matomo_api_user_email_exists.json.value }}"
+      when:
+        - not matomo_api_user_email_exists.failed
+        - matomo_api_user_email_exists.json is defined
+
+#    - name: "Check the if a Matomo account with the login {{ matomo_login }} exists"
+#      uri:
+#        url: "{{ matomo_url }}"
+#        method: POST
+#        body_format: form-urlencoded
+#        body:
+#          module: API
+#          format: JSON
+#          token_auth: "{{ matomo_token_auth }}"
+#          method: UsersManager.userExists
+#          userLogin: "{{ matomo_login }}"
+#      register: matomo_api_user_exists
+#
+#    - name: Debug matomo_api_user_exists
+#      debug:
+#        var: matomo_api_user_exists
+#        verbosity: 2
+
+    - name: When a Matomo account with the same email address already exists
+      block:
+
+        - name: Get the existing Matomo login using the API
+          uri:
+            url: "{{ matomo_url }}"
+            method: POST
+            body_format: form-urlencoded
+            body:
+              module: API
+              format: JSON
+              token_auth: "{{ matomo_token_auth }}"
+              method: UsersManager.getUserLoginFromUserEmail
+              userEmail: "{{ matomo_login_email }}"
+          register: matomo_api_get_user_login_from_user_email
+
+        - name: Debug matomo_api_get_user_login_from_user_email
+          debug:
+            var: matomo_api_get_user_login_from_user_email
+            verbosity: 2
+
+        - name: Debug fail
+          fail:
+            msg: Debug
+
+        - name: "Set a variable based on Matomo username for {{ matomo_login_email }}"
+          set_fact:
+            matomo_login: "{{ matomo_login_check.stdout }}"
+          when: matomo_login_check is defined
+
+      when: ( matomo_login_email == matomo_login_email_present ) and ( matomo_login_email_present )
+
+    - name: When a Matomo account with the same email address doesn't exist
+      block:
+
+        - name: "Check the if the Matomo {{ matomo_login }} account exists using the API"
+          uri:
+            url: "{{ matomo_url }}"
+            method: POST
+            body_format: form-urlencoded
+            body:
+              module: API
+              format: JSON
+              token_auth: "{{ matomo_token_auth }}"
+              method: UsersManager.userExists
+              userLogin: "{{ matomo_login }}"
+          register: matomo_api_user_exists
+
+        - name: Debug matomo_api_user_exists
+          debug:
+            var: matomo_api_user_exists
+            verbosity: 2
+
+        - name: "Set a variable based on the presence of the Matomo {{ matomo_login }} account"
+          set_fact:
+            matomo_login_present: "{{ matomo_api_user_exists.json.value }}"
+          when:
+            - not matomo_api_user_exists.failed
+            - matomo_api_user_exists.json is defined
+
+        - name: Debug fail
+          fail:
+            msg: Debug
+
+        - name: Add Matomo user
+          include_tasks: newuser.yml
+          when: ( matomo_login_present is defined ) and ( not matomo_login_present )
+
+        - name: Check and update Matomo user
+          include_tasks: updateuser.yml
+          when: ( matomo_login_present is defined ) and ( matomo_login_present )
+
+      when: ( matomo_login_email_present is defined ) and ( not matomo_login_email_present )
+
+  tags:
+    - matomo
+...

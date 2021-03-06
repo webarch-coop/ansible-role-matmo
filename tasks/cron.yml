@@ -1,74 +1,10 @@
 ---
-# If ~/bin/README.md exists then assume the users is chrooted and
-# can't create a regular cron job, see
-# https://git.coop/webarch/users/blob/dev/tasks/crontab_user_present.yml
-
-- name: "Stat {{ matomo_home }}/bin"
-  stat:
-    path: "{{ matomo_home }}/bin"
-  register: matomo_bin
-  tags:
-    - matomo
-
-- name: "When {{ matomo_home }}/bin exists"
-  block:
-
-    - name: "Stat {{ matomo_home }}/bin/README.md"
-      stat:
-        path: "{{ matomo_home }}/bin/README.md"
-      register: matomo_bin_readme
-      when: matomo_bin.stat.isdir
-
-    - name: Cron job setup for chrooted user
-      block:
-
-        - name: "Stat {{ matomo_home }}/bin/cron_hourly.sh"
-          stat:
-            path: "{{ matomo_home }}/bin/cron_hourly.sh"
-          register: matomo_bin_cron_hourly
-
-        - name: "Blank cron_hourly.sh template in place"
-          template:
-            src: templates/cron_hourly.sh.j2
-            dest: "{{ matomo_home }}/bin/cron_hourly.sh"
-            owner: "{{ matomo_user }}"
-            group: "{{ matomo_group }}"
-            mode: "0750"
-          when: ( matomo_bin_cron_hourly is defined ) and ( matomo_bin_cron_hourly.stat.exists == False )
-
-        - name: "Archive job added to {{ matomo_home }}/bin/cron_hourly.sh script for {{ matomo_user }}"
-          lineinfile:
-            path: "{{ matomo_home }}/bin/cron_hourly.sh"
-            line: "cd {{ matomo_html }} ; php console core:archive --url={{ matomo_url }} > {{ matomo_logs }}/matomo-archive.log"
-            state: present
-            insertbefore: "^# END ANSIBLE SCRIPTS"
-            firstmatch: true
-            create: false
-            owner: "{{ matomo_user }}"
-            group: "{{ matomo_group }}"
-            mode: "0750"
-
-      when: ( matomo_bin_readme is defined ) and ( matomo_bin_readme.stat.exists )
-      tags:
-        - matomo
-
-  when: ( matomo_bin is defined ) and ( matomo_bin.stat.exists )
-  tags:
-    - matomo
-
-- name: Debug
-  debug:
-    msg: "matomo_bin_readme: {{ matomo_bin_readme }}"
-    verbosity: 1
-  tags:
-    - matomo
-
 - name: "Archive cron job present for {{ matomo_user }}"
   cron:
     name: "Matomo Archiving"
+    user: "{{ matomo_user }}"
     minute: "{{ 59 | random }}"
-    job: "cd {{ matomo_html }} ; php console core:archive --url={{ matomo_url }} > {{ matomo_logs }}/matomo-archive.log"
-  when: matomo_bin_readme.skipped
+    job: "cd {{ matomo_html }} && php console core:archive --force-all-websites > {{ matomo_logs }}/matomo-archive.log && php core:run-scheduled-tasks > {{ matomo_logs }}/matomo-archive.log"
   tags:
     - matomo
 ...

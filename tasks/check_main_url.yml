@@ -1,0 +1,52 @@
+---
+- name: add site ID to matomo_existing_site_ids array if matomo_proposed_url is in matomo_existing_main_urls
+  block:
+
+    - name: Check that required variables are defined
+      assert:
+        that:
+          - ( matomo_url is defined ) and ( matomo_url | length > 0 )
+          - ( matomo_token_auth is defined ) and ( matomo_token_auth | length > 0 )
+          - ( matomo_get_all_sites.json is defined ) and ( matomo_get_all_sites.json | length > 0 )
+          - ( matomo_proposed_url is defined ) and ( matomo_proposed_url is regex("^http:\/\/.*$") )
+          - ( matomo_existing_id is defined ) and ( matomo_existing_id is regex("^[0-9]{1,6}$") )
+          - ( matomo_existing_main_urls is defined ) and ( matomo_existing_main_urls[0] is defined )
+
+    - name: Debug matomo_existing_main_urls
+      debug:
+        var: matomo_existing_main_urls
+        verbosity: 2
+
+    - name: Debug matomo_proposed_url
+      debug:
+        var: matomo_proposed_url
+        verbosity: 2
+
+    - name: Debug Loop thought the matomo_existing_main_urls
+      debug:
+        msg:
+          - "matomo_existing_id: {{ matomo_existing_id }}"
+          - "url: {{ url }}"
+          - "matomo_proposed_url: {{ matomo_proposed_url }}"
+      loop: "{{ matomo_existing_main_urls }}"
+      loop_control:
+        loop_var: url
+
+    - name: Loop thought the matomo_existing_main_urls
+      set_fact:
+        matomo_existing_site_ids: "{{ matomo_existing_site_ids | default([]) }} + [ '{{ site.idsite }}' ]"
+      when:
+        - ( matomo_proposed_url == url )
+        - ( matomo_existing_id not in matomo_existing_site_ids )
+      loop: "{{ matomo_existing_main_urls }}"
+      loop_control:
+        loop_var: url
+
+    - name: Debug matomo_existing_site_ids
+      debug:
+        var: matomo_existing_site_ids
+        verbosity: 2
+
+  tags:
+    - matomo
+...

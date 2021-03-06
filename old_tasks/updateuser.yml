@@ -1,0 +1,168 @@
+---
+- name: Update Matomo user
+  block:
+
+    - name: "Get the existing email address for the Matomo {{ matomo_login }} user using the API"
+      uri:
+        url: "{{ matomo_url }}"
+        method: POST
+        body_format: form-urlencoded
+        body:
+          module: API
+          format: JSON
+          token_auth: "{{ matomo_token_auth }}"
+          method: UsersManager.getUser
+          userLogin: "{{ matomo_login }}"
+      register: matomo_api_get_user
+
+    - name: Debug matomo_api_get_user
+      debug:
+        var: matomo_api_get_user
+        verbosity: 2
+
+    - name: Set a variable for the existing email address
+      set_fact:
+        matomo_old_login_email: "{{ matomo_api_get_user.json.email }}"
+
+    - name: Update the email address
+      block:
+
+        - name: "Update the email address for {{ matomo_login }} using the API"
+          uri:
+            url: "{{ matomo_url }}"
+            method: POST
+            body_format: form-urlencoded
+            body:
+              module: API
+              format: JSON
+              token_auth: "{{ matomo_token_auth }}"
+              method: UsersManager.updateUser
+              userLogin: "{{ matomo_login }}"
+              email: "{{ matomo_login_email }}"
+          register: matomo_api_update_user_email
+
+        - name: Debug matomo_api_update_user_email
+          debug:
+            var: matomo_api_update_user_email
+            verbosity: 2
+
+        - name: "Email address update notification email sent to {{ matomo_login_email }}"
+          mail:
+            from: "{{ matomo_email_from | default('Webarchitects') }} <root@{{ inventory_hostname }}>"
+            to: "{{ matomo_login_email }}"
+            subject: "[{{ matomo_email_subject_tag | default('webarchitects') }}] Matomo email address updated for {{ matomo_login }} on {{ matomo_url }}"
+            headers: "{{ matomo_notify_headers }}"
+            # https://github.com/ansible/ansible/issues/58543
+            charset: us-ascii
+            body: "{{ lookup('template', 'templates/notify_matomo_email.j2') }}"
+            host: localhost
+            port: 25
+            secure: never
+
+      when: matomo_login_email != matomo_old_login_email
+
+    - name: Matomo account password notification
+      block:
+
+        - name: "Check for existance of {{ matomo_login_home }}/.notify_matomo_passwd file"
+          stat:
+            path: "{{ matomo_login_home }}/.notify_matomo_passwd"
+          register: matomo_passwd_notify_check
+
+        - name: Password notification
+          block:
+
+            - name: Generate a random string for Matomo password
+              command: pwgen -n 20 1
+              register: matomo_login_password_gen
+              no_log: true
+
+            - name: Set a variable with the random password
+              set_fact:
+                matomo_login_password: "{{ matomo_login_password_gen.stdout }}"
+              no_log: true
+
+            - name: "Reset the password for {{ matomo_login }} using the API"
+              uri:
+                url: "{{ matomo_url }}"
+                method: POST
+                body_format: form-urlencoded
+                body:
+                  module: API
+                  format: JSON
+                  token_auth: "{{ matomo_token_auth }}"
+                  method: UsersManager.updateUser
+                  userLogin: "{{ matomo_login }}"
+                  password: "{{ matomo_login_password }}"
+                  passwordConfirmation: "{{ matomo_login_password }}"
+              register: matomo_api_update_user_password
+
+            - name: Debug matomo_api_update_user_password
+              debug:
+                var: matomo_api_update_user_password
+                verbosity: 2
+
+            - name: Fail if password reset generated an error
+              fail:
+                msg: "{{ matomo_api_update_user_password.json.message }}"
+              when: matomo_api_update_user_password.json.result == "error"
+
+            - name: Save the password to the matomo_password_file path if it is defined
+              block:
+
+                - name: "Ensure that the {{ matomo_password_file }} exists"
+                  blockinfile:
+                    path: "{{ matomo_password_file }}"
+                    block: |
+                      ---
+                      matomo_email_addresses:
+                    insertbefore: BOF
+                    marker: "# Ansible managed Matomo email addresses {mark}"
+                    mode: 0600
+                    owner: root
+                    group: root
+
+                - name: "Password for {{ matomo_login_email }} present in {{ matomo_password_file }}"
+                  blockinfile:
+                    path: "{{ matomo_password_file }}"
+                    block: |
+                      - email: {{ matomo_login_email }}
+                        password: {{ matomo_login_password }}
+                    marker: "# {{ matomo_login_email }} {mark}"
+                    mode: 0600
+                    owner: root
+                    group: root
+
+              when: ( matomo_password_file is defined ) and ( matomo_password_file | length > 0 )
+
+            - name: "Password notification email sent to {{ matomo_login_email }}"
+              mail:
+                from: "{{ matomo_email_from | default('Webarchitects') }} <root@{{ inventory_hostname }}>"
+                to: "{{ matomo_login_email }}"
+                subject: "[{{ matomo_email_subject_tag | default('webarchitects') }}] Matomo {{ matomo_login }} account details for {{ matomo_url }}"
+                headers: "{{ matomo_notify_headers }}"
+                charset: us-ascii
+                body: "{{ lookup('template', 'templates/notify_matomo_passwd.j2') }}"
+                host: localhost
+                port: 25
+                secure: never
+
+            - name: "Notification date recorded in {{ matomo_login_home }}/.notify_matomo_passwd file"
+              lineinfile:
+                path: "{{ matomo_login_home }}/.notify_matomo_passwd"
+                line: "{{ lookup('pipe', 'date +%Y-%m-%d-%H-%M-%S') }} : {{ matomo_login }} <{{ matomo_login_email }}>"
+                create: true
+                state: present
+                insertafter: EOF
+                owner: root
+                group: "{{ matomo_login }}"
+                mode: 0640
+              when: ( matomo_login_home is defined ) and ( matomo_login_home | length > 0 )
+
+          when: not matomo_passwd_notify_check.stat.exists
+
+      when: ( matomo_notify_passwd ) and ( matomo_login_home is defined ) and ( matomo_login_home | length > 0 )
+
+  tags:
+    - matomo
+...

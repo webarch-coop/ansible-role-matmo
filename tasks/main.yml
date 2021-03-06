@@ -1,87 +1,9 @@
 ---
-- name: Include variables checks
-  include_tasks: check_variables.yml
-  tags:
-    - matomo
-
-- name: Only install or upgrade Matomo if the user account exists
+- name: Install, configure and upgrade Matomo
   block:
 
-    - name: Required directories present
-      file:
-        path: "{{ matomo_home }}/{{ dir }}"
-        state: directory
-        owner: "{{ matomo_user }}"
-        group: "{{ matomo_user }}"
-        mode: 0700
-      loop:
-        - .ansible
-        - .gnupg
-      loop_control:
-        loop_var: dir
-
-    # https://builds.piwik.org/signature.asc
-    - name: The Matomo GPG public key is present
-      copy:
-        src: files/matomo.pub
-        dest: "{{ matomo_private }}/matomo.pub"
-      become: true
-      become_user: "{{ matomo_user }}"
-
-    - name: The Matomo GPG public key is imported
-      command: "gpg --no-tty --import {{ matomo_private }}/matomo.pub"
-      register: matomo_gpg_key_import
-      changed_when: "'not changed' not in matomo_gpg_key_import.stderr"
-      become: true
-      become_user: "{{ matomo_user }}"
-
-    # https://github.com/web-flow.gpg
-    - name: The GitHub GPG public key is present
-      copy:
-        src: files/github.pub
-        dest: "{{ matomo_private }}/github.pub"
-      become: true
-      become_user: "{{ matomo_user }}"
-
-    - name: The GitHub GPG public key is imported
-      command: "gpg --no-tty --import {{ matomo_private }}/github.pub"
-      register: matomo_gh_gpg_key_import
-      changed_when: "'not changed' not in matomo_gh_gpg_key_import.stderr"
-      become: true
-      become_user: "{{ matomo_user }}"
-
-    # Set matomo_latest to the latest available version of Matomo
-    - name: Include latest version check
-      include_tasks: check_latest_version.yml
-
-    - name: Set the matomo_required variable
-      set_fact:
-        matomo_required: "{% if matomo_autoupdate %}{{ matomo_latest }}{% else %}{{ matomo_version }}{% endif %}"
-
-    - name: Check for config.ini.php
-      stat:
-        path: "{{ matomo_html }}/config/config.ini.php"
-      register: matomo_config_check
-
-    - name: Check if Matomo is installed
-      command: php console config:get -s database --no-ansi -n
-      args:
-        chdir: "{{ matomo_html }}"
-      register: matomo_config_database
-      when: ( matomo_config_check is defined ) and ( matomo_config_check.stat.exists )
-      become: true
-      become_user: "{{ matomo_user }}"
-
-    - name: Include install tasks
-      include_tasks: install.yml
-      when: ( not matomo_config_check.stat.exists ) or ( "Looks like section database does not exist" in matomo_config_database.stdout_lines )
-
-    # Set matomo_installed to the installed version of Matomo
-    - name: Include version check
-      include_tasks: check_version.yml
-      when:
-        - ( matomo_config_check is defined ) and ( matomo_config_check.stat.exists )
-        - ( matomo_config_database is defined ) and ( "Looks like section database does not exist" not in matomo_config_database.stdout_lines )
+    - name: Include variables checks
+      include_tasks: check_variables.yml
 
     - name: Matomo upgrade
       block:
@@ -99,34 +21,33 @@
         - name: Warn if the installed version is older than the latest version
           debug:
             msg: "The installed Matomo version {{ matomo_installed }}, is older than the latest Matomo {{ matomo_required }}."
-          when:
-            - ( matomo_installed is version(matomo_latest, '<') )
+          when: matomo_installed is version(matomo_latest, '<')
 
         - name: Warn if the installed version is newer than the required version
           debug:
             msg: "Downgrading from the installed Matomo version {{ matomo_installed }}, to the required version, Matomo {{ matomo_required }}, is not supported so has been skipped."
-          when:
-            - ( matomo_installed is version(matomo_required, '>') )
+          when: matomo_installed is version(matomo_required, '>')
 
         - name: Include upgrade tasks
           include_tasks: upgrade.yml
-          when:
-            - ( matomo_autoupdate ) or ( matomo_installed is version(matomo_required, '<') )
+          when: ( matomo_autoupdate ) or ( matomo_installed is version(matomo_required, '<') )
 
-      when:
-        - ( matomo_autoupdate is defined ) and ( matomo_installed is defined) and ( matomo_required is defined )
-        - ( matomo_config_database is defined ) and ( "Looks like section database does not exist" not in matomo_config_database.stdout_lines )
-      tags:
-        - matomo
+      when: ( matomo_autoupdate is defined ) and ( matomo_installed is defined) and ( matomo_required is defined )
+
+    - name: Include install tasks
+      include_tasks: install.yml
+      when: ( matomo_config_check is defined ) and ( not matomo_config_check.stat.exists )
+
+    - name: Include geolocation tasks
+      include_tasks: geolocation.yml
+
+    - name: Include settings tasks
+      include_tasks: settings.yml
 
     - name: Include cron tasks
       include_tasks: cron.yml
       when: ( matomo_cron is defined ) and ( matomo_cron )
 
-    - name: Include settings tasks
-      include_tasks: settings.yml
-
-  when: '"no such user" not in matomo_user_check.stderr'
   tags:
     - matomo
 ...

@@ -20,7 +20,7 @@
   loop:
     - "symfony/process:^3.4"
     - "symfony/yaml:~2.6.0"
-    - "davaxi/sparkline:dev-multiple-series"
+    # - "davaxi/sparkline:dev-multiple-series"
   loop_control:
     loop_var: pkg
   tags:
@@ -30,6 +30,7 @@
   git:
     repo: https://github.com/digitalist-se/extratools.git
     dest: "{{ matomo_html }}/plugins/ExtraTools"
+    version: "{{ matomo_extratools_version }}"
     clone: true
     update: true
     depth: 1

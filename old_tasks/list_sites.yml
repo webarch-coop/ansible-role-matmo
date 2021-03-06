@@ -1,0 +1,42 @@
+---
+- name: Get all Matomo sites
+  block:
+
+    - name: Get all the sites in JSON format using the API
+      uri:
+        url: "{{ matomo_url }}"
+        method: POST
+        body_format: form-urlencoded
+        body:
+          module: API
+          format: JSON
+          token_auth: "{{ matomo_token_auth }}"
+          method: SitesManager.getAllSites
+      register: matomo_api_get_all_sites
+
+    - name: Debug matomo_api_get_all_sites
+      debug:
+        var: matomo_api_get_all_sites
+        verbosity: 2
+
+    - name: Set matomo_sites_names to an empty array
+      set_fact:
+        matomo_sites_names: []
+
+    - name: Set an array for the Matomo site names
+      set_fact:
+        matomo_sites_names: "{{ matomo_sites_names }} + [ '{{ site.name }}' ]"
+      loop: "{{ matomo_api_get_all_sites.json }}"
+      loop_control:
+        loop_var: site
+        label: "{{ site.idsite }}"
+
+    - name: Print the Matomo site names
+      debug:
+        msg:
+          - "Matomo site names: {{ matomo_sites_names }}"
+        verbosity: 2
+
+  tags:
+    - matomo
+...

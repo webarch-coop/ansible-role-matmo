@@ -1,0 +1,19 @@
+---
+- name: Get Matomo site id
+  block:
+
+    - name: "Update the matomo_sites list"
+      include_tasks: list_sites.yml
+
+    - name: "Get the idsite for {{ matomo_site_name }}"
+      set_fact:
+        matomo_idsite: "{{ site.idsite }}"
+      when: site.name == matomo_site_name
+      loop: "{{ matomo_api_get_all_sites.json }}"
+      loop_control:
+        loop_var: site
+        label: "{{ site.name }}"
+
+  tags:
+    - matomo
+...

@@ -1,5 +1,8 @@
+---
 extends: default
-
+yaml-files:
+  - '*.yaml'
+  - '*.yml'
 rules:
   braces:
     max-spaces-inside: 1
@@ -8,3 +11,6 @@ rules:
     max-spaces-inside: 1
     level: error
   line-length: disable
+  comments-indentation: disable
+# vim: syntax=yaml
+...

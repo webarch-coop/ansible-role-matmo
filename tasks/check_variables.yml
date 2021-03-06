@@ -1,86 +1,109 @@
 ---
-- name: Check that the matomo_users variable is defined
-  assert:
-    that:
-      - ( matomo_user is defined ) and ( matomo_user is regex("^[a-z0-9]*$") )
-  tags:
-    - matomo
+- name: Check variables
+  block:
 
-- name: "Check if the Matomo {{ matomo_user }} user account exists"
-  shell: "id {{ matomo_user }} && echo true || echo false"
-  check_mode: false
-  register: matomo_user_check
-  changed_when: '"no such user" in matomo_user_check.stderr'
-  tags:
-    - matomo
+    - name: Check that the matomo_users variable is defined
+      assert:
+        that:
+          - ( matomo_user is defined ) and ( matomo_user is regex("^[a-z0-9]*$") )
 
-- name: "Check that the required directory variables are defined for {{ matomo_user }}"
-  assert:
-    that:
-      - matomo_home is defined
-      - matomo_html is defined
-      - matomo_private is defined
-      - matomo_logs is defined
-  tags:
-    - matomo
+    - name: "Populate the getent_passwd array for {{ inventory_hostname }}"
+      getent:
+        database: passwd
+        split: ':'
 
-- name: "Stat directories for {{ matomo_user }}"
-  stat:
-    path: "{{ path }}"
-  loop:
-    - "{{ matomo_home }}"
-    - "{{ matomo_html }}"
-    - "{{ matomo_private }}"
-    - "{{ matomo_logs }}"
-  register: matomo_dirs
-  loop_control:
-    loop_var: path
-    label: "{{ path }}"
-  tags:
-    - matomo
+    - name: "Fail if the {{ matomo_user }} user account doesn't exist"
+      fail:
+        msg: "The {{ matomo_user }} user account doesn't exist on {{ inventory_hostname }}"
+      when: matomo_user not in getent_passwd
 
-- name: "Print the results of the directory checks for {{ matomo_user }}"
-  debug:
-    msg: "Stat results: {{ stat }}"
-    verbosity: 1
-  loop: "{{ matomo_dirs.results }}"
-  loop_control:
-    loop_var: stat
-    label: "{{ stat.path }}"
-  tags:
-    - matomo
+    - name: "Check that the required directory variables are defined for {{ matomo_user }}"
+      assert:
+        that:
+          - matomo_home is defined
+          - matomo_html is defined
+          - matomo_private is defined
+          - matomo_logs is defined
 
-- name: "Fail if any of the directories for {{ matomo_user }} don't exist"
-  fail:
-    msg: "The directory {{ dir.stat.path }} needs to exist"
-  when: dir.stat.isdir == False
-  loop: "{{ matomo_dirs.results }}"
-  loop_control:
-    loop_var: dir
-    label: "{{ dir.path }}"
-  tags:
-    - matomo
+    - name: "Stat directories for {{ matomo_user }}"
+      stat:
+        path: "{{ path }}"
+      loop:
+        - "{{ matomo_home }}"
+        - "{{ matomo_html }}"
+        - "{{ matomo_private }}"
+        - "{{ matomo_logs }}"
+      register: matomo_dirs
+      loop_control:
+        loop_var: path
+        label: "{{ path }}"
 
-# Additional check on the values of these variables could be added below
-- name: "Check that required variables are defined for {{ matomo_user }}"
-  assert:
-    that:
-      - ( matomo_db_username is defined )
-      - ( matomo_db_host is defined )
-      - ( matomo_dbname is defined )
-      - ( matomo_url is defined )
-      - ( matomo_first_site_name is defined )
-      - ( matomo_first_site_url is defined )
-      - ( matomo_first_user is defined )
-      - ( matomo_first_user_email is defined )
-      - ( matomo_notify_passwd is defined )
-      - ( matomo_notify_from is defined )
-      - ( matomo_notify_reply_to is defined )
-      - ( matomo_notify_headers is defined )
-      - ( matomo_notify_subject_tag is defined )
-      - ( matomo_notify_passwd_signature is defined )
-      - ( matomo_git is defined )
-      - ( matomo_autoupdate is defined )
+    - name: "Print the results of the directory checks for {{ matomo_user }}"
+      debug:
+        msg: "Stat results: {{ stat }}"
+        verbosity: 1
+      loop: "{{ matomo_dirs.results }}"
+      loop_control:
+        loop_var: stat
+        label: "{{ stat.path }}"
+
+    - name: "Fail if any of the directories for {{ matomo_user }} don't exist"
+      fail:
+        msg: "The directory {{ dir.stat.path }} needs to exist"
+      when: not dir.stat.isdir
+      loop: "{{ matomo_dirs.results }}"
+      loop_control:
+        loop_var: dir
+        label: "{{ dir.path }}"
+
+    # Additional check on the values of these variables could be added below
+    - name: "Check that required variables are defined for {{ matomo_user }}"
+      assert:
+        that:
+          - ( matomo_db_username is defined )
+          - ( matomo_db_host is defined )
+          - ( matomo_dbname is defined )
+          - ( matomo_url is defined )
+          - ( matomo_first_site_name is defined )
+          - ( matomo_first_site_url is defined )
+          - ( matomo_first_user is defined )
+          - ( matomo_first_user_email is defined )
+          - ( matomo_notify_passwd is defined )
+          - ( matomo_notify_from is defined )
+          - ( matomo_notify_reply_to is defined )
+          - ( matomo_notify_headers is defined )
+          - ( matomo_notify_subject_tag is defined )
+          - ( matomo_notify_passwd_signature is defined )
+          - ( matomo_autoupdate is defined )
+
+    - name: Check for config.ini.php
+      stat:
+        path: "{{ matomo_html }}/config/config.ini.php"
+      register: matomo_config_check
+
+    - name: "Check Matomo version"
+      block:
+
+        - name: Include Matomo version check
+          include_tasks: check_version.yml
+
+        - name: Check that matomo_token_auth and matomo_password are correct if defined
+          include_tasks: check_auth.yml
+          when:
+            - ( matomo_installed is defined ) and ( matomo_installed is version('3.14.1', '>=') )
+            - ( matomo_password is defined ) and ( matomo_password | length > 0 )
+            - ( matomo_token_auth is defined ) and ( matomo_token_auth | length > 0 )
+
+      when: ( matomo_config_check is defined ) and ( matomo_config_check.stat.exists )
+
+    # Set matomo_latest to the latest available version of Matomo
+    - name: Include latest version check
+      include_tasks: check_latest_version.yml
+
+    - name: Set the matomo_required variable
+      set_fact:
+        matomo_required: "{% if matomo_autoupdate %}{{ matomo_latest }}{% else %}{{ matomo_version }}{% endif %}"
+
   tags:
     - matomo
 ...

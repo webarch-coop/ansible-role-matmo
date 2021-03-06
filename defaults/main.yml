@@ -5,12 +5,9 @@ matomo_autoupdate: false
 # The matomo_version is used if matomo_autoupdate is
 # false
 # https://github.com/matomo-org/matomo/releases
-matomo_version: 3.13.5
-# The Extra Tools and User Console plugins are required, these
-# variables can be set to "install", "force" or "skip"
-matomo_extratools: install
-matomo_userconsole: install
-# The system user name for the account (for example www-data)
+matomo_version: 4.2.1
+# The system user name for the account (for example www-data), matomo_user is
+# also used for the Matomo super user acount username
 matomo_user: stats
 matomo_group: "{{ matomo_user }}"
 matomo_home: "/home/{{ matomo_user }}"
@@ -18,17 +15,18 @@ matomo_html: "{{ matomo_home }}/sites/default"
 matomo_private: "{{ matomo_home }}/private"
 matomo_logs: "{{ matomo_private }}"
 matomo_db_username: "{{ matomo_user }}"
-# if matomo_db_pass is not set then it is read from ~/.my.cnf
 matomo_db_pass: ""
 matomo_db_host: localhost
 matomo_dbname: "{{ matomo_user }}"
+matomo_db_prefix: "matomo_"
+matomo_db_adaptor: "PDO\\MYSQL"
 matomo_url: "https://{{ matomo_user }}.{{ inventory_hostname }}/"
 matomo_first_site_name: "{{ inventory_hostname }}"
 matomo_first_site_url: "http://{{ inventory_hostname }}/"
+matomo_first_site_tz: "Europe/London"
 matomo_first_user: "{{ matomo_user }}"
 matomo_first_user_email: "root@{{ inventory_hostname }}"
-# if matomo_first_user_pass is not defined or empty a random one is generated
-matomo_first_user_pass: ""
+matomo_accounts_file: "{{ matomo_private }}/.matomo_accounts.yml"
 # if matomo_notify_passwd is true the random password is sent to matomo_first_user_email
 matomo_notify_passwd: true
 matomo_notify_from: "Webarchitects <root@{{ inventory_hostname }}>"
@@ -38,12 +36,6 @@ matomo_notify_headers:
  - "Reply-To={{ matomo_notify_reply_to }}"
 matomo_notify_subject_tag: webarchitects
 matomo_notify_passwd_signature: Webarch Co-operative Limited\nhttps://www.webarch.coop/
-# The following two variables can be set to force or skip but without these
-# plugins tasks like installing and adding users will not work.
-# matomo_extratools: force
-# matomo_userconsole: force
-# Set to true to download using a git clone rather than the tgz archive
-matomo_git: false
 # Set matomo_cron to true to setup cron archiving
 matomo_cron: false
 ...

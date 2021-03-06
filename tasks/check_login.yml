@@ -1,0 +1,59 @@
+---
+- name: Check if a Matomo login exists when there is no match for the matomo_login_email address
+  block:
+
+    - name: Check variables
+      assert:
+        that:
+          - ( matomo_url is defined )
+          - ( matomo_token_auth is defined )
+          - ( matomo_login is defined ) and ( matomo_login is regex("^[a-zA-Z0-9-]{2,14}$") )
+          - ( matomo_login_email is defined ) and ( matomo_login_email is regex("^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$") )
+
+    - name: "Check if a Matomo login named {{ matomo_login }} exists using the API"
+      uri:
+        url: "{{ matomo_url }}"
+        method: POST
+        body_format: form-urlencoded
+        body:
+          module: API
+          format: JSON
+          token_auth: "{{ matomo_token_auth }}"
+          method: UsersManager.userExists
+          userLogin: "{{ matomo_login }}"
+        status_code: 200
+        return_content: true
+      register: matomo_api_user_exists
+      changed_when: false
+      failed_when: ( matomo_api_user_exists.json is not defined )
+
+    - name: Debug matomo_api_user_exists
+      debug:
+        var: matomo_api_user_exists
+        verbosity: 2
+
+    - name: Tasks when the matomo_login account exists
+      block:
+
+        - name: Update the email address
+          include_tasks: update_email.yml
+
+        - name: "Set the matomo_login_existing variables to {{ matomo_login }}"
+          set_fact:
+            matomo_login_existing: "{{ matomo_login }}"
+
+      when:
+        - ( matomo_api_user_exists.json is defined )
+        - ( matomo_api_user_exists.json.value is defined )
+        - ( matomo_api_user_exists.json.value )
+
+    - name: Add a new user account when there is no match for the matomo_login or matomo_login_email address
+      include_tasks: add_user.yml
+      when:
+        - ( matomo_api_user_exists.json is defined )
+        - ( matomo_api_user_exists.json.value is defined )
+        - ( not matomo_api_user_exists.json.value )
+
+  tags:
+    - matomo
+...

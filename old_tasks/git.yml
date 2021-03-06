@@ -1,0 +1,35 @@
+---
+- name: Delete, create and clone or update Matomo in the private directory
+  block:
+
+    - name: "Check if {{ matomo_private }}/matomo/.git exists"
+      stat:
+        path: "{{ matomo_private }}/matomo/.git"
+      register: matomo_git_clone
+      tags:
+        - matomo
+
+    - name: Private directory for Matomo to be unarchived into absent
+      file:
+        path: "{{ matomo_private }}/matomo"
+        state: absent
+      become: true
+      become_user: "{{ matomo_user }}"
+      when: not matomo_git_clone.stat.exists
+      tags:
+        - matomo
+
+    - name: Required Matomo cloned into private directory
+      git:
+        repo: https://github.com/matomo-org/matomo
+        dest: "{{ matomo_private }}/matomo"
+        version: "{{ matomo_required }}"
+        verify_commit: true
+        force: true
+        depth: 1
+      become: true
+      become_user: "{{ matomo_user }}"
+
+  tags:
+    - matomo
+...

@@ -1,0 +1,66 @@
+---
+- name: Get existing Matomo site URLs from Site ID using the API
+  block:
+
+    - name: Check that required variables are defined
+      assert:
+        that:
+          - ( matomo_url is defined ) and ( matomo_url | length > 0 )
+          - ( matomo_token_auth is defined ) and ( matomo_token_auth | length > 0 )
+          - ( id is defined ) and ( id | length > 0 )
+
+    - name: "Check if Matomo URLs exists for idSite {{ id }}"
+      uri:
+        url: "{{ matomo_url }}"
+        method: POST
+        body_format: form-urlencoded
+        body:
+          module: API
+          format: JSON
+          token_auth: "{{ matomo_token_auth }}"
+          method: SitesManager.getSiteUrlsFromId
+          idSite: "{{ id }}"
+          status_code: 200
+          return_content: true
+      register: users_matomo_get_site_urls_from_id
+      failed_when: ( users_matomo_get_site_urls_from_id.failed is defined ) and ( users_matomo_get_site_urls_from_id.failed )
+
+    - name: Debug users_matomo_get_site_urls_from_id
+      debug:
+        var: users_matomo_get_site_urls_from_id
+        verbosity: 2
+
+    - name: Set site_urls to an empty variable
+      set_fact:
+        site_urls: ''
+
+    - name: Add all URLs to site_urls variable
+      set_fact:
+        site_urls: "{{ site_url }}{% if site_urls | length > 0 %}, {{ site_urls }}{% endif %}"
+      loop: "{{ users_matomo_get_site_urls_from_id.json }}"
+      loop_control:
+        loop_var: site_url
+      when:
+        - ( users_matomo_get_site_urls_from_id.json is defined )
+        - ( users_matomo_get_site_urls_from_id.json != [] )
+
+    - name: Debug site_urls
+      debug:
+        var: site_urls
+        verbosity: 2
+
+    - name: Create an array for matomo_existing_site_urls
+      set_fact:
+        matomo_existing_site_urls: "{{ site_urls.split(', ') | list }}"
+      when:
+        - ( users_matomo_get_site_urls_from_id.json is defined )
+        - ( users_matomo_get_site_urls_from_id.json != [] )
+
+    - name: Debug matomo_existing_site_urls
+      debug:
+        var: matomo_existing_site_urls
+        verbosity: 2
+
+  tags:
+    - matomo
+...
