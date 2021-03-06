@@ -66,21 +66,6 @@
         path: "{{ matomo_accounts_file }}"
       register: matomo_accounts_file_path
 
-    - name: Check the length of the accounts file
-      block:
-
-        - name: "Get the length of {{ matomo_accounts_file }}"
-          command: "wc {{ matomo_accounts_file }}"
-          register: matomo_accounts_file_wc
-
-        - name: "Set a fact for the length of {{ matomo_accounts_file }}"
-          set_fact:
-            matomo_accounts_file_lines: "{{ matomo_accounts_file_wc.stdout | split(' ')[0] }}"
-
-      when:
-        - ( matomo_accounts_file_path.stat is defined )
-        - ( matomo_accounts_file_path.stat.exists )
-
     - name: Update the email address in the matomo_accounts_file
       block:
 
@@ -151,7 +136,6 @@
       when:
         - ( matomo_accounts_file is defined ) and ( matomo_accounts_file | length > 0 )
         - ( matomo_accounts_file_path is defined ) and ( matomo_accounts_file_path.stat.exists )
-        - ( matomo_accounts_file_lines is defined ) and ( matomo_accounts_file_lines | int > 3 )
 
     - name: "Email address update notification email sent to {{ matomo_login_email }}"
       mail:
