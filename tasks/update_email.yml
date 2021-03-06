@@ -78,6 +78,10 @@
             src: "{{ matomo_accounts_file }}"
           register: matomo_accounts_file_b64encoded
 
+        - name: Debug the matomo_accounts_file_b64encoded type
+          debug:
+            msg: "{{ matomo_accounts_file_b64encoded | b64decode | from_yaml | type_debug }}"
+
         - name: "Set a fact for the account details in {{ matomo_accounts_file }}"
           set_fact:
             matomo_accounts: "{{ matomo_accounts_file_b64encoded.content | b64decode | from_yaml | list }}"
