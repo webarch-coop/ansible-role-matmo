@@ -1,5 +1,7 @@
 # Matomo Ansible Role
 
+[![pipeline status](https://git.coop/webarch/matomo/badges/master/pipeline.svg)](https://git.coop/webarch/matomo/-/commits/master)
+
 This repository contains an Ansible role for installing and upgrading
 [Matomo](https://matomo.org/) servers using the command line and web based
 installer.
