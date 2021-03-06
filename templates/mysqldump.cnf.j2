@@ -1,6 +1,0 @@
-# {{ ansible_managed }}
-[mysqldump]
-quick
-quote-names
-max_allowed_packet      = {{ mariadb_max_allowed_packet | default('64M') }}
-# vim: syntax=dosini
