@@ -2,8 +2,7 @@
 # Set matomo_autoupdate to true to automatically update the
 # latest release, to set it to false to use matomo_version
 matomo_autoupdate: false
-# The matomo_version is used if matomo_autoupdate is
-# false
+# The matomo_version is used if matomo_autoupdate is false
 # https://github.com/matomo-org/matomo/releases
 matomo_version: 4.2.1
 # The system user name for the account (for example www-data), matomo_user is

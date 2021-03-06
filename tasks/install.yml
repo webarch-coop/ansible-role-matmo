@@ -1,4 +1,4 @@
----
+--
 - name: Install Matomo
   block:
 
@@ -32,32 +32,17 @@
     - name: Include web install tasks
       include_tasks: install_web.yml
 
-    - name: Matomo admin password notification
-      block:
-
-        - name: "Password notification email sent to {{ matomo_first_user_email }}"
-          mail:
-            from: "{{ matomo_notify_from }}"
-            to: '"{{ matomo_first_user | quote }}" <{{ matomo_first_user_email }}>'
-            subject: "[{{ matomo_notify_subject_tag | default('webarchitects') }}] Matomo superuser password for {{ matomo_url }}"
-            # https://github.com/ansible/ansible/issues/58543
-            charset: us-ascii
-            body: "{{ lookup('template', 'notify_matomo_install_passwd.j2') }}"
-            host: localhost
-            port: 25
-            secure: never
-
-        - name: "Notification date recorded in {{ matomo_home }}/.notify_matomo_passwd file"
-          lineinfile:
-            path: "{{ matomo_home }}/.notify_matomo_passwd"
-            line: "{{ lookup('pipe', 'date +%Y-%m-%d-%H-%M-%S') }} : {{ matomo_first_user | quote  }} <{{ matomo_first_user_email }}>"
-            create: true
-            state: present
-            insertafter: EOF
-            owner: root
-            group: "{{ matomo_user }}"
-            mode: 0640
-
+    - name: "Password notification email sent to {{ matomo_first_user_email }}"
+      mail:
+        from: "{{ matomo_notify_from }}"
+        to: '"{{ matomo_first_user | quote }}" <{{ matomo_first_user_email }}>'
+        subject: "[{{ matomo_notify_subject_tag | default('webarchitects') }}] Matomo superuser password for {{ matomo_url }}"
+        # https://github.com/ansible/ansible/issues/58543
+        charset: us-ascii
+        body: "{{ lookup('template', 'notify_matomo_install_passwd.j2') }}"
+        host: localhost
+        port: 25
+        secure: never
       when: ( matomo_notify_passwd is defined ) and ( matomo_notify_passwd )
 
     - name: Get the installed Matomo version number
