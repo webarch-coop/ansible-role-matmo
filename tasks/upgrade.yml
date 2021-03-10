@@ -26,8 +26,16 @@
       become: true
       become_user: "{{ matomo_user }}"
 
-    - name: Upgrade from Matomo 3.x
+    - name: Migrate token auths after upgrade from Matomo 3.x
       command: php console --no-ansi -n core:matomo4-migrate-token-auths
+      args:
+        chdir: "{{ matomo_html }}"
+      become: true
+      become_user: "{{ matomo_user }}"
+      when: matomo_installed is version('3.14.1', '<=')
+
+    - name: Convert database to utf8mb4 after upgrade from Matomo 3.x
+      command: php console --no-ansi -n core:convert-to-utf8mb4
       args:
         chdir: "{{ matomo_html }}"
       become: true
