@@ -20,7 +20,12 @@
 
     - name: Debug matomo_get_site_check_urls_from_id
       debug:
-        var: matomo_get_site_check_urls_from_id
+        var: matomo_get_site_check_urls_from_id.json
+        verbosity: 2
+
+    - name: Debug matomo_site_url
+      debug:
+        var: matomo_site_url
         verbosity: 2
 
     - name: Loop though all the URLs checking for URL duplicates
