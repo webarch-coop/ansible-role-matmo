@@ -35,7 +35,6 @@
           - "URL for the site being checked is {{ matomo_site_url }}"
           - "the matching URL is {{ matomo_site_check_url }}"
           - "and this belongs to {{ site_check.idsite }}"
-        matomo_site_duplicates: "{{ matomo_site_duplicates }} + [ '{{ site_check.idsite }}' ]"
       when: matomo_site_url == matomo_site_check_url
       loop: "{{ matomo_get_site_urls_from_id.json }}"
       loop_control:
