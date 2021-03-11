@@ -33,9 +33,61 @@
       loop_control:
         loop_var: matomo_site_url
 
-    - name: Print the sites IDs with duplicate URLs
-      fail:
-        msg: "{{ matomo_site_duplicates }}"
+    - name: Get details of duplicated sites 
+      block:
+
+        - name: Get the details for the site being checked
+          uri:
+            url: "{{ matomo_url }}"
+            method: POST
+            body_format: form-urlencoded
+            body:
+              module: API
+              format: JSON
+              token_auth: "{{ matomo_token_auth }}"
+              method: SitesManager.getSiteSettings
+              idSite: "{{ site.idsite }}"
+          register: matomo_site_checked
+          failed_when: ( matomo_site_checked.failed is defined ) and ( matomo_site_checked.failed )
+
+        - name: Debug matomo_site_checked
+          debug:
+            var: matomo_site_checked.json
+            verbosity: 2
+
+        - name: Get the details of the sites with duplicate URLs
+          uri:
+            url: "{{ matomo_url }}"
+            method: POST
+            body_format: form-urlencoded
+            body:
+              module: API
+              format: JSON
+              token_auth: "{{ matomo_token_auth }}"
+              method: SitesManager.getSiteSettings
+              idSite: "{{ matomo_siteid_dupe }}"
+          register: matomo_site_checked
+          loop: "{{ matomo_site_duplicates | unique }}"
+          loop_control:
+            loop_var: matomo_siteid_dupe
+
+        - name: Debug matomo_site_checked.results
+          debug:
+            var: matomo_site_checked.results
+            verbosity: 2
+
+        - name: Print the sites IDs with duplicate URLs
+          fail:
+            msg:
+              - "The site with the following details"
+              - "{{ matomo_site_checked.json }}"
+              - "Shares URLs with these sites"
+              - "{{ matomo_site_checked_result.json }}"
+          loop: "{{ matomo_site_checked.results }}"
+          loop: "{{ matomo_site_checked.results }}"
+          loop_control:
+            loop_var: matomo_site_checked_result
+
       when: matomo_site_duplicates != []
 
   tags:
