@@ -1,0 +1,39 @@
+---
+- name: Check Matomo site for duplicates
+  block:
+
+    - name: Set an empty duplicate variable
+      set_fact:
+        matomo_site_duplicates: ""
+
+    - name: Matomo API POST request to SitesManager.getSiteUrlsFromId
+      uri:
+        url: "{{ matomo_url }}"
+        method: POST
+        body_format: form-urlencoded
+        body:
+          module: API
+          format: JSON
+          token_auth: "{{ matomo_token_auth }}"
+          method: SitesManager.getSiteUrlsFromId
+          idSite: "{{ site.idsite }}"
+          status_code: 200
+          return_content: true
+      register: matomo_get_site_urls_from_id
+      failed_when: ( matomo_get_site_urls_from_id.failed is defined ) and ( matomo_get_all_sites.failed )
+
+    - name: Debug matomo_get_site_urls_from_id
+      debug:
+        var: matomo_get_site_urls_from_id
+        verbosity: 2
+
+    # - name: "Set a fact for all the URLs for {{ site.idsite }}"
+
+    # - name: Loop though all the sites checking for URL duplicates
+    #   include_tasks: check_duplicate_sites.yml
+
+    # - name: List the 
+
+  tags:
+    - matomo
+...

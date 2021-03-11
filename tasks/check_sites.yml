@@ -5,6 +5,14 @@
     - name: Include get all sites tasks
       include_tasks: get_all_sites.yml
 
+    - name: Loop through the sites
+      include_tasks: check_site.yml
+      loop: "{{ matomo_get_all_sites.json }}"
+      loop_control:
+        loop_var: site
+        label: "{{ site.idsite }}"
+      when: matomo_get_all_sites.json is defined  
+
   tags:
     - matomo
 ...
