@@ -11,7 +11,7 @@
       loop_control:
         loop_var: site
         label: "{{ site.idsite }}"
-      when: matomo_get_all_sites.json is defined  
+      when: matomo_get_all_sites.json is defined
 
   tags:
     - matomo

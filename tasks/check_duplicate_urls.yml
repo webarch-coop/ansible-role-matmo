@@ -8,7 +8,7 @@
       loop_control:
         loop_var: site_check
         label: "{{ site_check.idsite }}"
-      when: site.idsite != site_check.idsite 
+      when: site.idsite != site_check.idsite
 
   tags:
     - matomo
