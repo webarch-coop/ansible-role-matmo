@@ -35,7 +35,7 @@
 
     - name: Print the sites IDs with duplicate URLs
       fail:
-        var: matomo_site_duplicates
+        msg: "{{ matomo_site_duplicates }}"
       when: matomo_site_duplicates != []
 
   tags:
