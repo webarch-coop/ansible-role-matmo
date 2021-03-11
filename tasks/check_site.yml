@@ -80,9 +80,9 @@
           fail:
             msg:
               - "The site with the following id, name and main url"
-              - "{{ matomo_site_checked.json.idsite }} {{ matomo_site_checked.json.name }} {{ matomo_site_checked.json.mainurl }}"
+              - "{{ matomo_site_checked.json.idsite }} {{ matomo_site_checked.json.name }} {{ matomo_site_checked.json.main_url }}"
               - "Shares URLs with this site"
-              - "{{ matomo_sites_checked_result.json.idsite }} {{ matomo_sites_checked_result.json.name }} {{ matomo_sites_checked_result.json.mainurl }}"
+              - "{{ matomo_sites_checked_result.json.idsite }} {{ matomo_sites_checked_result.json.name }} {{ matomo_sites_checked_result.json.main_url }}"
           loop: "{{ matomo_sites_checked.results }}"
           loop_control:
             loop_var: matomo_site_checked_result
