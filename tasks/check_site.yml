@@ -73,7 +73,7 @@
 
         - name: Debug matomo_sites_checked.results
           debug:
-            var: matomo_site_checked
+            var: matomo_sites_checked
             verbosity: 2
 
         - name: Print the sites IDs with duplicate URLs
