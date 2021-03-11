@@ -22,13 +22,13 @@
       register: matomo_get_site_urls_from_id
       failed_when: ( matomo_get_site_urls_from_id.failed is defined ) and ( matomo_get_site_urls_from_id.failed )
 
-    - name: Debug matomo_get_site_urls_from_id
+    - name: Debug matomo_get_site_urls_from_id.json
       debug:
-        var: matomo_get_site_urls_from_id
+        var: matomo_get_site_urls_from_id.json
         verbosity: 2
 
     - name: Loop though all the URLs checking for URL duplicates
-      include_tasks: check_duplicate_url.yml
+      include_tasks: check_duplicate_urls.yml
       loop: "{{ matomo_get_site_urls_from_id.json }}"
       loop_control:
         loop_var: matomo_site_url
