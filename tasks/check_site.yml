@@ -45,7 +45,7 @@
               module: API
               format: JSON
               token_auth: "{{ matomo_token_auth }}"
-              method: SitesManager.getSiteSettings
+              method: SitesManager.getSiteFromId
               idSite: "{{ site.idsite }}"
           register: matomo_site_checked
           failed_when: ( matomo_site_checked.failed is defined ) and ( matomo_site_checked.failed )
@@ -64,7 +64,7 @@
               module: API
               format: JSON
               token_auth: "{{ matomo_token_auth }}"
-              method: SitesManager.getSiteSettings
+              method: SitesManager.getSiteFromId
               idSite: "{{ matomo_siteid_dupe }}"
           register: matomo_site_checked
           loop: "{{ matomo_site_duplicates | unique }}"
@@ -79,8 +79,8 @@
         - name: Print the sites IDs with duplicate URLs
           fail:
             msg:
-              - "The site with the following details"
-              - "{{ matomo_site_checked.json }}"
+              - "The site with the following id, name and main url"
+              - "{{ matomo_site_checked.json.idsite }} {{ matomo_site_checked.json.name }} {{ matomo_site_checked.json.mainurl }}"
               - "Shares URLs with these sites"
               - "{{ matomo_site_checked_result.json }}"
           loop: "{{ matomo_site_checked.results }}"
