@@ -66,12 +66,12 @@
               token_auth: "{{ matomo_token_auth }}"
               method: SitesManager.getSiteFromId
               idSite: "{{ matomo_siteid_dupe }}"
-          register: matomo_site_checked
+          register: matomo_sites_checked
           loop: "{{ matomo_site_duplicates | unique }}"
           loop_control:
             loop_var: matomo_siteid_dupe
 
-        - name: Debug matomo_site_checked.results
+        - name: Debug matomo_sites_checked.results
           debug:
             var: matomo_site_checked.results
             verbosity: 2
@@ -81,11 +81,12 @@
             msg:
               - "The site with the following id, name and main url"
               - "{{ matomo_site_checked.json.idsite }} {{ matomo_site_checked.json.name }} {{ matomo_site_checked.json.mainurl }}"
-              - "Shares URLs with these sites"
-              - "{{ matomo_site_checked_result.json }}"
-          loop: "{{ matomo_site_checked.results }}"
+              - "Shares URLs with this site"
+              - "{{ matomo_sites_checked_result.json.idsite }} {{ matomo_sites_checked_result.json.name }} {{ matomo_sites_checked_result.json.mainurl }}"
+          loop: "{{ matomo_sites_checked.results }}"
           loop_control:
             loop_var: matomo_site_checked_result
+            label: "{{ matomo_site_checked_result.json.idsite }}"
 
       when: matomo_site_duplicates != []
 
