@@ -37,10 +37,6 @@
       debug:
         var: matomo_site_duplicates
 
-    - name: Debug fail
-      fail:
-        msg: Debug
-
   tags:
     - matomo
 ...
