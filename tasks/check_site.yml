@@ -76,13 +76,26 @@
             var: matomo_sites_checked
             verbosity: 2
 
-        - name: Print the sites IDs with duplicate URLs
-          fail:
-            msg:
-              - "The site with the following id, name and main url"
-              - "{{ matomo_site_checked.json.idsite }} {{ matomo_site_checked.json.name }} {{ matomo_site_checked.json.main_url }}"
-              - "Shares URLs with this site"
-              - "{{ matomo_sites_checked_result.json.idsite }} {{ matomo_sites_checked_result.json.name }} {{ matomo_sites_checked_result.json.main_url }}"
+        - name: Directory for results present
+          file:
+            path: "{{ matomo_private }}/.matomo_site_duplicates"
+            state: directory
+            mode: 0600
+            owner: "{{ matomo_user }}"
+            group: "{{ matomo_group }}"
+
+        - name: Print the sites IDs with duplicate URLs to a file
+          blockinfile:
+            path: "{{ matomo_private }}/.matomo_site_duplicates/{{ matomo_site_checked.json.name }}.yml"
+            create: true
+            block: |
+              - name: {{ matomo_site_checked.json.name }}
+                idsite: {{ matomo_site_checked.json.idsite }}
+                main_url: {{ matomo_site_checked.json.main_url }}
+                duplicate_site:
+                  - name: {{ matomo_site_checked_result.json.name }}
+                    idsite: {{ matomo_site_checked_result.json.idsite }}
+                    main_url: {{ matomo_site_checked_result.json.main_url }}
           loop: "{{ matomo_sites_checked.results }}"
           loop_control:
             loop_var: matomo_site_checked_result
