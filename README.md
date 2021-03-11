@@ -42,11 +42,11 @@ main.yml
 
 If a superuser username, password and token authentication string are provided
 (these can be sorted encrypted using Ansible vault on the Ansible controller)
-then this role can also be used to add Matomo user accounts and sites using
-the Matomo API.
+then this role can also be used to add Matomo user accounts and sites using the
+Matomo API.
 
 To add a Matomo user account include this role with tasks from
-`user_present.yml` and then these files will be used:
+`user_present.yml` and then the tasks in these files will be run:
 
 
 ```
@@ -83,7 +83,7 @@ matomo_accounts:
 ## Matomo sites
 
 To add a Matomo site include this role with tasks from `site_present.yml` and
-then these files will be used:
+then the tasks in these files will be run:
 
 ```
 site_present.yml
@@ -98,3 +98,16 @@ site_present.yml
   |
   \-- add_site.yml
 ```
+
+## Duplicate sites
+
+To check for two sites having the same URL include this role with tasks from
+`check_sites.yml` and then the tasks in these files wil be run:
+
+```
+check_site.yml
+  |
+  \-- check_duplicate_urls.yml
+        |
+        \-- check_duplicate_url.yml
+``` 

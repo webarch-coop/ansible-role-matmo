@@ -33,7 +33,7 @@
       loop_control:
         loop_var: matomo_site_url
 
-    - name: Get details of duplicated sites 
+    - name: Get details of duplicated sites
       block:
 
         - name: Get the details for the site being checked
@@ -83,7 +83,6 @@
               - "{{ matomo_site_checked.json }}"
               - "Shares URLs with these sites"
               - "{{ matomo_site_checked_result.json }}"
-          loop: "{{ matomo_site_checked.results }}"
           loop: "{{ matomo_site_checked.results }}"
           loop_control:
             loop_var: matomo_site_checked_result
