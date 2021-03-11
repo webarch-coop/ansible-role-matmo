@@ -61,6 +61,9 @@
             matomo_proposed_site_urls:
               - "{{ matomo_site_main_url }}"
 
+        # NOTE The main_url probably shouldn't be multiple URLs seperated by commas
+        #      but due to earlier bugs this was the case with the Matomo site used for
+        #      development of this role, so this could probably be changed in the future.
         - name: Set a matomo_existing_site_urls array
           set_fact:
             matomo_existing_site_urls: "{{ site.main_url.split(', ') | list }}"
