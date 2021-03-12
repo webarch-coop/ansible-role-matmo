@@ -12,7 +12,7 @@
           - ( matomo_login_email is defined ) and ( matomo_login_email is regex("^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$") )
 
     - name: Generate a random string for Matomo password
-      command: pwgen -n 20 1
+      command: "pwgen -n {{ 24 | random(14) }} 1"
       register: matomo_login_password_gen
       no_log: true
 
