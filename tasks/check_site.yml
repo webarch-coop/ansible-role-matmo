@@ -84,11 +84,12 @@
             owner: "{{ matomo_user }}"
             group: "{{ matomo_group }}"
 
-        - name: Print the sites IDs with duplicate URLs to a file
+        - name: Write the sites IDs with duplicate URLs to a file
           blockinfile:
             path: "{{ matomo_private }}/.matomo_site_duplicates/{{ matomo_site_checked.json.name }}.yml"
             create: true
             block: |
+              ---
               - name: {{ matomo_site_checked.json.name }}
                 idsite: {{ matomo_site_checked.json.idsite }}
                 main_url: {{ matomo_site_checked.json.main_url }}
@@ -96,6 +97,10 @@
                   - name: {{ matomo_site_checked_result.json.name }}
                     idsite: {{ matomo_site_checked_result.json.idsite }}
                     main_url: {{ matomo_site_checked_result.json.main_url }}
+              ...
+            mode: 0600
+            owner: "{{ matomo_user }}"
+            group: "{{ matomo_group }}"
           loop: "{{ matomo_sites_checked.results }}"
           loop_control:
             loop_var: matomo_site_checked_result

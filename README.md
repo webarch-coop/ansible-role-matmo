@@ -101,8 +101,9 @@ site_present.yml
 
 ## Duplicate sites
 
-To check for two sites having the same URL include this role with tasks from
-`check_sites.yml` and then the tasks in these files wil be run:
+To check (in a rather slow manner) for two sites having the same URL include
+this role with tasks from `check_sites.yml` and then the tasks in these files
+wil be run:
 
 ```
 check_site.yml
