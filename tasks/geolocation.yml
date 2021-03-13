@@ -33,6 +33,15 @@
         path: "{{ matomo_private }}/dbip-city-lite-{{ lookup('pipe','date +%Y-%m') }}.mmdb"
       register: matomo_dbip_mmdb
 
+    - name: Error updating the DBIP City Lite database
+      fail:
+        msg:
+          - "There has been an error downloading, unarchiving and copying the DBIP City Lite database for Matomo"
+          - "Check if https://download.db-ip.com/free/dbip-city-lite-{{ lookup('pipe','date +%Y-%m') }}.mmdb.gz exists"
+          - "Check if {{ matomo_private }}/dbip-city-lite-{{ lookup('pipe','date +%Y-%m') }}.mmdb.gz exists"
+          - "Check if {{ matomo_private }}/dbip-city-lite-{{ lookup('pipe','date +%Y-%m') }}.mmdb exists"
+      when: not matomo_dbip_mmdb.stat.exists
+
     - name: DBIP City Lite database in place
       copy:
         src: "{{ matomo_private }}/dbip-city-lite-{{ lookup('pipe','date +%Y-%m') }}.mmdb"
@@ -42,14 +51,6 @@
         group: "{{ matomo_group }}"
         mode: 0644
       when: matomo_dbip_mmdb.stat.exists
-
-    - name: Error updating the DBIP City Lite database
-      fail:
-        msg:
-          - "There has been an error downloading, unarchiving and copying the DBIP City Lite database for Matomo"
-          - "Check if https://download.db-ip.com/free/dbip-city-lite-{{ lookup('pipe','date +%Y-%m') }}.mmdb.gz exists"
-          - "Check if {{ matomo_private }}/dbip-city-lite-{{ lookup('pipe','date +%Y-%m') }}.mmdb.gz exists"
-          - "Check if {{ matomo_private }}/dbip-city-lite-{{ lookup('pipe','date +%Y-%m') }}.mmdb exists"
 
   tags:
     - matomo
