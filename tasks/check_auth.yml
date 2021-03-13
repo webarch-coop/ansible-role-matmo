@@ -21,8 +21,8 @@
           token_auth: "{{ matomo_token_auth }}"
           method: UsersManager.getUsersHavingSuperUserAccess
       register: matomo_api_get_users_having_super_user_access 
-      changed_when: false
-      failed_when: matomo_api_get_users_having_super_user_access.json.result == "error"
+      # changed_when: false
+      # failed_when: matomo_api_get_users_having_super_user_access.json.result == "error"
 
     - name: Debug matomo_api_get_users_having_super_user_access
       debug:
