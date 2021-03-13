@@ -80,24 +80,37 @@
             loop_var: url
           when: ( matomo_site_urls is defined ) and ( matomo_site_urls != [] )
 
-        - name: Set variables for the sorted and unique existing and proposed URL
+        - name: Set variable for the sorted and unique existing URLs
           set_fact:
             matomo_existing_site_urls_sorted: "{{ matomo_existing_site_urls | sort | unique }}"
+          when:
+            - matomo_existing_site_urls is defined
+            - matomo_existing_site_urls | type_debug == "list"
+
+        - name: Set variable for the sorted and unique proposed URLs
+          set_fact:
             matomo_proposed_site_urls_sorted: "{{ matomo_proposed_site_urls | sort | unique }}"
+          when:
+            - matomo_proposed_site_urls is defined
+            - matomo_proposed_site_urls | type_debug == "list"
 
         - name: Debug existing URLs
           debug:
             var: matomo_existing_site_urls_sorted
             verbosity: 2
+          when: matomo_existing_site_urls_sorted is defined
 
         - name: Debug matomo_proposed_site_urls_sorted
           debug:
             var: matomo_proposed_site_urls_sorted
             verbosity: 2
+          when: matomo_proposed_site_urls_sorted is defined
 
         - name: Include update Matomo site tasks when existing URLs don't match the proposed ones
           include_tasks: update_site.yml
-          when: ( matomo_existing_site_urls_sorted | difference(matomo_proposed_site_urls_sorted) | length > 0 ) or ( matomo_proposed_site_urls_sorted | difference(matomo_existing_site_urls_sorted) | length > 0 )
+          when:
+            - ( matomo_existing_site_urls_sorted is defined ) and ( matomo_proposed_site_urls_sorted is defined )
+            - ( matomo_existing_site_urls_sorted | difference(matomo_proposed_site_urls_sorted) | length > 0 ) or ( matomo_proposed_site_urls_sorted | difference(matomo_existing_site_urls_sorted) | length > 0 )
 
       when: ( matomo_existing_site_ids is defined ) and ( matomo_existing_site_ids[0] is defined )
 
