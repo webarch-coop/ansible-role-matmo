@@ -78,56 +78,61 @@
             src: "{{ matomo_accounts_file }}"
           register: matomo_accounts_file_b64encoded
 
-        - name: "Set a fact for the account details in {{ matomo_accounts_file }}"
-          set_fact:
-            matomo_accounts: "{{ matomo_accounts_file_b64encoded.content | b64decode | from_yaml | list }}"
-
-        - name: Debug matomo_accounts
-          debug:
-            var: matomo_accounts
-            verbosity: 2
-
-        - name: Set a fact for the matomo_login_password
-          set_fact:
-            matomo_account_login_password: "{{ matomo_account.password }}"
-          when: matomo_account.login == matomo_login
-          loop: "{{ matomo_accounts }}"
-          loop_control:
-            loop_var: matomo_account
-
-        - name: "Remove the account details for {{ matomo_login }} with {{ matomo_login_email_existing }} from {{ matomo_accounts_file }}"
-          blockinfile:
-            path: "{{ matomo_accounts_file }}"
-            block: ""
-            marker: "# {{ matomo_login }} <{{ matomo_login_email_existing }}> {mark}"
-            mode: 0600
-            owner: "{{ matomo_user }}"
-            group: "{{ matomo_group }}"
-
-        - name: "Matomo login, email address and password for {{ matomo_login }} present in {{ matomo_accounts_file }}"
-          blockinfile:
-            path: "{{ matomo_accounts_file }}"
-            block: |
-              - login: {{ matomo_login | quote }}
-                email: {{ matomo_login_email | quote }}
-                password: {{ matomo_account_login_password | quote }}
-            marker: "# {{ matomo_login }} <{{ matomo_login_email }}> {mark}"
-            mode: 0600
-            owner: "{{ matomo_user }}"
-            group: "{{ matomo_group }}"
-          when: matomo_account_login_password | length > 0
-
-        - name: Set matomo_login_existing and include the update password tasks as the password couldn't be read from the matomo_accounts_file
+        - name: When the matomo_accounts_file contains a list
           block:
 
-            - name: "Set the matomo_login_existing variable to {{ matomo_login }}"
+            - name: "Set a fact for the account details in {{ matomo_accounts_file }}"
               set_fact:
-                matomo_login_existing: "{{ matomo_login }}"
+                matomo_accounts: "{{ matomo_accounts_file_b64encoded.content | b64decode | from_yaml | list }}"
 
-            - name: Include the check password tasks
-              include_tasks: update_password.yml
+            - name: Debug matomo_accounts
+              debug:
+                var: matomo_accounts
+                verbosity: 2
 
-          when: matomo_account_login_password | length == 0
+            - name: Set a fact for the matomo_login_password
+              set_fact:
+                matomo_account_login_password: "{{ matomo_account.password }}"
+              when: matomo_account.login == matomo_login
+              loop: "{{ matomo_accounts }}"
+              loop_control:
+                loop_var: matomo_account
+
+            - name: "Remove the account details for {{ matomo_login }} with {{ matomo_login_email_existing }} from {{ matomo_accounts_file }}"
+              blockinfile:
+                path: "{{ matomo_accounts_file }}"
+                block: ""
+                marker: "# {{ matomo_login }} <{{ matomo_login_email_existing }}> {mark}"
+                mode: 0600
+                owner: "{{ matomo_user }}"
+                group: "{{ matomo_group }}"
+
+            - name: "Matomo login, email address and password for {{ matomo_login }} present in {{ matomo_accounts_file }}"
+              blockinfile:
+                path: "{{ matomo_accounts_file }}"
+                block: |
+                  - login: {{ matomo_login | quote }}
+                    email: {{ matomo_login_email | quote }}
+                    password: {{ matomo_account_login_password | quote }}
+                marker: "# {{ matomo_login }} <{{ matomo_login_email }}> {mark}"
+                mode: 0600
+                owner: "{{ matomo_user }}"
+                group: "{{ matomo_group }}"
+              when: matomo_account_login_password | length > 0
+
+            - name: Set matomo_login_existing and include the update password tasks as the password couldn't be read from the matomo_accounts_file
+              block:
+
+                - name: "Set the matomo_login_existing variable to {{ matomo_login }}"
+                  set_fact:
+                    matomo_login_existing: "{{ matomo_login }}"
+
+                - name: Include the check password tasks
+                  include_tasks: update_password.yml
+
+              when: matomo_account_login_password | length == 0
+
+          when: matomo_accounts_file_b64encoded.content | b64decode | from_yaml | type_debug == "list"
 
       when:
         - ( matomo_accounts_file is defined ) and ( matomo_accounts_file | length > 0 )
