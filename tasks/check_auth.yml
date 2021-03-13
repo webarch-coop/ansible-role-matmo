@@ -10,7 +10,20 @@
           - matomo_password is defined
           - matomo_token_auth is defined
 
-    - name: "Check who has superuser access"
+    - name: Unblock all currently blocked IPs
+      command: php console --no-ansi -n login:unblock-blocked-ips
+      args:
+        chdir: "{{ matomo_html }}"
+      changed_when: false
+      check_mode: false
+      become: true
+      become_user: "{{ matomo_user }}"
+      register: matomo_unblock_blocked_ips
+      failed_when: ( matomo_unblock_blocked_ips.rc != 0 ) or ( matomo_unblock_blocked_ips.stdout != "Done" )
+
+    # NOTE The following POST is to check that both the password and the
+    #      token auth are correct
+    - name: "Check superuser access for {{ matomo_user }}"
       uri:
         url: "{{ matomo_url }}"
         method: POST
@@ -19,40 +32,17 @@
           module: API
           format: JSON
           token_auth: "{{ matomo_token_auth }}"
-          method: UsersManager.getUsersHavingSuperUserAccess
-      register: matomo_api_get_users_having_super_user_access 
-      # changed_when: false
-      # failed_when: matomo_api_get_users_having_super_user_access.json.result == "error"
+          method: UsersManager.setSuperUserAccess
+          userLogin: "{{ matomo_user }}"
+          hasSuperUserAccess: true
+          passwordConfirmation: "{{ matomo_password }}"
+      register: matomo_api_set_super_user_access
+      changed_when: ( matomo_api_set_super_user_access.json.result != "success" )
 
-    - name: Debug matomo_api_get_users_having_super_user_access
+    - name: Debug matomo_api_set_super_user_access
       debug:
-        var: matomo_api_get_users_having_super_user_access
+        var: matomo_api_set_super_user_access
         verbosity: 2
-
-    - name: Fail
-      fail:
-        msg: Debug
-
-    # - name: "Set superuser access for {{ matomo_user }}"
-    #   uri:
-    #     url: "{{ matomo_url }}"
-    #     method: POST
-    #     body_format: form-urlencoded
-    #     body:
-    #       module: API
-    #       format: JSON
-    #       token_auth: "{{ matomo_token_auth }}"
-    #       method: UsersManager.setSuperUserAccess
-    #       userLogin: "{{ matomo_user }}"
-    #       hasSuperUserAccess: true
-    #       passwordConfirmation: "{{ matomo_password }}"
-    #   register: matomo_api_set_super_user_access
-    #   changed_when: ( matomo_api_set_super_user_access.json.result != "success" )
-
-    # - name: Debug matomo_api_set_super_user_access
-    #   debug:
-    #     var: matomo_api_set_super_user_access
-    #     verbosity: 2
 
     - name: Set variable based on result of superuser token_auth and password check
       set_fact:
