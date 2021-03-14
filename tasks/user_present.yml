@@ -64,7 +64,7 @@
     - name: Set the matomo_login_existing variable to matomo_login when it is not defined
       set_fact:
         matomo_login_existing: "{{ matomo_login }}"
-      when: ( matomo_login_existing is not defined ) or ( matomo_login_existing | length == 0 ) 
+      when: ( matomo_login_existing is not defined ) or ( matomo_login_existing | length == 0 )
 
   tags:
     - matomo
