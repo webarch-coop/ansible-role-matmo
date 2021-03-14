@@ -23,7 +23,7 @@
 
     # NOTE The following POST is to check that both the password and the
     #      token auth are correct
-    - name: "Check superuser access for {{ matomo_user }} on {{ matomo_url }} "
+    - name: "Check superuser access for {{ matomo_user }} on {{ matomo_url }}"
       uri:
         url: "{{ matomo_url }}"
         method: POST
@@ -38,15 +38,20 @@
           passwordConfirmation: "{{ matomo_password }}"
         status_code: 200
       register: matomo_api_set_super_user_access
-      failed_when: ( matomo_api_set_super_user_access.status != 200 ) or ( matomo_api_set_super_user_access.json.result != "success" )
-      retries: 3
-      delay: 2
-      until: matomo_api_set_super_user_access.json.result == "success"
 
     - name: Debug matomo_api_set_super_user_access
       debug:
         var: matomo_api_set_super_user_access
         verbosity: 2
+
+    - name: Set variable based on result of superuser token_auth and password check
+      set_fact:
+        matomo_super_user_access: "{% if matomo_api_set_super_user_access.json.result is defined and matomo_api_set_super_user_access.json.result == 'success' %}True{% else %}False{% endif %}"
+
+    - name: Matomo super user auth token and / or password variables check
+      fail:
+        msg: "Please check the matomo_token_auth and matomo_password are correct for the Matomo superuser {{ matomo_user }} on {{ matomo_url }}"
+      when: not matomo_super_user_access
 
   tags:
     - matomo
