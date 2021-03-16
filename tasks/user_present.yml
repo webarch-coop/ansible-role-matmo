@@ -12,12 +12,44 @@
           - ( matomo_login_email is defined ) and ( matomo_login_email is regex("^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$") )
         msg: "Please ensure that all the required variables are defined"
 
-    - name: Check that a Matomo superuser isn't being configured
+    - name: Check that a Matomo first user isn't being configured
       assert:
         that:
           - ( matomo_login != matomo_first_user )
           - ( matomo_login_email != matomo_first_user_email )
+        msg: "Please use a different email address (or alias) and login username for the Matomo  first user and regular users"
+
+    - name: "Get a list of the Matomo superusers for {{ matomo_url }}"
+      uri:
+        url: "{{ matomo_url }}"
+        method: POST
+        body_format: form-urlencoded
+        body:
+          module: API
+          format: JSON
+          token_auth: "{{ matomo_token_auth }}"
+          method: UsersManager.getUsersHavingSuperUserAccess
+        status_code: 200
+        return_content: true
+      register: matomo_api_get_users_having_super_user_access
+      changed_when: false
+      failed_when: ( matomo_api_get_users_having_super_user_access.json is not defined )
+
+    - name: Debug matomo_api_get_users_having_super_user_access
+      debug:
+        var: matomo_api_get_users_having_super_user_access
+        verbosity: 2
+
+    - name: Loop through the superusers accounts to check that we are not configuring one
+      assert:
+        that:
+          - matomo_existing_superuser.login != matomo_login
+          - matomo_existing_superuser.email != matomo_login_email
         msg: "Please use a different email address (or alias) and login username for the Matomo superuser and regular users"
+      loop: "{{ matomo_api_get_users_having_super_user_access.json }}"
+      loop_control:
+        loop_var: matomo_existing_superuser
+        label: "{{ matomo_existing_superuser.login }}" 
 
     - name: Set the matomo_login_existing to an empty value
       set_fact:
