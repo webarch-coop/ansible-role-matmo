@@ -12,13 +12,6 @@
           - ( matomo_login_email is defined ) and ( matomo_login_email is regex("^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$") )
         msg: "Please ensure that all the required variables are defined"
 
-    - name: Check that a Matomo first user isn't being configured
-      assert:
-        that:
-          - ( matomo_login != matomo_first_user )
-          - ( matomo_login_email != matomo_first_user_email )
-        msg: "Please use a different email address (or alias) and login username for the Matomo  first user and regular users"
-
     - name: "Get a list of the Matomo superusers for {{ matomo_url }}"
       uri:
         url: "{{ matomo_url }}"
