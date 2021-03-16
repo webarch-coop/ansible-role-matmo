@@ -49,7 +49,7 @@
       loop: "{{ matomo_api_get_users_having_super_user_access.json }}"
       loop_control:
         loop_var: matomo_existing_superuser
-        label: "{{ matomo_existing_superuser.login }}" 
+        label: "{{ matomo_existing_superuser.login }}"
 
     - name: Set the matomo_login_existing to an empty value
       set_fact:
