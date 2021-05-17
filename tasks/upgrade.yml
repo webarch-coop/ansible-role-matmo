@@ -25,7 +25,7 @@
         chdir: "{{ matomo_html }}"
       register: matomo_core_update
       changed_when: ( "Everything is already up to date." not in matomo_core_update.stdout_lines )
-      failed_when: ( "Matomo has been successfully updated!" not in matomo_core_update.stdout_lines ) or ( "Everything is already up to date." not in matomo_core_update.stdout_lines )
+      failed_when: ( "Matomo has been successfully updated!" not in matomo_core_update.stdout_lines ) and ( "Everything is already up to date." not in matomo_core_update.stdout_lines )
       become: true
       become_user: "{{ matomo_user }}"
 
