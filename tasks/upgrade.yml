@@ -23,6 +23,8 @@
       command: php console --no-ansi -n core:update --yes
       args:
         chdir: "{{ matomo_html }}"
+      register: matomo_core_update
+      failed_when: ( "Matomo has been successfully updated!" not in matomo_core_update.stdout_lines
       become: true
       become_user: "{{ matomo_user }}"
 
