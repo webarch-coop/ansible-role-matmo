@@ -9,7 +9,7 @@
 
     - name: Debug the check if a current DBIP City Lite database exists
       debug:
-        var: matomo_dbip_mmdb.stat
+        var: matomo_dbip_mmdb.stat.exists
         verbosity: 2
       when: matomo_dbip_mmdb is defined
 
@@ -42,7 +42,7 @@
 
     - name: Debug the check if a current DBIP City Lite database exists
       debug:
-        var: matomo_dbip_mmdb.stat
+        var: matomo_dbip_mmdb.stat.exists
         verbosity: 2
       when: matomo_dbip_mmdb is defined
 
