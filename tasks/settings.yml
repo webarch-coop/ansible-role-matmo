@@ -4,12 +4,22 @@
 
     # TODO Use a dictionary to define settings
 
+    - name: Slurp the settings from the config/config.ini.php file
+      slurp:
+        path: "{{ matomo_html }}/config/config.ini.php"
+      register: matomo_config_b64encoded
+
+    - name: Set a variable for the contents of config/config.ini.php
+      set_fact:
+        matomo_config: "{{ matomo_config_b64encoded['content'] | b64decode | trim }}"
+
     - name: "Set force_ssl to true for {{ matomo_user }}"
       command: php console --no-ansi -n config:set --section="General" --key="force_ssl" --value="1"
       args:
         chdir: "{{ matomo_html }}"
       become: true
       become_user: "{{ matomo_user }}"
+      when: ( 'force_ssl = "1"' not in matomo_config )
 
   tags:
     - matomo

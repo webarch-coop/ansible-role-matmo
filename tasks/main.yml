@@ -30,7 +30,7 @@
 
         - name: Include upgrade tasks
           include_tasks: upgrade.yml
-          when: ( matomo_autoupdate and matomo_installed is version(matomo_required, '<') ) or ( matomo_installed is version(matomo_required, '<') )
+          when: matomo_installed is version(matomo_required, '<')
 
       when: ( matomo_autoupdate is defined ) and ( matomo_installed is defined) and ( matomo_required is defined )
 
