@@ -9,8 +9,9 @@
 
     - name: Debug the check if a current DBIP City Lite database exists
       debug:
-        var: matomo_dbip_mmdb
+        var: matomo_dbip_mmdb.stat
         verbosity: 2
+      when: matomo_dbip_mmdb is defined
 
     - name: Download and unarchive the DBIP City Lite database
       block:
@@ -32,12 +33,18 @@
           become: true
           become_user: "{{ matomo_user }}"
 
-      when: ( matomo_dbip_mmdb is not defined ) or ( not matomo_dbip_mmdb.stat.exists )
+      when: ( not matomo_dbip_mmdb.stat.exists )
 
     - name: Check if a current DBIP City Lite database exists
       stat:
         path: "{{ matomo_private }}/dbip-city-lite-{{ lookup('pipe','date +%Y-%m') }}.mmdb"
       register: matomo_dbip_mmdb
+
+    - name: Debug the check if a current DBIP City Lite database exists
+      debug:
+        var: matomo_dbip_mmdb.stat
+        verbosity: 2
+      when: matomo_dbip_mmdb is defined
 
     - name: Error updating the DBIP City Lite database
       fail:
