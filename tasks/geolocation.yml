@@ -31,7 +31,7 @@
           become: true
           become_user: "{{ matomo_user }}"
 
-      when: not matomo_dbip_mmdb.stat.exists
+      when: ( matomo_dbip_mmdb is not defined ) or ( not matomo_dbip_mmdb.stat.exists )
 
     - name: Check if a current DBIP City Lite database exists
       stat:
