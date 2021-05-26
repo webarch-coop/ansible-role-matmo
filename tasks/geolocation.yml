@@ -7,6 +7,11 @@
         path: "{{ matomo_private }}/dbip-city-lite-{{ lookup('pipe','date +%Y-%m') }}.mmdb"
       register: matomo_dbip_mmdb
 
+    - name: Debug the check if a current DBIP City Lite database exists
+      debug:
+        var: matomo_dbip_mmdb
+        verbosity: 2
+
     - name: Download and unarchive the DBIP City Lite database
       block:
 
