@@ -26,12 +26,22 @@
             mode: 0640
 
         - name: DBIP City Lite database unarchived
-          command: "gunzip dbip-city-lite-{{ lookup('pipe','date +%Y-%m') }}.mmdb.gz"
-          args:
-            chdir: "{{ matomo_private }}"
-            creates: "{{ matomo_private }}/dbip-city-lite-{{ lookup('pipe','date +%Y-%m') }}.mmdb"
-          become: true
-          become_user: "{{ matomo_user }}"
+          block:
+
+            - name: DBIP City Lite database unarchived
+              command: "gunzip dbip-city-lite-{{ lookup('pipe','date +%Y-%m') }}.mmdb.gz"
+              args:
+                chdir: "{{ matomo_private }}"
+                creates: "{{ matomo_private }}/dbip-city-lite-{{ lookup('pipe','date +%Y-%m') }}.mmdb"
+              become: true
+              become_user: "{{ matomo_user }}"
+
+          rescue:
+
+            - name: Delete the downloaded DBIP City Lite database if there was an error unarchiving it
+              file:
+                path: "{{ matomo_private }}/dbip-city-lite-{{ lookup('pipe','date +%Y-%m') }}.mmdb"
+                state: absent
 
       when: ( not matomo_dbip_mmdb.stat.exists )
 
