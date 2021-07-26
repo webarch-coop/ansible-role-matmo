@@ -5,6 +5,11 @@
     - name: Matomo download tgz tasks included
       include_tasks: download.yml
 
+    - name: Matomo files rsync'd into place
+      command: "rsync -aq {{ matomo_private }}/matomo/ {{ matomo_html }}/"
+      become: true
+      become_user: "{{ matomo_user }}"
+
     - name: Random passwd for Matomo admin generated
       command: "pwgen -n {{ 24 | random(14) }} 1"
       no_log: true
