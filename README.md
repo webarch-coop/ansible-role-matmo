@@ -38,6 +38,20 @@ main.yml
   \-- cron.yml
 ```
 
+## Upgrading
+
+This role works fine for upgradting Matomo sites, the only thing it doesn't do
+is delete files, but an [ad hoc
+task](https://docs.ansible.com/ansible/latest/user_guide/intro_adhoc.html) can
+be used for this, assuming the servers with Matomo installed are in a
+`matomo_servers` inventory group:
+
+```bash
+ansible matomo_servers -m file -a "path=/home/stats/sites/default/vendor/doctrine state=absent" --check
+```
+
+If the result looks OK them omit the `--check` to delete the files.
+
 ## Matomo user accounts
 
 If a superuser username, password and token authentication string are provided

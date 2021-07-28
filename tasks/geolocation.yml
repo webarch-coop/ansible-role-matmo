@@ -64,7 +64,7 @@
     - name: Error updating the DBIP City Lite database
       fail:
         msg:
-          - "There has been an error downloading, unarchiving and copying the DBIP City Lite database for Matomoi."
+          - "There has been an error downloading, unarchiving and copying the DBIP City Lite database for Matomo."
           - "If the downloaded file was corrupted and couldn't be unarchived then simply running this again might fix the issue."
           - "For further debugging:"
           - "Check if https://download.db-ip.com/free/dbip-city-lite-{{ lookup('pipe','date +%Y-%m') }}.mmdb.gz exists"
