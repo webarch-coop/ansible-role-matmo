@@ -4,7 +4,7 @@
 
     - name: File deletion script in place
       copy:
-        src: "{{ matomo_installed }}.sh"
+        src: "delete_files_scripts/{{ matomo_installed }}.sh"
         dest: "{{ matomo_html }}/{{ matomo_installed }}.sh"
         mode: 0700
         owner: "{{ matomo_user }}"
