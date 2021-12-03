@@ -9,6 +9,7 @@
         mode: 0700
         owner: "{{ matomo_user }}"
         group: "{{ matomo_group }}"
+      changed_when: false
 
     - name: Run the file deletion script
       command: "bash ./{{ matomo_installed }}.sh"
@@ -23,6 +24,7 @@
       file:
         path: "{{ matomo_html }}/{{ matomo_installed }}.sh"
         state: absent
+      changed_when: false
 
   tags:
     - matomo
