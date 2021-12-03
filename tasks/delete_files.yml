@@ -26,6 +26,14 @@
         state: absent
       changed_when: false
 
+    - name: Wrongly deleted file replaced
+      copy:
+        src: xhprofile.php
+        dest: "{{ matomo_html }}/vendor/lox/xhprof/scripts/xhprofile.php"
+        mode: 0644
+        owner: "{{ matomo_user }}"
+        group: "{{ matomo_group }}"
+
   tags:
     - matomo
 ...
