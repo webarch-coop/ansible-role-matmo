@@ -32,6 +32,10 @@
           include_tasks: upgrade.yml
           when: matomo_installed is version(matomo_required, '<')
 
+        - name: Include file delete tasks
+          include_tasks: delete_files.yml
+          when: matomo_installed in matomo_delete_files_scripts
+
       when: ( matomo_autoupdate is defined ) and ( matomo_installed is defined) and ( matomo_required is defined )
 
     - name: Include install tasks

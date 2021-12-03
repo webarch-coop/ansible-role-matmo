@@ -1,0 +1,27 @@
+---
+- name: Delete unneeded files
+  block:
+
+    - name: File deletion script in place
+      copy:
+        src: "{{ matomo_installed }}.sh"
+        dest: "{{ matomo_html }}/{{ matomo_installed }}.sh"
+        mode: 0700
+        owner: "{{ matomo_user }}"
+        group: "{{ matomo_group }}"
+
+    - name: Run the file deletion script
+      command: "bash ./{{ matomo_installed }}.sh"
+      args:
+        chdir: "{{ matomo_html }}"
+      become: true
+      become_user: "{{ matomo_user }}"
+ 
+    - name: Delete the file deletion script
+      file:
+        path: "{{ matomo_html }}/{{ matomo_installed }}.sh"
+        state: absent
+
+  tags:
+    - matomo
+...
