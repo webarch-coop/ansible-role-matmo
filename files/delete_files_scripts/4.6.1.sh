@@ -150,20 +150,36 @@ node_modules/jquery.dotdotdot/.npmignore
 node_modules/ng-dialog/.eslintrc
 vendor/php-di/php-di/.gitstats.yml
 vendor/php-di/php-di/.phpstorm.meta.php
-vendor/twig/twig/.php_cs.dist
-vendor/lox/xhprof/bin/xhprofile"
+vendor/twig/twig/.php_cs.dist"
+SYMLINKS="vendor/lox/xhprof/bin/xhprofile"
 
 # Delete files
 for f in ${FILES}; do
   if [[ -f "${f}" ]]; then
-    rmdir "${f}"
+    echo "Deleting file ${f}"
+    rm "${f}"
+  else
+    echo "File ${f} has already been deleted"
+  fi
+done
+
+# Delete symlinks
+for s in ${SYMLINKS}; do
+  if [[ -L "${s}" ]]; then
+    echo "Deleting symlink ${s}"
+    rm "${s}"
+  else
+    echo "Symlink ${s} has already been deleted"
   fi
 done
 
 # Delete directories
 for d in ${DIRS}; do
   if [[ -d "${d}" ]]; then
+    echo "Deleting directory ${d}"
     rmdir "${d}"
+  else
+    echo "Directory ${d} has already been deleeted"
   fi
 done
 
