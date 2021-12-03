@@ -38,6 +38,6 @@ matomo_notify_passwd_signature: Webarch Co-operative Limited\nhttps://www.webarc
 # Set matomo_cron to true to setup cron archiving
 matomo_cron: false
 # Matomo versions for which a list of files to delete is present:
-matomo_delete_files_script:
+matomo_delete_files_scripts:
   - 4.6.1
 ...
