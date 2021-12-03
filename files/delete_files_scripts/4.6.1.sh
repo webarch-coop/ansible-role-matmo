@@ -77,7 +77,6 @@ plugins/LanguagesManager/Commands/CreatePull.php
 plugins/Morpheus/javascripts/ajaxHelper.js
 tsconfig.json
 tsconfig.spec.json
-vendor/lox/xhprof/scripts/xhprofile.php
 vendor/maxmind-db/reader/phpstan.neon
 vendor/pear/pear_exception/package.xml
 vendor/php-di/php-di/404.md
