@@ -16,6 +16,8 @@
         chdir: "{{ matomo_html }}"
       become: true
       become_user: "{{ matomo_user }}"
+      register: matomo_files_deleted
+      changed_when: ( "Deleting " in matomo_files_deleted.stdout
 
     - name: Delete the file deletion script
       file:
