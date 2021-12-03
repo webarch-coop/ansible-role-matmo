@@ -3,13 +3,14 @@ dependency:
   name: galaxy
 platforms:
   - name: instance
-    image: registry.git.coop/webarch/containers/images/ansible:0.5.0
+    image: registry.git.coop/webarch/containers/images/ansible:0.8.0
     pre_build_image: true
 provisioner:
   name: ansible
 lint: |
- set -e
-  yamllint -c .yamllint .
+  set -e
+  find -type f -name '*.j2' -exec ansiblej2lint.py {} +
+  yamllint -f colored -c .yamllint .
   ansible-lint -c .ansible-lint --force-color .
 # vim: syntax=yaml
 ...

@@ -16,7 +16,7 @@
         chdir: "{{ matomo_html }}"
       become: true
       become_user: "{{ matomo_user }}"
- 
+
     - name: Delete the file deletion script
       file:
         path: "{{ matomo_html }}/{{ matomo_installed }}.sh"
