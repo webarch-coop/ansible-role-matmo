@@ -177,7 +177,7 @@ done
 for d in ${DIRS}; do
   if [[ -d "${d}" ]]; then
     echo "Deleting directory ${d}"
-    rmdir "${d}"
+    rm -rf "${d}"
   else
     echo "Directory ${d} has already been deleeted"
   fi
