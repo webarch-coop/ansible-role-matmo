@@ -39,7 +39,7 @@ for d in ${DIRS}; do
     echo "Deleting directory ${d}"
     rm -rf "${d}"
   else
-    echo "Directory ${d} has already been deleeted"
+    echo "Directory ${d} has already been deleted"
   fi
 done
 
