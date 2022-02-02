@@ -41,4 +41,5 @@ matomo_cron: false
 matomo_delete_files_scripts:
   - 4.6.1
   - 4.6.2
+  - 4.7.0
 ...
