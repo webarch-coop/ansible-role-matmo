@@ -54,7 +54,7 @@
       check_mode: false
       failed_when: >
         ( matomo_signature_check.rc != 0 ) or
-        ( "Good signature from" not in firefox_gpg_verify.stdout )
+        ( "Good signature from" not in matomo_signature_check.stdout )
       become: true
       become_user: "{{ matomo_user }}"
 
