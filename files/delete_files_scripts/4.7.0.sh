@@ -58,6 +58,13 @@ plugins/CoreHome/angularjs/sparkline/sparkline.component.less
 plugins/CoreHome/vue/src/Menudropdown/Menudropdown.adapter.ts
 plugins/CoreHome/vue/src/Menudropdown/Menudropdown.less
 plugins/CoreHome/vue/src/Menudropdown/Menudropdown.vue
+plugins/CoreHome/angularjs/widget-bydimension-container/widget-bydimension-container.directive.html
+plugins/CoreHome/angularjs/widget-bydimension-container/widget-bydimension-container.directive.js
+plugins/CoreHome/angularjs/widget-bydimension-container/widget-bydimension-container.directive.less
+plugins/CoreHome/angularjs/widget-container/widgetcontainer.directive.html
+plugins/CoreHome/angularjs/widget-container/widgetcontainer.directive.js
+plugins/CoreHome/angularjs/widget-loader/widgetloader.directive.html
+plugins/CoreHome/angularjs/widget-loader/widgetloader.directive.js
 plugins/TagManager/angularjs/importVersion/import-version.controller.js
 plugins/TagManager/angularjs/importVersion/import-version.directive.html
 plugins/TagManager/angularjs/importVersion/import-version.directive.js
