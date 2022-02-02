@@ -50,6 +50,11 @@
         "{{ matomo_private }}/matomo-{{ matomo_required }}.tar.gz.asc"
         "{{ matomo_private }}/matomo-{{ matomo_required }}.tar.gz"
       register: matomo_signature_check
+      changed_when: false
+      check_mode: false
+      failed_when: >
+        ( matomo_signature_check.rc != 0 ) or
+        ( "Good signature from" not in firefox_gpg_verify.stdout )
       become: true
       become_user: "{{ matomo_user }}"
 
