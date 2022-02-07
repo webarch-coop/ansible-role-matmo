@@ -2,16 +2,24 @@
 - name: Apply Matomo settings
   block:
 
-    # TODO Use a dictionary to define settings
-
-    - name: Slurp the settings from the config/config.ini.php file
-      slurp:
-        path: "{{ matomo_html }}/config/config.ini.php"
-      register: matomo_config_b64encoded
+    # TODO Use a dictionary to define general config settings, for example:
+    # matomo_config_general:
+    #   force_ssl: 1
+    #   login_allow_logme: 1
 
     - name: Set a variable for the contents of config/config.ini.php
       set_fact:
         matomo_config: "{{ matomo_config_b64encoded['content'] | b64decode | trim }}"
+
+    - name: "Check the Matomo force_ssl setting for {{ matomo_user }}"
+      command: php console --no-ansi -n config:get --section="General" --key="force_ssl" --format="text"
+      args:
+        chdir: "{{ matomo_html }}"
+      changed_when: false
+      check_mode: false
+      register: matomo_force_ssl
+      become: true
+      become_user: "{{ matomo_user }}"
 
     - name: "Set force_ssl to true for {{ matomo_user }}"
       command: php console --no-ansi -n config:set --section="General" --key="force_ssl" --value="1"
@@ -19,7 +27,25 @@
         chdir: "{{ matomo_html }}"
       become: true
       become_user: "{{ matomo_user }}"
-      when: ( 'force_ssl = "1"' not in matomo_config )
+      when: matomo_force_ssl.stdout != "General.force_ssl = 1"
+
+    - name: "Check the Matomo login_allow_logme setting for {{ matomo_user }}"
+      command: php console --no-ansi -n config:get --section="General" --key="login_allow_logme" --format="text"
+      args:
+        chdir: "{{ matomo_html }}"
+      changed_when: false
+      check_mode: false
+      register: matomo_login_allow_logme
+      become: true
+      become_user: "{{ matomo_user }}"
+
+    - name: "Set login_allow_logme to true for {{ matomo_user }}"
+      command: php console --no-ansi -n config:set --section="General" --key="login_allow_logme" --value="1"
+      args:
+        chdir: "{{ matomo_html }}"
+      become: true
+      become_user: "{{ matomo_user }}"
+      when: matomo_login_allow_logme.stdout != "General.login_allow_logme = 1"
 
   tags:
     - matomo
