@@ -7,10 +7,6 @@
     #   force_ssl: 1
     #   login_allow_logme: 1
 
-    - name: Set a variable for the contents of config/config.ini.php
-      set_fact:
-        matomo_config: "{{ matomo_config_b64encoded['content'] | b64decode | trim }}"
-
     - name: "Check the Matomo force_ssl setting for {{ matomo_user }}"
       command: php console --no-ansi -n config:get --section="General" --key="force_ssl" --format="text"
       args:
@@ -46,6 +42,33 @@
       become: true
       become_user: "{{ matomo_user }}"
       when: matomo_login_allow_logme.stdout != "General.login_allow_logme = 1"
+
+    - name: "Check the Matomo salt setting for {{ matomo_user }}"
+      command: php console --no-ansi -n config:get --section="General" --key="salt" --format="text"
+      args:
+        chdir: "{{ matomo_html }}"
+      changed_when: false
+      check_mode: false
+      register: matomo_salt
+      become: true
+      become_user: "{{ matomo_user }}"
+
+    - name: Generate and set a random string for the salt
+      block:
+
+        - name: "Random string generated for Matomo salt for {{ matomo_user }}"
+          set_fact:
+            matomo_salt: "{{ lookup('random_string', special=false, length=33) }}"
+          no_log: true
+
+        - name: "Set salt for {{ matomo_user }}"
+          command: "php console --no-ansi -n config:set --section='General' --key='salt' --value='{{ matomo_salt }}'"
+          args:
+            chdir: "{{ matomo_html }}"
+          become: true
+          become_user: "{{ matomo_user }}"
+
+      when: matomo_salt.stdout == "Nothing found"
 
   tags:
     - matomo
