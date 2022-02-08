@@ -67,6 +67,7 @@
             chdir: "{{ matomo_html }}"
           become: true
           become_user: "{{ matomo_user }}"
+          no_log: true
 
       when: matomo_salt.stdout == "Nothing found"
 
