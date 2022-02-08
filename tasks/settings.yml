@@ -13,7 +13,7 @@
         chdir: "{{ matomo_html }}"
       changed_when: false
       check_mode: false
-      register: matomo_force_ssl
+      register: matomo_get_force_ssl
       become: true
       become_user: "{{ matomo_user }}"
 
@@ -23,7 +23,7 @@
         chdir: "{{ matomo_html }}"
       become: true
       become_user: "{{ matomo_user }}"
-      when: matomo_force_ssl.stdout != "General.force_ssl = 1"
+      when: matomo_get_force_ssl.stdout != "General.force_ssl = 1"
 
     - name: "Check the Matomo login_allow_logme setting for {{ matomo_user }}"
       command: php console --no-ansi -n config:get --section="General" --key="login_allow_logme" --format="text"
@@ -31,7 +31,7 @@
         chdir: "{{ matomo_html }}"
       changed_when: false
       check_mode: false
-      register: matomo_login_allow_logme
+      register: matomo_get_login_allow_logme
       become: true
       become_user: "{{ matomo_user }}"
 
@@ -41,7 +41,7 @@
         chdir: "{{ matomo_html }}"
       become: true
       become_user: "{{ matomo_user }}"
-      when: matomo_login_allow_logme.stdout != "General.login_allow_logme = 1"
+      when: matomo_get_login_allow_logme.stdout != "General.login_allow_logme = 1"
 
     - name: "Check the Matomo salt setting for {{ matomo_user }}"
       command: php console --no-ansi -n config:get --section="General" --key="salt" --format="text"
@@ -49,7 +49,7 @@
         chdir: "{{ matomo_html }}"
       changed_when: false
       check_mode: false
-      register: matomo_salt
+      register: matomo_get_salt
       become: true
       become_user: "{{ matomo_user }}"
 
@@ -64,7 +64,7 @@
           register: matomo_salt_pwgen
           # no_log: true
 
-        - name: "Random string generated for Matomo salt for {{ matomo_user }}"
+        - name: "Set variable for Matomo salt for {{ matomo_user }}"
           set_fact:
             matomo_salt: "{{ matomo_salt_pwgen.stdout | trim }}"
           # no_log: true
@@ -77,7 +77,7 @@
           become_user: "{{ matomo_user }}"
           # no_log: true
 
-      when: matomo_salt.stdout == "Nothing found"
+      when: matomo_get_salt.stdout == "Nothing found"
 
   tags:
     - matomo
