@@ -66,7 +66,7 @@
 
         - name: "Random string generated for Matomo salt for {{ matomo_user }}"
           set_fact:
-            matomo_salt: "{{ matomo_salt_pwgen.stdout  | trim }}"
+            matomo_salt: "{{ matomo_salt_pwgen.stdout | trim }}"
           # no_log: true
 
         - name: "Set salt for {{ matomo_user }}"
@@ -75,7 +75,7 @@
             chdir: "{{ matomo_html }}"
           become: true
           become_user: "{{ matomo_user }}"
-          no_log: true
+          # no_log: true
 
       when: matomo_salt.stdout == "Nothing found"
 
