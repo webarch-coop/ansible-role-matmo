@@ -70,7 +70,7 @@
           # no_log: true
 
         - name: "Set salt for {{ matomo_user }}"
-          command: "php console --no-ansi -n config:set --section='General' --key='salt' --value='{{ matomo_salt }}'"
+          command: 'php console --no-ansi -n config:set --section="General" --key="salt" --value="{{ matomo_salt }}"'
           args:
             chdir: "{{ matomo_html }}"
           become: true
