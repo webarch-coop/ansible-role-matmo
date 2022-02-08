@@ -14,8 +14,6 @@
       command: php console --no-ansi -n login:unblock-blocked-ips
       args:
         chdir: "{{ matomo_html }}"
-      changed_when: false
-      check_mode: false
       become: true
       become_user: "{{ matomo_user }}"
       register: matomo_unblock_blocked_ips
@@ -23,6 +21,7 @@
 
     # NOTE The following POST is to check that both the password and the
     #      token auth are correct
+    #      See https://developer.matomo.org/api-reference/reporting-api#UsersManager
     - name: "Check superuser access for {{ matomo_user }} on {{ matomo_url }}"
       uri:
         url: "{{ matomo_url }}"
