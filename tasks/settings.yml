@@ -59,7 +59,7 @@
         - name: "Random string generated for Matomo salt for {{ matomo_user }}"
           set_fact:
             matomo_salt: "{{ lookup('random_string', special=false, length=33) }}"
-          no_log: true
+          # no_log: true
 
         - name: "Set salt for {{ matomo_user }}"
           command: "php console --no-ansi -n config:set --section='General' --key='salt' --value='{{ matomo_salt }}'"
