@@ -56,9 +56,17 @@
     - name: Generate and set a random string for the salt
       block:
 
+        # TODO
+        # https://docs.ansible.com/ansible/latest/collections/community/general/random_string_lookup.html
+
+        - name: "Random string generated for Matomo salt for {{ matomo_user }}"
+          command: pwgen -n 33 1
+          register: matomo_salt_pwgen
+          # no_log: true
+
         - name: "Random string generated for Matomo salt for {{ matomo_user }}"
           set_fact:
-            matomo_salt: "{{ lookup('random_string', special=false, length=33) }}"
+            matomo_salt: "{{ matomo_salt_pwgen.stdout  | trim }}"
           # no_log: true
 
         - name: "Set salt for {{ matomo_user }}"
