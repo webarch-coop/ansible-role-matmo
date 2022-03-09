@@ -56,7 +56,11 @@ plugins/TagManager/angularjs/manageVariable/list.directive.js
 plugins/TagManager/angularjs/manageVariable/manage.controller.js
 plugins/TagManager/angularjs/manageVariable/manage.directive.html
 plugins/TagManager/angularjs/manageVariable/manage.directive.js
-plugins/TagManager/angularjs/manageVariable/model.js"
+plugins/TagManager/angularjs/manageVariable/model.js
+plugins/TagManager/angularjs/selectVariableType/select-variable-type.controller.js
+plugins/TagManager/angularjs/selectVariableType/select-variable-type.directive.html
+plugins/TagManager/angularjs/selectVariableType/select-variable-type.directive.js
+plugins/TagManager/angularjs/selectVariableType/select-variable-type.directive.less"
 # SYMLINKS=""
 
 # Delete files
