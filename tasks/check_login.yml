@@ -10,6 +10,15 @@
           - ( matomo_login is defined ) and ( matomo_login is regex("^[a-zA-Z0-9-]{2,14}$") )
           - ( matomo_login_email is defined ) and ( matomo_login_email is regex("^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$") )
 
+    - name: Unblock all blocked IPs since there is no CLI to all IPs to the whitelist or check which are blocked
+      command: php console --no-ansi -n login:unblock-blocked-ips
+      args:
+        chdir: "{{ matomo_html }}"
+      register: matomo_unblock_locked_ips
+      failed_when: matomo_unblock_locked_ips.stdout != "Done"
+      become: true
+      become_user: "{{ matomo_user }}"
+
     - name: "Check if a Matomo login named {{ matomo_login }} exists using the API"
       uri:
         url: "{{ matomo_url }}"
