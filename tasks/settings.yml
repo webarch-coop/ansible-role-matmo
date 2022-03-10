@@ -5,7 +5,7 @@
     # TODO Use a dictionary to define general config settings, for example:
     # matomo_config_general:
     #   force_ssl: 1
-    #   login_allow_logme: 
+    #   login_allow_logme:
 
     - name: "Check the Matomo force_ssl setting for {{ matomo_user }}"
       command: php console --no-ansi -n config:get --section="General" --key="force_ssl" --format="text"
