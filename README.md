@@ -105,3 +105,12 @@ check_site.yml
         |
         \-- check_duplicate_url.yml
 ``` 
+
+## Ansible Galaxy and repo URL
+
+The primary URL of this repo is [`https://git.coop/webarch/matomo`](https://git.coop/webarch/matomo) however it is also [mirrored to GitHub](https://github.com/webarch-coop/ansible-role-matomo) and [available via Ansible Galaxy](https://galaxy.ansible.com/chriscroome/matomo).
+
+If you use this role please use a tagged release, see [the release notes](https://git.coop/webarch/matomo/-/releases).
+
+This role can also be used with the [localhost repo](https://git.coop/webarch/localhost) to install `matomo` locally.
+
