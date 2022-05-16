@@ -42,7 +42,7 @@ matomo_notify_headers:
   - X-Auto-Response-Suppress=All
   - "Reply-To={{ matomo_notify_reply_to }}"
 matomo_notify_subject_tag: webarchitects
-matomo_notify_passwd_signature: Webarch Co-operative Limited\nhttps://www.webarch.coop/
+matomo_notify_signature: Webarch Co-operative Limited\nhttps://www.webarch.coop/
 # Set matomo_cron to true to setup cron archiving
 matomo_cron: false
 ...

@@ -73,7 +73,7 @@
           - ( matomo_notify_reply_to is defined )
           - ( matomo_notify_headers is defined )
           - ( matomo_notify_subject_tag is defined )
-          - ( matomo_notify_passwd_signature is defined )
+          - ( matomo_notify_signature is defined )
           - ( matomo_autoupdate is defined )
 
     - name: Check for config.ini.php
