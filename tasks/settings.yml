@@ -14,6 +14,7 @@
       changed_when: false
       check_mode: false
       register: matomo_get_force_ssl
+      failed_when: matomo_get_force_ssl.rc is not regex('^0|1$')
       become: true
       become_user: "{{ matomo_user }}"
 
@@ -23,7 +24,7 @@
         chdir: "{{ matomo_html }}"
       become: true
       become_user: "{{ matomo_user }}"
-      when: matomo_get_force_ssl.stdout != "General.force_ssl = 1"
+      when: ( matomo_get_force_ssl.rc == 1 ) or ( matomo_get_force_ssl.stdout != "General.force_ssl = 1" )
 
     - name: "Check the Matomo login_allow_logme setting for {{ matomo_user }}"
       command: php console --no-ansi -n config:get --section="General" --key="login_allow_logme" --format="text"
@@ -32,6 +33,7 @@
       changed_when: false
       check_mode: false
       register: matomo_get_login_allow_logme
+      failed_when: matomo_get_login_allow_logme.rc is not regex('^0|1$')
       become: true
       become_user: "{{ matomo_user }}"
 
@@ -41,7 +43,7 @@
         chdir: "{{ matomo_html }}"
       become: true
       become_user: "{{ matomo_user }}"
-      when: matomo_get_login_allow_logme.stdout != "General.login_allow_logme = 1"
+      when: ( matomo_get_login_allow_logme.rc == 1 ) or ( matomo_get_login_allow_logme.stdout != "General.login_allow_logme = 1" )
 
     - name: "Check the Matomo salt setting for {{ matomo_user }}"
       command: php console --no-ansi -n config:get --section="General" --key="salt" --format="text"

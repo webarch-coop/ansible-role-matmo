@@ -20,7 +20,7 @@
 
         - name: Warn if the installed version is older than the latest version
           debug:
-            msg: "The installed Matomo version {{ matomo_installed }}, is older than the latest Matomo {{ matomo_required }}."
+            msg: "The installed Matomo version {{ matomo_installed }}, is older than the latest Matomo {{ matomo_latest }}."
           when: matomo_installed is version(matomo_latest, '<')
 
         - name: Warn if the installed version is newer than the required version
