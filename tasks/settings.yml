@@ -82,6 +82,18 @@
 
       when: ( matomo_get_salt.rc == 1 ) or ( matomo_get_salt.stdout == "Nothing found" )
 
+    - name: "Run php console core:create-security-files for {{ matomo_user }}"
+      command: php console --no-ansi -n core:create-security-files
+      args:
+        chdir: "{{ matomo_html }}"
+
+    - name: "Run php console diagnostics:run for {{ matomo_user }}"
+      command: php console --no-ansi -n diagnostics:run
+      args:
+        chdir: "{{ matomo_html }}"
+      changed_when: false
+      check_mode: false
+
   tags:
     - matomo
 ...
