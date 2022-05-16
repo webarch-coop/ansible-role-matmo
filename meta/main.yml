@@ -18,6 +18,10 @@ galaxy_info:
         - focal
         - bionic
         - xenial
-  galaxy_tags: []
+  galaxy_tags:
+    - debian
+    - ubuntu
+    - matomo
+    - piwik
 dependencies: []
 ...
