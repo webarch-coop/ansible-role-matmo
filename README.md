@@ -1,4 +1,4 @@
-# Matomo Ansible Role
+# Webarchitects Matomo Ansible Role
 
 [![pipeline status](https://git.coop/webarch/matomo/badges/master/pipeline.svg)](https://git.coop/webarch/matomo/-/commits/master)
 
