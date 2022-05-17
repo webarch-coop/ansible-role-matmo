@@ -86,6 +86,8 @@
       command: php console --no-ansi -n core:create-security-files
       args:
         chdir: "{{ matomo_html }}"
+      register: matomo_core_create_security_files
+      failed_when: ( "Done" not in matomo_core_create_security_files.stdout )
 
     - name: "Run php console diagnostics:run for {{ matomo_user }}"
       command: php console --no-ansi -n diagnostics:run
@@ -93,6 +95,8 @@
         chdir: "{{ matomo_html }}"
       changed_when: false
       check_mode: false
+      register: matomo_diagnostics_run
+      failed_when: ( "There are no problems with your Matomo setup" not in matomo_diagnostics_run.stdout )
 
   tags:
     - matomo
