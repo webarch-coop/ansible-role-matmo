@@ -46,4 +46,6 @@ matomo_notify_headers:
   - "Reply-To={{ matomo_notify_reply_to }}"
 # Set matomo_cron to true to setup cron archiving
 matomo_cron: false
+# Set matomo_diagnostics_fail to false to prevent a fail when warnings detected
+matomo_diagnostics_fail: true
 ...

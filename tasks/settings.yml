@@ -89,14 +89,28 @@
       register: matomo_core_create_security_files
       failed_when: ( "Done" not in matomo_core_create_security_files.stdout )
 
-    - name: "Run php console diagnostics:run for {{ matomo_user }}"
-      command: php console --no-ansi -n diagnostics:run
-      args:
-        chdir: "{{ matomo_html }}"
-      changed_when: false
-      check_mode: false
-      register: matomo_diagnostics_run
-      failed_when: ( "There are no problems with your Matomo setup" not in matomo_diagnostics_run.stdout )
+    - name: Run diagnostics
+      block:
+
+        - name: "Run php console diagnostics:run for {{ matomo_user }}"
+          command: php console --no-ansi -n diagnostics:run
+          args:
+            chdir: "{{ matomo_html }}"
+          changed_when: false
+          check_mode: false
+          register: matomo_diagnostics_run
+          failed_when: ( "There are no problems with your Matomo setup" not in matomo_diagnostics_run.stdout )
+
+      rescue:
+
+        - name: Print issues found
+          debug:
+            var: matomo_diagnostics_run.stdout_lines
+
+        - name: Fail if problems found
+          fail:
+          when: matomo_diagnostics_fail | bool
+
 
   tags:
     - matomo
