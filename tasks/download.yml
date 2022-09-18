@@ -3,7 +3,7 @@
   block:
 
     - name: GNU Privacy Guard directory present
-      file:
+      ansible.builtin.file:
         path: "{{ matomo_home }}/.gnupg"
         state: directory
         owner: "{{ matomo_user }}"
@@ -12,7 +12,7 @@
 
     # https://matomo.org/blog/2014/11/verify-signatures-piwik-packages/
     - name: The Matomo < 4.8.0 GPG public key is present
-      copy:
+      ansible.builtin.copy:
         src: files/matomo.pub
         dest: "{{ matomo_private }}/matomo.pub"
         owner: "{{ matomo_user }}"
@@ -20,7 +20,7 @@
         mode: 0644
 
     - name: The Matomo < 4.8.0 GPG public key is imported
-      command: "gpg --no-tty --import '{{ matomo_private }}/matomo.pub'"
+      ansible.builtin.command: "gpg --no-tty --import '{{ matomo_private }}/matomo.pub'"
       register: matomo_gpg_key_import
       changed_when: "'not changed' not in matomo_gpg_key_import.stderr"
       become: true
@@ -28,7 +28,7 @@
 
     # https://builds.matomo.org/signature.asc
     - name: The Matomo >= 4.8.0 GPG public key is present
-      copy:
+      ansible.builtin.copy:
         src: files/signature.asc
         dest: "{{ matomo_private }}/matomo.asc"
         owner: "{{ matomo_user }}"
@@ -36,14 +36,14 @@
         mode: 0644
 
     - name: The Matomo >= 4.8.0 GPG public key is imported
-      command: "gpg --no-tty --import '{{ matomo_private }}/matomo.asc'"
+      ansible.builtin.command: "gpg --no-tty --import '{{ matomo_private }}/matomo.asc'"
       register: matomo_gpg_key_import
       changed_when: "'not changed' not in matomo_gpg_key_import.stderr"
       become: true
       become_user: "{{ matomo_user }}"
 
     - name: Required Matomo GPG signature downloaded
-      get_url:
+      ansible.builtin.get_url:
         url: "https://builds.matomo.org/matomo-{{ matomo_required }}.tar.gz.asc"
         dest: "{{ matomo_private }}/matomo-{{ matomo_required }}.tar.gz.asc"
         force: true
@@ -52,7 +52,7 @@
         mode: 0640
 
     - name: Required Matomo downloaded
-      get_url:
+      ansible.builtin.get_url:
         url: "https://builds.matomo.org/matomo-{{ matomo_required }}.tar.gz"
         dest: "{{ matomo_private }}/matomo-{{ matomo_required }}.tar.gz"
         force: true
@@ -61,7 +61,7 @@
         mode: 0640
 
     - name: Matomo GPG signature checked
-      command: >
+      ansible.builtin.command: >
         gpg --no-tty --verify --logger-fd 1
         "{{ matomo_private }}/matomo-{{ matomo_required }}.tar.gz.asc"
         "{{ matomo_private }}/matomo-{{ matomo_required }}.tar.gz"
@@ -75,17 +75,17 @@
       become_user: "{{ matomo_user }}"
 
     - name: Debug GPG signature check
-      debug:
+      ansible.builtin.debug:
         var: matomo_signature_check.stdout_lines
         verbosity: 2
 
     - name: Private directory for Matomo to be unarchived into absent
-      file:
+      ansible.builtin.file:
         path: "{{ matomo_private }}/matomo"
         state: absent
 
     - name: Required Matomo unarchived into private directory
-      unarchive:
+      ansible.builtin.unarchive:
         remote_src: true
         src: "{{ matomo_private }}/matomo-{{ matomo_required }}.tar.gz"
         dest: "{{ matomo_private }}"

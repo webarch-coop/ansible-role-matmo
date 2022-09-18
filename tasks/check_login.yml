@@ -3,7 +3,7 @@
   block:
 
     - name: Check variables
-      assert:
+      ansible.builtin.assert:
         that:
           - ( matomo_url is defined )
           - ( matomo_token_auth is defined )
@@ -11,7 +11,7 @@
           - ( matomo_login_email is defined ) and ( matomo_login_email is regex("^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$") )
 
     - name: Unblock all blocked IPs since there is no CLI to all IPs to the whitelist or check which are blocked
-      command: php console --no-ansi -n login:unblock-blocked-ips
+      ansible.builtin.command: php console --no-ansi -n login:unblock-blocked-ips
       args:
         chdir: "{{ matomo_html }}"
       register: matomo_unblock_locked_ips
@@ -20,7 +20,7 @@
       become_user: "{{ matomo_user }}"
 
     - name: "Check if a Matomo login named {{ matomo_login }} exists using the API"
-      uri:
+      ansible.builtin.uri:
         url: "{{ matomo_url }}"
         method: POST
         body_format: form-urlencoded
@@ -37,7 +37,7 @@
       failed_when: ( matomo_api_user_exists.json is not defined )
 
     - name: Debug matomo_api_user_exists
-      debug:
+      ansible.builtin.debug:
         var: matomo_api_user_exists
         verbosity: 2
 
@@ -45,10 +45,10 @@
       block:
 
         - name: Update the email address
-          include_tasks: update_email.yml
+          ansible.builtin.include_tasks: update_email.yml
 
         - name: "Set the matomo_login_existing variables to {{ matomo_login }}"
-          set_fact:
+          ansible.builtin.set_fact:
             matomo_login_existing: "{{ matomo_login }}"
 
       when:
@@ -57,7 +57,7 @@
         - ( matomo_api_user_exists.json.value )
 
     - name: Add a new user account when there is no match for the matomo_login or matomo_login_email address
-      include_tasks: add_user.yml
+      ansible.builtin.include_tasks: add_user.yml
       when:
         - ( matomo_api_user_exists.json is defined )
         - ( matomo_api_user_exists.json.value is defined )

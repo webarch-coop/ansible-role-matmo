@@ -3,7 +3,7 @@
   block:
 
     - name: Get the installed Matomo version number
-      command: php console --no-ansi -n core:update --version
+      ansible.builtin.command: php console --no-ansi -n core:update --version
       args:
         chdir: "{{ matomo_html }}"
       changed_when: false
@@ -13,11 +13,11 @@
       register: matomo_installed_check
 
     - name: Set a variable for the installed Matomo version number
-      set_fact:
+      ansible.builtin.set_fact:
         matomo_installed: "{{ matomo_installed_check.stdout.split(' ')[2] | trim }}"
 
     - name: Print the installed version of Matomo
-      debug:
+      ansible.builtin.debug:
         msg: "The installed version of Matomo is {{ matomo_installed | quote }}"
         verbosity: 1
 

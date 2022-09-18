@@ -3,7 +3,7 @@
   block:
 
     - name: Check that required variables are defined
-      assert:
+      ansible.builtin.assert:
         that:
           - ( matomo_url is defined ) and ( matomo_url | length > 0 )
           - ( matomo_token_auth is defined ) and ( matomo_token_auth | length > 0 )
@@ -11,40 +11,40 @@
           - ( matomo_site_main_url is defined ) and ( matomo_site_main_url is regex("^http:\/\/.*$") )
 
     - name: Include Matomo getAllSites API tasks
-      include_tasks: get_all_sites.yml
+      ansible.builtin.include_tasks: get_all_sites.yml
 
     - name: Set matomo_site_ids to an empty array
-      set_fact:
+      ansible.builtin.set_fact:
         matomo_existing_site_ids: []
 
     # TODO Add a quick check that if the matomo_site_name exists and the URLs match then skip slower checks
 
     - name: "Check if there is a Matomo site ID for {{ matomo_site_main_url }}"
-      include_tasks: get_sites_id_from_site_url.yml
+      ansible.builtin.include_tasks: get_sites_id_from_site_url.yml
       vars:
         matomo_proposed_url: "{{ matomo_site_main_url }}"
 
     - name: Print the matomo_existing_site_ids
-      debug:
+      ansible.builtin.debug:
         var: matomo_existing_site_ids
         verbosity: 2
       when: matomo_existing_site_ids is defined
 
     - name: "Check if there is a Matomo site ID for site URLs other than the main one"
-      include_tasks: get_sites_id_from_site_url.yml
+      ansible.builtin.include_tasks: get_sites_id_from_site_url.yml
       loop: "{{ matomo_site_urls }}"
       loop_control:
         loop_var: matomo_proposed_url
       when: ( matomo_site_urls is defined ) and ( matomo_site_urls != [] )
 
     - name: Print the matomo_existing_site_ids
-      debug:
+      ansible.builtin.debug:
         var: matomo_existing_site_ids
         verbosity: 2
       when: matomo_existing_site_ids is defined
 
     - name: This Ansible role only supports having one Matomo site per URL
-      fail:
+      ansible.builtin.fail:
         msg:
           - "There appears to be more than one Matomo site with the same URL"
           - "Please login and check these site IDs: {{ matomo_existing_site_ids }}"
@@ -56,7 +56,7 @@
       block:
 
         - name: Set a matomo_site_id variable and add the matomo_site_main_url to a matomo_proposed_site_urls array
-          set_fact:
+          ansible.builtin.set_fact:
             matomo_site_id: "{{ matomo_existing_site_ids[0] }}"
             matomo_proposed_site_urls:
               - "{{ matomo_site_main_url }}"
@@ -66,7 +66,7 @@
         #      for development of this role, so this could probably be changed
         #      in the future.
         - name: Set a matomo_existing_site_urls array
-          set_fact:
+          ansible.builtin.set_fact:
             matomo_existing_site_urls: "{{ site.main_url.split(', ') | list }}"
           when: matomo_site_id == site.idsite
           loop: "{{ matomo_get_all_sites.json }}"
@@ -74,7 +74,7 @@
             loop_var: site
 
         - name: Add matomo_site_urls URLs to Matomo site proposed URLs
-          set_fact:
+          ansible.builtin.set_fact:
             matomo_proposed_site_urls: "{{ matomo_proposed_site_urls }} + [ '{{ url }}' ]"
           loop: "{{ matomo_site_urls }}"
           loop_control:
@@ -82,33 +82,33 @@
           when: ( matomo_site_urls is defined ) and ( matomo_site_urls != [] )
 
         - name: Set variable for the sorted and unique existing URLs
-          set_fact:
+          ansible.builtin.set_fact:
             matomo_existing_site_urls_sorted: "{{ matomo_existing_site_urls | sort | unique }}"
           when:
             - matomo_existing_site_urls is defined
             - matomo_existing_site_urls | type_debug == "list"
 
         - name: Set variable for the sorted and unique proposed URLs
-          set_fact:
+          ansible.builtin.set_fact:
             matomo_proposed_site_urls_sorted: "{{ matomo_proposed_site_urls | sort | unique }}"
           when:
             - matomo_proposed_site_urls is defined
             - matomo_proposed_site_urls | type_debug == "list"
 
         - name: Debug existing URLs
-          debug:
+          ansible.builtin.debug:
             var: matomo_existing_site_urls_sorted
             verbosity: 2
           when: matomo_existing_site_urls_sorted is defined
 
         - name: Debug matomo_proposed_site_urls_sorted
-          debug:
+          ansible.builtin.debug:
             var: matomo_proposed_site_urls_sorted
             verbosity: 2
           when: matomo_proposed_site_urls_sorted is defined
 
         - name: Include update Matomo site tasks when existing URLs don't match the proposed ones
-          include_tasks: update_site.yml
+          ansible.builtin.include_tasks: update_site.yml
           when:
             - ( matomo_existing_site_urls_sorted is defined ) and ( matomo_proposed_site_urls_sorted is defined )
             - ( matomo_existing_site_urls_sorted | difference(matomo_proposed_site_urls_sorted) | length > 0 ) or ( matomo_proposed_site_urls_sorted | difference(matomo_existing_site_urls_sorted) | length > 0 )
@@ -116,7 +116,7 @@
       when: ( matomo_existing_site_ids is defined ) and ( matomo_existing_site_ids[0] is defined )
 
     - name: Add new site to Matomo server
-      include_tasks: add_site.yml
+      ansible.builtin.include_tasks: add_site.yml
       when: ( matomo_existing_site_ids is not defined ) or ( matomo_existing_site_ids[0] is not defined )
 
     - name: Grant site access to Matomo accout
@@ -126,7 +126,7 @@
         # matches the result, if it does than the get Matomo user login from email address tasks can be skipped
 
         - name: "Check if a Matomo login with the email address {{ matomo_login_email }} exists using the API"
-          uri:
+          ansible.builtin.uri:
             url: "{{ matomo_url }}"
             method: POST
             body_format: form-urlencoded
@@ -143,12 +143,12 @@
           failed_when: ( matomo_api_get_user_login_from_user_email.json.value is not defined )
 
         - name: Debug matomo_api_get_user_login_from_user_email
-          debug:
+          ansible.builtin.debug:
             var: matomo_api_get_user_login_from_user_email
             verbosity: 2
 
         - name: "Set the matomo_login_existing variable to {{ matomo_api_get_user_login_from_user_email.json.value }} as a Matomo account with a matching email address exists"
-          set_fact:
+          ansible.builtin.set_fact:
             matomo_login_existing: "{{ matomo_api_get_user_login_from_user_email.json.value }}"
           when: ( matomo_api_get_user_login_from_user_email.json.value is defined )
 
@@ -156,12 +156,12 @@
           block:
 
             - name: Debug matomo_login_existing
-              debug:
+              ansible.builtin.debug:
                 var: matomo_login_existing
                 verbosity: 2
 
             - name: "Get users and their roles for Matomo site with ID {{ matomo_site_id }}"
-              uri:
+              ansible.builtin.uri:
                 url: "{{ matomo_url }}"
                 method: POST
                 body_format: form-urlencoded
@@ -175,12 +175,12 @@
               register: matomo_api_get_users_plus_role
 
             - name: Debug matomo_api_get_users_plus_role
-              debug:
+              ansible.builtin.debug:
                 var: matomo_api_get_users_plus_role
                 verbosity: 2
 
             - name: "Set a variable for the role for Matomo login {{ matomo_login }}"
-              set_fact:
+              ansible.builtin.set_fact:
                 matomo_existing_role: "{{ login_and_role.role  }}"
               when: login_and_role.login == matomo_login_existing
               loop: "{{ matomo_api_get_users_plus_role.json }}"
@@ -188,7 +188,7 @@
                 loop_var: login_and_role
 
             - name: "Set the role to view for {{ matomo_login_existing }} on site ID {{ matomo_site_id }}"
-              uri:
+              ansible.builtin.uri:
                 url: "{{ matomo_url }}"
                 method: POST
                 body_format: form-urlencoded
@@ -205,7 +205,7 @@
               failed_when: ( matomo_api_set_user_access.json is not defined ) or ( matomo_api_set_user_access.json is defined and matomo_api_set_user_access.json.result != "success" )
 
             - name: Debug matomo_api_set_user_access
-              debug:
+              ansible.builtin.debug:
                 var: matomo_api_set_user_access
                 verbosity: 2
 

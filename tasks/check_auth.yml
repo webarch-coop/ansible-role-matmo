@@ -3,7 +3,7 @@
   block:
 
     - name: Check variables are defined
-      assert:
+      ansible.builtin.assert:
         that:
           - matomo_url is defined
           - matomo_user is defined
@@ -11,7 +11,7 @@
           - matomo_token_auth is defined
 
     - name: Unblock all currently blocked IPs
-      command: php console --no-ansi -n login:unblock-blocked-ips
+      ansible.builtin.command: php console --no-ansi -n login:unblock-blocked-ips
       args:
         chdir: "{{ matomo_html }}"
       become: true
@@ -23,7 +23,7 @@
     #      token auth are correct
     #      See https://developer.matomo.org/api-reference/reporting-api#UsersManager
     - name: "Check superuser access for {{ matomo_user }} on {{ matomo_url }}"
-      uri:
+      ansible.builtin.uri:
         url: "{{ matomo_url }}"
         method: POST
         body_format: form-urlencoded
@@ -39,18 +39,18 @@
       register: matomo_api_set_super_user_access
 
     - name: Debug matomo_api_set_super_user_access
-      debug:
+      ansible.builtin.debug:
         var: matomo_api_set_super_user_access
         verbosity: 2
 
     - name: Set variable based on result of superuser token_auth and password check
-      set_fact:
+      ansible.builtin.set_fact:
         matomo_super_user_access: "{% if matomo_api_set_super_user_access.json.result is defined and matomo_api_set_super_user_access.json.result == 'success' %}True{% else %}False{% endif %}"
 
     - name: Matomo super user auth token and / or password variables check
-      fail:
+      ansible.builtin.fail:
         msg: "Please check the matomo_token_auth and matomo_password are correct for the Matomo superuser {{ matomo_user }} on {{ matomo_url }}"
-      when: not matomo_super_user_access
+      when: not matomo_super_user_access | bool
 
   tags:
     - matomo

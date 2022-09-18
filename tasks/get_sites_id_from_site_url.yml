@@ -3,7 +3,7 @@
   block:
 
     - name: Check that required variables are defined
-      assert:
+      ansible.builtin.assert:
         that:
           - ( matomo_url is defined ) and ( matomo_url | length > 0 )
           - ( matomo_token_auth is defined ) and ( matomo_token_auth | length > 0 )
@@ -15,7 +15,7 @@
    #      development of this role, so this could probably be changed in the
    #      future.
     - name: Loop thought the existing sites checking if the proposed URL is assigned to an existing Matomo site
-      include_tasks: check_main_url.yml
+      ansible.builtin.include_tasks: check_main_url.yml
       vars:
         matomo_existing_id: "{{ site.idsite }}"
         matomo_existing_main_urls: "{{ site.main_url.split(', ') }}"
@@ -24,7 +24,7 @@
         loop_var: site
 
     - name: Debug matomo_existing_site_ids
-      debug:
+      ansible.builtin.debug:
         var: matomo_existing_site_ids
         verbosity: 2
 

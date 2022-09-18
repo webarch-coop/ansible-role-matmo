@@ -3,18 +3,18 @@
   block:
 
     - name: Get the latest Matomo version number file
-      uri:
+      ansible.builtin.uri:
         url: https://builds.matomo.org/LATEST
         return_content: true
         force: true
       register: matomo_latest_get
 
     - name: Set a variable for the latest Matomo version
-      set_fact:
+      ansible.builtin.set_fact:
         matomo_latest: "{{ matomo_latest_get.content | trim }}"
 
     - name: Print the latest version
-      debug:
+      ansible.builtin.debug:
         msg: "The latest version of Matomo is {{ matomo_latest | quote }}"
         verbosity: 1
 

@@ -3,7 +3,7 @@
   block:
 
     - name: "Loop though all the sites apart from {{ site.idsite }}"
-      include_tasks: check_duplicate_url.yml
+      ansible.builtin.include_tasks: check_duplicate_url.yml
       loop: "{{ matomo_get_all_sites.json }}"
       loop_control:
         loop_var: site_check

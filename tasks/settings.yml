@@ -8,7 +8,7 @@
     #   login_allow_logme: 1
 
     - name: "Check the Matomo force_ssl setting for {{ matomo_user }}"
-      command: php console --no-ansi -n config:get --section="General" --key="force_ssl" --format="text"
+      ansible.builtin.command: php console --no-ansi -n config:get --section="General" --key="force_ssl" --format="text"
       args:
         chdir: "{{ matomo_html }}"
       changed_when: false
@@ -19,7 +19,7 @@
       become_user: "{{ matomo_user }}"
 
     - name: "Set force_ssl to true for {{ matomo_user }}"
-      command: php console --no-ansi -n config:set --section="General" --key="force_ssl" --value="1"
+      ansible.builtin.command: php console --no-ansi -n config:set --section="General" --key="force_ssl" --value="1"
       args:
         chdir: "{{ matomo_html }}"
       become: true
@@ -27,7 +27,7 @@
       when: ( matomo_get_force_ssl.rc == 1 ) or ( matomo_get_force_ssl.stdout != "General.force_ssl = 1" )
 
     - name: "Check the Matomo login_allow_logme setting for {{ matomo_user }}"
-      command: php console --no-ansi -n config:get --section="General" --key="login_allow_logme" --format="text"
+      ansible.builtin.command: php console --no-ansi -n config:get --section="General" --key="login_allow_logme" --format="text"
       args:
         chdir: "{{ matomo_html }}"
       changed_when: false
@@ -38,7 +38,7 @@
       become_user: "{{ matomo_user }}"
 
     - name: "Set login_allow_logme to true for {{ matomo_user }}"
-      command: php console --no-ansi -n config:set --section="General" --key="login_allow_logme" --value="1"
+      ansible.builtin.command: php console --no-ansi -n config:set --section="General" --key="login_allow_logme" --value="1"
       args:
         chdir: "{{ matomo_html }}"
       become: true
@@ -46,7 +46,7 @@
       when: ( matomo_get_login_allow_logme.rc == 1 ) or ( matomo_get_login_allow_logme.stdout != "General.login_allow_logme = 1" )
 
     - name: "Check the Matomo salt setting for {{ matomo_user }}"
-      command: php console --no-ansi -n config:get --section="General" --key="salt" --format="text"
+      ansible.builtin.command: php console --no-ansi -n config:get --section="General" --key="salt" --format="text"
       args:
         chdir: "{{ matomo_html }}"
       changed_when: false
@@ -63,17 +63,17 @@
         # https://docs.ansible.com/ansible/latest/collections/community/general/random_string_lookup.html
 
         - name: "Random string generated for Matomo salt for {{ matomo_user }}"
-          command: pwgen -n 33 1
+          ansible.builtin.command: pwgen -n 33 1
           register: matomo_salt_pwgen
           # no_log: true
 
         - name: "Set variable for Matomo salt for {{ matomo_user }}"
-          set_fact:
+          ansible.builtin.set_fact:
             matomo_salt: "{{ matomo_salt_pwgen.stdout | trim }}"
           # no_log: true
 
         - name: "Set salt for {{ matomo_user }}"
-          command: 'php console --no-ansi -n config:set --section="General" --key="salt" --value="{{ matomo_salt }}"'
+          ansible.builtin.command: 'php console --no-ansi -n config:set --section="General" --key="salt" --value="{{ matomo_salt }}"'
           args:
             chdir: "{{ matomo_html }}"
           become: true
@@ -83,7 +83,7 @@
       when: ( matomo_get_salt.rc == 1 ) or ( matomo_get_salt.stdout == "Nothing found" )
 
     - name: "Run php console core:create-security-files for {{ matomo_user }}"
-      command: php console --no-ansi -n core:create-security-files
+      ansible.builtin.command: php console --no-ansi -n core:create-security-files
       args:
         chdir: "{{ matomo_html }}"
       register: matomo_core_create_security_files
@@ -93,7 +93,7 @@
       block:
 
         - name: "Run php console diagnostics:run for {{ matomo_user }}"
-          command: php console --no-ansi -n diagnostics:run
+          ansible.builtin.command: php console --no-ansi -n diagnostics:run
           args:
             chdir: "{{ matomo_html }}"
           changed_when: false
@@ -104,11 +104,11 @@
       rescue:
 
         - name: Print issues found
-          debug:
+          ansible.builtin.debug:
             var: matomo_diagnostics_run.stdout_lines
 
         - name: Fail if problems found
-          fail:
+          ansible.builtin.fail:
           when: matomo_diagnostics_fail | bool
 
 

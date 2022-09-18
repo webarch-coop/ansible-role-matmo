@@ -3,7 +3,7 @@
   block:
 
     - name: Check variables
-      assert:
+      ansible.builtin.assert:
         that:
           - ( matomo_url is defined )
           - ( matomo_password is defined )
@@ -12,17 +12,17 @@
           - ( matomo_login_email is defined ) and ( matomo_login_email is regex("^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$") )
 
     - name: Generate a random string for Matomo password
-      command: "pwgen -n {{ 24 | random(14) }} 1"
+      ansible.builtin.command: "pwgen -n {{ 24 | random(14) }} 1"
       register: matomo_login_password_gen
       no_log: true
 
     - name: Set a variable with the random password
-      set_fact:
+      ansible.builtin.set_fact:
         matomo_login_password: "{{ matomo_login_password_gen.stdout }}"
       no_log: true
 
     - name: Add Matomo user account using the API
-      uri:
+      ansible.builtin.uri:
         url: "{{ matomo_url }}"
         method: POST
         body_format: form-urlencoded
@@ -40,7 +40,7 @@
       changed_when: ( matomo_api_add_user.json is defined ) or ( matomo_api_add_user.json.result == "success" )
 
     - name: Debug matomo_api_add_user
-      debug:
+      ansible.builtin.debug:
         var: matomo_api_add_user
         verbosity: 2
 
@@ -48,7 +48,7 @@
       block:
 
         - name: "Ensure that the {{ matomo_accounts_file }} exists"
-          blockinfile:
+          ansible.builtin.blockinfile:
             path: "{{ matomo_accounts_file }}"
             create: true
             block: |
@@ -60,7 +60,7 @@
             group: "{{ matomo_group }}"
 
         - name: "Password for {{ matomo_login_email }} present in {{ matomo_accounts_file }}"
-          blockinfile:
+          ansible.builtin.blockinfile:
             path: "{{ matomo_accounts_file }}"
             block: |
               - login: {{ matomo_login | quote }}
@@ -80,7 +80,7 @@
       block:
 
         - name: "Password notification email sent to {{ matomo_login_email }}"
-          mail:
+          ansible.builtin.mail:
             from: "{{ matomo_email_from | default('Webarchitects') | quote }} <root@{{ ansible_fqdn }}>"
             to: "{{ matomo_login_email }}"
             subject: "[{{ matomo_email_subject_tag | default('webarchitects') }}] Matomo {{ matomo_login }} account details for {{ matomo_url }}"
@@ -93,7 +93,7 @@
             secure: never
 
         - name: "Notification date recorded in {{ matomo_login_home }}/.notify_matomo_passwd file"
-          lineinfile:
+          ansible.builtin.lineinfile:
             path: "{{ matomo_login_home }}/.notify_matomo_passwd"
             line: "{{ lookup('pipe', 'date +%Y-%m-%d-%H-%M-%S') }} : {{ matomo_login }} <{{ matomo_login_email }}>"
             create: true
@@ -107,7 +107,7 @@
       when: matomo_api_add_user.json.result == "success"
 
     - name: "Set the matomo_login_existing variables to {{ matomo_login }}"
-      set_fact:
+      ansible.builtin.set_fact:
         matomo_login_existing: "{{ matomo_login }}"
 
   tags:

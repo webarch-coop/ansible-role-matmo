@@ -3,7 +3,7 @@
   block:
 
     - name: Matomo API POST request to SitesManager.getSiteUrlsFromId
-      uri:
+      ansible.builtin.uri:
         url: "{{ matomo_url }}"
         method: POST
         body_format: form-urlencoded
@@ -16,20 +16,20 @@
           status_code: 200
           return_content: true
       register: matomo_get_site_check_urls_from_id
-      failed_when: ( matomo_get_site_check_urls_from_id.failed is defined ) and ( matomo_get_site_check_urls_from_id.failed )
+      failed_when: ( matomo_get_site_check_urls_from_id.failed is defined ) and ( matomo_get_site_check_urls_from_id.failed | bool )
 
     - name: Debug matomo_get_site_check_urls_from_id
-      debug:
+      ansible.builtin.debug:
         var: matomo_get_site_check_urls_from_id.json
         verbosity: 2
 
     - name: Debug matomo_site_url
-      debug:
+      ansible.builtin.debug:
         var: matomo_site_url
         verbosity: 2
 
     - name: Debug loop though all the URLs checking for URL duplicates
-      debug:
+      ansible.builtin.debug:
         msg:
           - "The Matomo siteid being checked is {{ site.idsite }}"
           - "URL for the site being checked is {{ matomo_site_url }}"
@@ -41,7 +41,7 @@
         loop_var: matomo_site_check_url
 
     - name: Loop though all the URLs checking for URL duplicates
-      set_fact:
+      ansible.builtin.set_fact:
         # matomo_site_duplicates: "{{ matomo_site_duplicates }} + [ '{{ site_check.idsite }}' ]"
         matomo_site_duplicates: "{{ [ matomo_site_duplicates ] + [ site_check.idsite ] }}"
       when: matomo_site_url == matomo_site_check_url

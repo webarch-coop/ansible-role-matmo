@@ -2,7 +2,7 @@
 # https://docs.ansible.com/ansible-lint/rules/default_rules.html
 skip_list:
   # Use FQCN for builtin actions
-  - fqcn-builtins
+  # - fqcn-builtins
   # Commands should not change things if nothing needs doing
   - no-changed-when
   # The metadata schema validation fails as it expect the versions of Debian to be intergers and not strings

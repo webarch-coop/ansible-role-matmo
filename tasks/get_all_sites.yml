@@ -3,13 +3,13 @@
   block:
 
     - name: Check that required variables are defined
-      assert:
+      ansible.builtin.assert:
         that:
           - ( matomo_url is defined ) and ( matomo_url | length > 0 )
           - ( matomo_token_auth is defined ) and ( matomo_token_auth | length > 0 )
 
     - name: Matomo API POST request to SitesManager.getAllSites
-      uri:
+      ansible.builtin.uri:
         url: "{{ matomo_url }}"
         method: POST
         body_format: form-urlencoded
@@ -24,12 +24,12 @@
       failed_when: ( matomo_get_all_sites.failed is defined ) and ( matomo_get_all_sites.failed )
 
     - name: Debug matomo_get_all_sites
-      debug:
+      ansible.builtin.debug:
         var: matomo_get_all_sites
         verbosity: 2
 
     - name: Debug matomo_get_all_sites.json type
-      debug:
+      ansible.builtin.debug:
         msg: "The matomo_get_all_sites.json variable type: {{ matomo_get_all_sites.json | type_debug }}"
         verbosity: 2
 

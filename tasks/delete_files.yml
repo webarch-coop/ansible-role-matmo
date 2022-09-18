@@ -3,7 +3,7 @@
   block:
 
     - name: File deletion script in place
-      copy:
+      ansible.builtin.copy:
         src: "delete_files_scripts/{{ matomo_installed }}.sh"
         dest: "{{ matomo_html }}/{{ matomo_installed }}.sh"
         mode: 0700
@@ -12,7 +12,7 @@
       changed_when: false
 
     - name: Run the file deletion script
-      command: "bash ./{{ matomo_installed }}.sh"
+      ansible.builtin.command: "bash ./{{ matomo_installed }}.sh"
       args:
         chdir: "{{ matomo_html }}"
       become: true
@@ -21,7 +21,7 @@
       changed_when: ( "Deleting " in matomo_files_deleted.stdout )
 
     - name: Delete the file deletion script
-      file:
+      ansible.builtin.file:
         path: "{{ matomo_html }}/{{ matomo_installed }}.sh"
         state: absent
       changed_when: false

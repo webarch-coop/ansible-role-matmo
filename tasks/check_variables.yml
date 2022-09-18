@@ -3,22 +3,22 @@
   block:
 
     - name: Check that the matomo_users variable is defined
-      assert:
+      ansible.builtin.assert:
         that:
           - ( matomo_user is defined ) and ( matomo_user is regex("^[a-z0-9]*$") )
 
     - name: "Populate the getent_passwd array for {{ inventory_hostname }}"
-      getent:
+      ansible.builtin.getent:
         database: passwd
         split: ':'
 
     - name: "Fail if the {{ matomo_user }} user account doesn't exist"
-      fail:
+      ansible.builtin.fail:
         msg: "The {{ matomo_user }} user account doesn't exist on {{ inventory_hostname }}"
       when: matomo_user not in getent_passwd
 
     - name: "Check that the required directory variables are defined for {{ matomo_user }}"
-      assert:
+      ansible.builtin.assert:
         that:
           - matomo_home is defined
           - matomo_html is defined
@@ -26,7 +26,7 @@
           - matomo_logs is defined
 
     - name: "Stat directories for {{ matomo_user }}"
-      stat:
+      ansible.builtin.stat:
         path: "{{ path }}"
       loop:
         - "{{ matomo_home }}"
@@ -39,7 +39,7 @@
         label: "{{ path }}"
 
     - name: "Print the results of the directory checks for {{ matomo_user }}"
-      debug:
+      ansible.builtin.debug:
         msg: "Stat results: {{ stat }}"
         verbosity: 1
       loop: "{{ matomo_dirs.results }}"
@@ -48,7 +48,7 @@
         label: "{{ stat.path }}"
 
     - name: "Fail if any of the directories for {{ matomo_user }} don't exist"
-      fail:
+      ansible.builtin.fail:
         msg: "The directory {{ dir.stat.path }} needs to exist"
       when: not dir.stat.isdir
       loop: "{{ matomo_dirs.results }}"
@@ -58,7 +58,7 @@
 
     # Additional check on the values of these variables could be added below
     - name: "Check that required variables are defined for {{ matomo_user }}"
-      assert:
+      ansible.builtin.assert:
         that:
           - ( matomo_db_username is defined )
           - ( matomo_db_host is defined )
@@ -77,7 +77,7 @@
           - ( matomo_autoupdate is defined )
 
     - name: Check for config.ini.php
-      stat:
+      ansible.builtin.stat:
         path: "{{ matomo_html }}/config/config.ini.php"
       register: matomo_config_check
 
@@ -85,10 +85,10 @@
       block:
 
         - name: Include Matomo version check
-          include_tasks: check_version.yml
+          ansible.builtin.include_tasks: check_version.yml
 
         - name: Check that matomo_token_auth and matomo_password are correct if defined
-          include_tasks: check_auth.yml
+          ansible.builtin.include_tasks: check_auth.yml
           when:
             - ( matomo_installed is defined ) and ( matomo_installed is version('3.14.1', '>=') )
             - ( matomo_password is defined ) and ( matomo_password | length > 0 )
@@ -98,10 +98,10 @@
 
     # Set matomo_latest to the latest available version of Matomo
     - name: Include latest version check
-      include_tasks: check_latest_version.yml
+      ansible.builtin.include_tasks: check_latest_version.yml
 
     - name: Set the matomo_required variable
-      set_fact:
+      ansible.builtin.set_fact:
         matomo_required: "{% if matomo_autoupdate %}{{ matomo_latest }}{% else %}{{ matomo_version }}{% endif %}"
 
   tags:

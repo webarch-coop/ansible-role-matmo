@@ -3,12 +3,12 @@
   block:
 
     - name: Check if a current DBIP City Lite database exists
-      stat:
+      ansible.builtin.stat:
         path: "{{ matomo_private }}/dbip-city-lite-{{ lookup('pipe','date +%Y-%m') }}.mmdb"
       register: matomo_dbip_mmdb
 
     - name: Debug the check if a current DBIP City Lite database exists
-      debug:
+      ansible.builtin.debug:
         var: matomo_dbip_mmdb.stat.exists
         verbosity: 2
       when: matomo_dbip_mmdb is defined
@@ -17,7 +17,7 @@
       block:
 
         - name: Current DBIP City Lite database archive present
-          get_url:
+          ansible.builtin.get_url:
             url: "https://download.db-ip.com/free/dbip-city-lite-{{ lookup('pipe','date +%Y-%m') }}.mmdb.gz"
             dest: "{{ matomo_private }}/dbip-city-lite-{{ lookup('pipe','date +%Y-%m') }}.mmdb.gz"
             timeout: 120
@@ -29,7 +29,7 @@
           block:
 
             - name: DBIP City Lite database unarchived
-              command: "gunzip dbip-city-lite-{{ lookup('pipe','date +%Y-%m') }}.mmdb.gz"
+              ansible.builtin.command: "gunzip dbip-city-lite-{{ lookup('pipe','date +%Y-%m') }}.mmdb.gz"
               args:
                 chdir: "{{ matomo_private }}"
                 creates: "{{ matomo_private }}/dbip-city-lite-{{ lookup('pipe','date +%Y-%m') }}.mmdb"
@@ -39,30 +39,30 @@
           rescue:
 
             - name: Delete the downloaded DBIP City Lite database archive if there was an error unarchiving it
-              file:
+              ansible.builtin.file:
                 path: "{{ matomo_private }}/dbip-city-lite-{{ lookup('pipe','date +%Y-%m') }}.mmdb.gz"
                 state: absent
 
             - name: Delete the downloaded DBIP City Lite database if there was an error unarchiving it
-              file:
+              ansible.builtin.file:
                 path: "{{ matomo_private }}/dbip-city-lite-{{ lookup('pipe','date +%Y-%m') }}.mmdb"
                 state: absent
 
       when: ( not matomo_dbip_mmdb.stat.exists )
 
     - name: Check if a current DBIP City Lite database exists
-      stat:
+      ansible.builtin.stat:
         path: "{{ matomo_private }}/dbip-city-lite-{{ lookup('pipe','date +%Y-%m') }}.mmdb"
       register: matomo_dbip_mmdb
 
     - name: Debug the check if a current DBIP City Lite database exists
-      debug:
+      ansible.builtin.debug:
         var: matomo_dbip_mmdb.stat.exists
         verbosity: 2
       when: matomo_dbip_mmdb is defined
 
     - name: Error updating the DBIP City Lite database
-      fail:
+      ansible.builtin.fail:
         msg:
           - "There has been an error downloading, unarchiving and copying the DBIP City Lite database for Matomo."
           - "If the downloaded file was corrupted and couldn't be unarchived then simply running this again might fix the issue."
@@ -73,7 +73,7 @@
       when: not matomo_dbip_mmdb.stat.exists
 
     - name: DBIP City Lite database in place
-      copy:
+      ansible.builtin.copy:
         src: "{{ matomo_private }}/dbip-city-lite-{{ lookup('pipe','date +%Y-%m') }}.mmdb"
         dest: "{{ matomo_html }}/misc/DBIP-City.mmdb"
         remote_src: true

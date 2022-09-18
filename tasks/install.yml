@@ -3,26 +3,26 @@
   block:
 
     - name: Matomo download tgz tasks included
-      include_tasks: download.yml
+      ansible.builtin.include_tasks: download.yml
 
     - name: Matomo files rsync'd into place
-      command: "rsync -aq {{ matomo_private }}/matomo/ {{ matomo_html }}/"
+      ansible.builtin.command: "rsync -aq {{ matomo_private }}/matomo/ {{ matomo_html }}/"
       become: true
       become_user: "{{ matomo_user }}"
 
     - name: Random passwd for Matomo admin generated
-      command: "pwgen -n {{ 24 | random(14) }} 1"
+      ansible.builtin.command: "pwgen -n {{ 24 | random(14) }} 1"
       no_log: true
       register: matomo_first_user_pass_gen
 
     - name: Fact set for Matomo admin password
-      set_fact:
+      ansible.builtin.set_fact:
         matomo_first_user_pass: "{{ matomo_first_user_pass_gen.stdout | trim | quote }}"
       when: ( matomo_first_user_pass_gen is defined ) and ( matomo_first_user_pass_gen | length > 0 )
       no_log: true
 
     - name: Check that required variables are defined
-      assert:
+      ansible.builtin.assert:
         that:
           - ( matomo_db_host is defined ) and ( matomo_db_host | length > 0 )
           - ( matomo_dbname is defined ) and ( matomo_dbname | length > 0 )
@@ -35,10 +35,10 @@
           - ( matomo_first_user_pass is defined ) and ( matomo_first_user_pass | length > 0 )
 
     - name: Include web install tasks
-      include_tasks: install_web.yml
+      ansible.builtin.include_tasks: install_web.yml
 
     - name: "Password notification email sent to {{ matomo_first_user_email }}"
-      mail:
+      ansible.builtin.mail:
         from: "{{ matomo_notify_from }}"
         to: '"{{ matomo_first_user | quote }}" <{{ matomo_first_user_email }}>'
         subject: "[{{ matomo_notify_subject_tag | default('webarchitects') }}] Matomo superuser password for {{ matomo_url }}"
@@ -51,7 +51,7 @@
       when: ( matomo_notify_passwd is defined ) and ( matomo_notify_passwd )
 
     - name: Get the installed Matomo version number
-      command: php console --no-ansi -n core:update --version
+      ansible.builtin.command: php console --no-ansi -n core:update --version
       args:
         chdir: "{{ matomo_html }}"
       changed_when: false
@@ -61,11 +61,11 @@
       register: matomo_installed_check
 
     - name: Set a variable for the installed Matomo version number
-      set_fact:
+      ansible.builtin.set_fact:
         matomo_installed: "{{ matomo_installed_check.stdout.split(' ')[2] }}"
 
     - name: Print the installed version of Matomo
-      debug:
+      ansible.builtin.debug:
         msg: "The installed version of Matomo is {{ matomo_installed }}"
         verbosity: 1
 

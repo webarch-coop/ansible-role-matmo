@@ -3,13 +3,13 @@
   block:
 
     - name: Include variables checks
-      include_tasks: check_variables.yml
+      ansible.builtin.include_tasks: check_variables.yml
 
     - name: Matomo upgrade
       block:
 
         - name: Debug version variables
-          debug:
+          ansible.builtin.debug:
             msg:
               - "Matomo automatic update: {{ matomo_autoupdate }}"
               - "Matomo version (from defaults): {{ matomo_version }}"
@@ -19,38 +19,38 @@
             verbosity: 1
 
         - name: Warn if the installed version is older than the latest version
-          debug:
+          ansible.builtin.debug:
             msg: "The installed Matomo version {{ matomo_installed }}, is older than the latest Matomo {{ matomo_latest }}."
           when: matomo_installed is version(matomo_latest, '<')
 
         - name: Warn if the installed version is newer than the required version
-          debug:
+          ansible.builtin.debug:
             msg: "Downgrading from the installed Matomo version {{ matomo_installed }}, to the required version, Matomo {{ matomo_required }}, is not supported so has been skipped."
           when: matomo_installed is version(matomo_required, '>')
 
         - name: Include upgrade tasks
-          include_tasks: upgrade.yml
+          ansible.builtin.include_tasks: upgrade.yml
           when: matomo_installed is version(matomo_required, '<')
 
         - name: Include file delete tasks
-          include_tasks: delete_files.yml
+          ansible.builtin.include_tasks: delete_files.yml
           when: matomo_installed in matomo_delete_files_scripts
 
       when: ( matomo_autoupdate is defined ) and ( matomo_installed is defined) and ( matomo_required is defined )
 
     - name: Include install tasks
-      include_tasks: install.yml
-      when: ( matomo_config_check is defined ) and ( not matomo_config_check.stat.exists )
+      ansible.builtin.include_tasks: install.yml
+      when: ( matomo_config_check is defined ) and ( not matomo_config_check.stat.exists | bool )
 
     - name: Include geolocation tasks
-      include_tasks: geolocation.yml
+      ansible.builtin.include_tasks: geolocation.yml
 
     - name: Include settings tasks
-      include_tasks: settings.yml
+      ansible.builtin.include_tasks: settings.yml
 
     - name: Include cron tasks
       include_tasks: cron.yml
-      when: ( matomo_cron is defined ) and ( matomo_cron )
+      ansible.builtin.when: ( matomo_cron is defined ) and ( matomo_cron | bool )
 
   tags:
     - matomo

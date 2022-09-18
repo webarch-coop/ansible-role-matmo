@@ -3,7 +3,7 @@
   block:
 
     - name: Check that required variables are defined
-      assert:
+      ansible.builtin.assert:
         that:
           - ( matomo_url is defined ) and ( matomo_url | length > 0 )
           - ( matomo_token_auth is defined ) and ( matomo_token_auth | length > 0 )
@@ -13,17 +13,17 @@
           - ( matomo_existing_main_urls is defined ) and ( matomo_existing_main_urls[0] is defined )
 
     - name: Debug matomo_existing_main_urls
-      debug:
+      ansible.builtin.debug:
         var: matomo_existing_main_urls
         verbosity: 2
 
     - name: Debug matomo_proposed_url
-      debug:
+      ansible.builtin.debug:
         var: matomo_proposed_url
         verbosity: 2
 
-    - name: Debug Loop thought the matomo_existing_main_urls
-      debug:
+    - name: Debug Loop though the matomo_existing_main_urls
+      ansible.builtin.debug:
         msg:
           - "matomo_existing_id: {{ matomo_existing_id }}"
           - "url: {{ url }}"
@@ -33,8 +33,9 @@
         loop_var: url
 
     - name: Loop thought the matomo_existing_main_urls
-      set_fact:
-        matomo_existing_site_ids: "{{ matomo_existing_site_ids | default([]) }} + [ '{{ site.idsite }}' ]"
+      ansible.builtin.set_fact:
+        # matomo_existing_site_ids: "{{ matomo_existing_site_ids | default([]) }} + [ '{{ site.idsite }}' ]"
+        matomo_existing_site_ids: "{{ [ matomo_existing_site_ids ] + [ site.idsite ] }}"
       when:
         - ( matomo_proposed_url == url )
         - ( matomo_existing_id not in matomo_existing_site_ids )
@@ -43,7 +44,7 @@
         loop_var: url
 
     - name: Debug matomo_existing_site_ids
-      debug:
+      ansible.builtin.debug:
         var: matomo_existing_site_ids
         verbosity: 2
 

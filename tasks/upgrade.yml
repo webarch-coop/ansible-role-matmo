@@ -3,10 +3,10 @@
   block:
 
     - name: Matomo download tgz tasks included
-      include_tasks: download.yml
+      ansible.builtin.include_tasks: download.yml
 
     - name: Backup up the Matomo config file
-      copy:
+      ansible.builtin.copy:
         remote_src: true
         src: "{{ matomo_html }}/config/config.ini.php"
         dest: "{{ matomo_private }}/config.ini.php.{{ ansible_date_time.date }}.{{ ansible_date_time.time }}.bak"
@@ -15,12 +15,12 @@
         mode: 0600
 
     - name: Required Matomo rsynced over last version
-      command: "rsync -aq {{ matomo_private }}/matomo/ {{ matomo_html }}/"
+      ansible.builtin.command: "rsync -aq {{ matomo_private }}/matomo/ {{ matomo_html }}/"
       become: true
       become_user: "{{ matomo_user }}"
 
     - name: Matomo database upgraded
-      command: php console --no-ansi -n core:update --yes
+      ansible.builtin.command: php console --no-ansi -n core:update --yes
       args:
         chdir: "{{ matomo_html }}"
       register: matomo_core_update
@@ -30,7 +30,7 @@
       become_user: "{{ matomo_user }}"
 
     - name: Migrate token auths after upgrade from Matomo 3.x
-      command: php console --no-ansi -n core:matomo4-migrate-token-auths
+      ansible.builtin.command: php console --no-ansi -n core:matomo4-migrate-token-auths
       args:
         chdir: "{{ matomo_html }}"
       become: true
@@ -38,7 +38,7 @@
       when: matomo_installed is version('3.14.1', '<=')
 
     - name: Convert database to utf8mb4 after upgrade from Matomo 3.x
-      command: php console --no-ansi -n core:convert-to-utf8mb4
+      ansible.builtin.command: php console --no-ansi -n core:convert-to-utf8mb4
       args:
         chdir: "{{ matomo_html }}"
       become: true
@@ -46,7 +46,7 @@
       when: matomo_installed is version('3.14.1', '<=')
 
     - name: Get the installed Matomo version number
-      command: php console --no-ansi -n core:update --version
+      ansible.builtin.command: php console --no-ansi -n core:update --version
       args:
         chdir: "{{ matomo_html }}"
       become: true
@@ -56,11 +56,11 @@
       register: matomo_installed_check
 
     - name: Set a variable for the installed Matomo version number
-      set_fact:
+      ansible.builtin.set_fact:
         matomo_installed: "{{ matomo_installed_check.stdout.split(' ')[2] }}"
 
     - name: Print the installed version of Matomo
-      debug:
+      ansible.builtin.debug:
         msg: "The installed version of Matomo is {{ matomo_installed }}"
         verbosity: 1
 

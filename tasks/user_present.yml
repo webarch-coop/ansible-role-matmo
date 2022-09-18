@@ -3,7 +3,7 @@
   block:
 
     - name: Check variables
-      assert:
+      ansible.builtin.assert:
         that:
           - ( matomo_url is defined )
           - ( matomo_password is defined )
@@ -13,7 +13,7 @@
         msg: "Please ensure that all the required variables are defined"
 
     - name: "Get a list of the Matomo superusers for {{ matomo_url }}"
-      uri:
+      ansible.builtin.uri:
         url: "{{ matomo_url }}"
         method: POST
         body_format: form-urlencoded
@@ -29,12 +29,12 @@
       failed_when: ( matomo_api_get_users_having_super_user_access.json is not defined )
 
     - name: Debug matomo_api_get_users_having_super_user_access
-      debug:
+      ansible.builtin.debug:
         var: matomo_api_get_users_having_super_user_access
         verbosity: 2
 
     - name: Loop through the superusers accounts to check that we are not configuring one
-      assert:
+      ansible.builtin.assert:
         that:
           - matomo_existing_superuser.login != matomo_login
           - matomo_existing_superuser.email != matomo_login_email
@@ -45,11 +45,11 @@
         label: "{{ matomo_existing_superuser.login }}"
 
     - name: Set the matomo_login_existing to an empty value
-      set_fact:
+      ansible.builtin.set_fact:
         matomo_login_existing: ""
 
     - name: "Check if a Matomo login with the email address {{ matomo_login_email }} exists using the API"
-      uri:
+      ansible.builtin.uri:
         url: "{{ matomo_url }}"
         method: POST
         body_format: form-urlencoded
@@ -66,28 +66,28 @@
       failed_when: ( matomo_api_get_user_login_from_user_email.json is not defined )
 
     - name: Debug matomo_api_get_user_login_from_user_email
-      debug:
+      ansible.builtin.debug:
         var: matomo_api_get_user_login_from_user_email
         verbosity: 2
 
     - name: "Include check for the {{ matomo_login }} existing when the {{ matomo_login_email }} doesn't exist"
-      include_tasks: check_login.yml
+      ansible.builtin.include_tasks: check_login.yml
       when: ( matomo_api_get_user_login_from_user_email.json.value is not defined )
 
     - name: Set matomo_login_existing and include password checks when the user exists
       block:
 
         - name: "Set the matomo_login_existing variable to {{ matomo_api_get_user_login_from_user_email.json.value }} as a Matomo account with a matching email address exists"
-          set_fact:
+          ansible.builtin.set_fact:
             matomo_login_existing: "{{ matomo_api_get_user_login_from_user_email.json.value }}"
 
         - name: "Include the check password tasks when a user with the email address {{ matomo_login_email }} does exist"
-          include_tasks: check_password.yml
+          ansible.builtin.include_tasks: check_password.yml
 
       when: ( matomo_api_get_user_login_from_user_email.json.value is defined )
 
     - name: Set the matomo_login_existing variable to matomo_login when it is not defined
-      set_fact:
+      ansible.builtin.set_fact:
         matomo_login_existing: "{{ matomo_login }}"
       when: ( matomo_login_existing is not defined ) or ( matomo_login_existing | length == 0 )
 

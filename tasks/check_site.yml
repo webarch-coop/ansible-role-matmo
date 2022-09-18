@@ -3,11 +3,11 @@
   block:
 
     - name: Set an empty duplicate variable
-      set_fact:
+      ansible.builtin.set_fact:
         matomo_site_duplicates: []
 
     - name: Matomo API POST request to SitesManager.getSiteUrlsFromId
-      uri:
+      ansible.builtin.uri:
         url: "{{ matomo_url }}"
         method: POST
         body_format: form-urlencoded
@@ -23,12 +23,12 @@
       failed_when: ( matomo_get_site_urls_from_id.failed is defined ) and ( matomo_get_site_urls_from_id.failed )
 
     - name: Debug matomo_get_site_urls_from_id.json
-      debug:
+      ansible.builtin.debug:
         var: matomo_get_site_urls_from_id.json
         verbosity: 2
 
     - name: Loop though all the URLs checking for URL duplicates
-      include_tasks: check_duplicate_urls.yml
+      ansible.builtin.include_tasks: check_duplicate_urls.yml
       loop: "{{ matomo_get_site_urls_from_id.json }}"
       loop_control:
         loop_var: matomo_site_url
@@ -37,7 +37,7 @@
       block:
 
         - name: Get the details for the site being checked
-          uri:
+          ansible.builtin.uri:
             url: "{{ matomo_url }}"
             method: POST
             body_format: form-urlencoded
@@ -48,15 +48,15 @@
               method: SitesManager.getSiteFromId
               idSite: "{{ site.idsite }}"
           register: matomo_site_checked
-          failed_when: ( matomo_site_checked.failed is defined ) and ( matomo_site_checked.failed )
+          failed_when: ( matomo_site_checked.failed is defined ) and ( matomo_site_checked.failed | bool )
 
         - name: Debug matomo_site_checked
-          debug:
+          ansible.builtin.debug:
             var: matomo_site_checked.json
             verbosity: 2
 
         - name: Get the details of the sites with duplicate URLs
-          uri:
+          ansible.builtin.uri:
             url: "{{ matomo_url }}"
             method: POST
             body_format: form-urlencoded
@@ -72,12 +72,12 @@
             loop_var: matomo_siteid_dupe
 
         - name: Debug matomo_sites_checked.results
-          debug:
+          ansible.builtin.debug:
             var: matomo_sites_checked
             verbosity: 2
 
         - name: Directory for results present
-          file:
+          ansible.builtin.file:
             path: "{{ matomo_private }}/.matomo_site_duplicates"
             state: directory
             mode: 0600
@@ -85,7 +85,7 @@
             group: "{{ matomo_group }}"
 
         - name: Write the sites IDs with duplicate URLs to a file
-          blockinfile:
+          ansible.builtin.blockinfile:
             path: "{{ matomo_private }}/.matomo_site_duplicates/{{ matomo_site_checked.json.name }}.yml"
             create: true
             block: |

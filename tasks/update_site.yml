@@ -3,7 +3,7 @@
   block:
 
     - name: Check that required variables are defined
-      assert:
+      ansible.builtin.assert:
         that:
           - ( matomo_url is defined ) and ( matomo_url | length > 0 ) and ( matomo_url is regex("^http[s]*:\/\/.*$") )
           - ( matomo_token_auth is defined ) and ( matomo_token_auth | length > 0 )
@@ -13,7 +13,7 @@
         quiet: true
 
     - name: Ensure that matomo_site_urls start with http(s)://
-      assert:
+      ansible.builtin.assert:
         that:
           - ( url is regex("^http[s]*:\/\/.*$") )
         quiet: true
@@ -23,16 +23,16 @@
       when: ( matomo_site_urls is defined ) and ( matomo_site_urls[0] is defined )
 
     - name: Set a fact for the update site POST data
-      set_fact:
+      ansible.builtin.set_fact:
         matomo_update_site_json: "{{ lookup('template', 'update_site.json.j2') }}"
 
     - name: Debug the update site POST data
-      debug:
+      ansible.builtin.debug:
         var: matomo_update_site_json
         verbosity: 2
 
     - name: "Update Matomo site {{ matomo_site_name }} with main URL {{ matomo_site_main_url }}"
-      uri:
+      ansible.builtin.uri:
         url: "{{ matomo_url }}"
         method: POST
         body_format: form-urlencoded
@@ -43,7 +43,7 @@
       failed_when: ( matomo_update_site.failed is defined and matomo_update_site.failed ) or ( matomo_update_site.json.result is defined and matomo_update_site.json.result != "success" )
 
     - name: Debug matomo_update_site
-      debug:
+      ansible.builtin.debug:
         var: matomo_update_site
         verbosity: 2
 
