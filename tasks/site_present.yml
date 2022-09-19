@@ -13,9 +13,9 @@
     - name: Include Matomo getAllSites API tasks
       ansible.builtin.include_tasks: get_all_sites.yml
 
-    - name: Set matomo_site_ids to an empty array
-      ansible.builtin.set_fact:
-        matomo_existing_site_ids: []
+    # - name: Set matomo_site_ids to an empty array
+    #   ansible.builtin.set_fact:
+    #     matomo_existing_site_ids: []
 
     # TODO Add a quick check that if the matomo_site_name exists and the URLs match then skip slower checks
 
