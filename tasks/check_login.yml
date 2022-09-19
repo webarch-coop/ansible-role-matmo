@@ -16,6 +16,7 @@
         chdir: "{{ matomo_html }}"
       register: matomo_unblock_locked_ips
       failed_when: matomo_unblock_locked_ips.stdout != "Done"
+      changed_when: true
       become: true
       become_user: "{{ matomo_user }}"
 

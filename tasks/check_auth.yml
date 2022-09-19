@@ -14,6 +14,7 @@
       ansible.builtin.command: php console --no-ansi -n login:unblock-blocked-ips
       args:
         chdir: "{{ matomo_html }}"
+      changed_when: true
       become: true
       become_user: "{{ matomo_user }}"
       register: matomo_unblock_blocked_ips

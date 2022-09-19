@@ -16,6 +16,7 @@
 
     - name: Required Matomo rsynced over last version
       ansible.builtin.command: "rsync -aq {{ matomo_private }}/matomo/ {{ matomo_html }}/"
+      changed_when: true
       become: true
       become_user: "{{ matomo_user }}"
 

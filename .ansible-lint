@@ -4,7 +4,7 @@ skip_list:
   # Use FQCN for builtin actions
   # - fqcn-builtins
   # Commands should not change things if nothing needs doing
-  - no-changed-when
+  # - no-changed-when
   # The metadata schema validation fails as it expect the versions of Debian to be intergers and not strings
   - schema[meta]
   # Lines should be no longer than 160 chars

@@ -64,6 +64,7 @@
 
         - name: "Random string generated for Matomo salt for {{ matomo_user }}"
           ansible.builtin.command: pwgen -n 33 1
+          changed_when: true
           register: matomo_salt_pwgen
           # no_log: true
 
@@ -76,6 +77,7 @@
           ansible.builtin.command: 'php console --no-ansi -n config:set --section="General" --key="salt" --value="{{ matomo_salt }}"'
           args:
             chdir: "{{ matomo_html }}"
+          changed_when: true
           become: true
           become_user: "{{ matomo_user }}"
           # no_log: true
@@ -84,6 +86,7 @@
 
     - name: "Run php console core:create-security-files for {{ matomo_user }}"
       ansible.builtin.command: php console --no-ansi -n core:create-security-files
+      changed_when: true
       args:
         chdir: "{{ matomo_html }}"
       register: matomo_core_create_security_files
