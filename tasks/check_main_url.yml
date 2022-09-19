@@ -42,7 +42,6 @@
       when:
         - ( matomo_proposed_url == url )
         - ( matomo_existing_site_ids is not defined ) or ( matomo_existing_site_ids == [] )
-        - ( matomo_existing_id not in matomo_existing_site_ids )
       loop: "{{ matomo_existing_main_urls }}"
       loop_control:
         loop_var: url
