@@ -32,6 +32,9 @@
       loop_control:
         loop_var: url
 
+    # This is not ideal, it is to work-around this change with Ansibe 2.13
+    # https://github.com/ansible/ansible/blob/devel/docs/docsite/rst/porting_guides/porting_guide_core_2.13.rst#playbook
+
     - name: Loop though the matomo_existing_main_urls and set matomo_existing_site_ids if not defined
       ansible.builtin.set_fact:
         # matomo_existing_site_ids: "{{ matomo_existing_site_ids | default([]) }} + [ '{{ site.idsite }}' ]"
