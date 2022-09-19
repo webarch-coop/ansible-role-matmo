@@ -35,7 +35,7 @@
     - name: Loop thought the matomo_existing_main_urls
       ansible.builtin.set_fact:
         # matomo_existing_site_ids: "{{ matomo_existing_site_ids | default([]) }} + [ '{{ site.idsite }}' ]"
-        matomo_existing_site_ids: "{{ [ matomo_existing_site_ids ] + [ site.idsite ] }}"
+        matomo_existing_site_ids: "{{ [ matomo_existing_site_ids | default() ] + [ site.idsite ] }}"
       when:
         - ( matomo_proposed_url == url )
         - ( matomo_existing_id not in matomo_existing_site_ids )
