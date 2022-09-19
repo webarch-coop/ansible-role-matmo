@@ -49,8 +49,8 @@
       ansible.builtin.include_tasks: settings.yml
 
     - name: Include cron tasks
-      include_tasks: cron.yml
-      ansible.builtin.when: ( matomo_cron is defined ) and ( matomo_cron | bool )
+      ansible.builtin.include_tasks: cron.yml
+      when: ( matomo_cron is defined ) and ( matomo_cron | bool )
 
   tags:
     - matomo
