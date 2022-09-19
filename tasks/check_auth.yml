@@ -15,6 +15,7 @@
       args:
         chdir: "{{ matomo_html }}"
       changed_when: true
+      check_mode: false
       become: true
       become_user: "{{ matomo_user }}"
       register: matomo_unblock_blocked_ips
@@ -37,6 +38,8 @@
           hasSuperUserAccess: true
           passwordConfirmation: "{{ matomo_password }}"
         status_code: 200
+      changed_when: false
+      check_mode: false
       register: matomo_api_set_super_user_access
 
     - name: Debug matomo_api_set_super_user_access
