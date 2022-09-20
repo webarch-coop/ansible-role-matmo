@@ -114,7 +114,6 @@
           ansible.builtin.fail:
           when: matomo_diagnostics_fail | bool
 
-
   tags:
     - matomo
 ...
