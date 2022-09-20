@@ -6,18 +6,14 @@ galaxy_info:
   description: Ansible role for installing and upgrading Matomo servers on Debian
   company: Webarchitects Co-operative
   license: GNU General Public License v3.0 (GPLv3)
-  min_ansible_version: 2.9
+  min_ansible_version: 2.10
   platforms:
     - name: debian
       versions:
+        - bookworm
         - bullseye
         - buster
         - stretch
-    - name: ubuntu
-      versions:
-        - focal
-        - bionic
-        - xenial
   galaxy_tags:
     - debian
     - ubuntu
