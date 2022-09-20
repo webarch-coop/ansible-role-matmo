@@ -7,13 +7,15 @@
 
     - name: Matomo files rsync'd into place
       ansible.builtin.command: "rsync -aq {{ matomo_private }}/matomo/ {{ matomo_html }}/"
-      changed_when: true
+      register: matomo_rsync_command
+      changed_when: ( "total size is 0" not in matomo_rsync_command.stdout_lines )
       become: true
       become_user: "{{ matomo_user }}"
 
     - name: Random passwd for Matomo admin generated
       ansible.builtin.command: "pwgen -n {{ 24 | random(14) }} 1"
-      changed_when: true
+      changed_when: false
+      check_mode: false
       no_log: true
       register: matomo_first_user_pass_gen
 

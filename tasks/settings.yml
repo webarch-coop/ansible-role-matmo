@@ -64,7 +64,8 @@
 
         - name: "Random string generated for Matomo salt for {{ matomo_user }}"
           ansible.builtin.command: pwgen -n 33 1
-          changed_when: true
+          changed_when: false
+          check_mode: false
           register: matomo_salt_pwgen
           # no_log: true
 

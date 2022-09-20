@@ -32,27 +32,23 @@
       loop_control:
         loop_var: url
 
-    # This is not ideal, it is to work-around this change with Ansibe 2.13
-    # https://github.com/ansible/ansible/blob/devel/docs/docsite/rst/porting_guides/porting_guide_core_2.13.rst#playbook
-
-    - name: Loop though the matomo_existing_main_urls and set matomo_existing_site_ids if not defined
+    - name: Loop though the matomo_existing_main_urls and set matomo_existing_site_ids when defined for Ansible < 2.13
       ansible.builtin.set_fact:
-        # matomo_existing_site_ids: "{{ matomo_existing_site_ids | default([]) }} + [ '{{ site.idsite }}' ]"
-        matomo_existing_site_ids: "{{ [ site.idsite ] }}"
+        matomo_existing_site_ids: "{{ matomo_existing_site_ids | default([]) }} + [ '{{ site.idsite }}' ]"
       when:
+        - ( ansible_version.full is version('2.13.0', '<') )
         - ( matomo_proposed_url == url )
-        - ( matomo_existing_site_ids is not defined ) or ( matomo_existing_site_ids == [] )
+        - ( matomo_existing_id not in matomo_existing_site_ids )
       loop: "{{ matomo_existing_main_urls }}"
       loop_control:
         loop_var: url
 
-    - name: Loop though the matomo_existing_main_urls and set matomo_existing_site_ids when defined
+    - name: Loop though the matomo_existing_main_urls and set matomo_existing_site_ids when defined for Ansible >= 2.13
       ansible.builtin.set_fact:
-        # matomo_existing_site_ids: "{{ matomo_existing_site_ids | default([]) }} + [ '{{ site.idsite }}' ]"
-        matomo_existing_site_ids: "{{ [ matomo_existing_site_ids ] + [ site.idsite ] }}"
+        matomo_existing_site_ids: "{{ matomo_existing_site_ids | default([]) + [ site.idsite ] }}"
       when:
+        - ( ansible_version.full is version('2.13.0', '>=') )
         - ( matomo_proposed_url == url )
-        - ( matomo_existing_site_ids is defined ) and ( matomo_existing_site_ids != [] )
         - ( matomo_existing_id not in matomo_existing_site_ids )
       loop: "{{ matomo_existing_main_urls }}"
       loop_control:

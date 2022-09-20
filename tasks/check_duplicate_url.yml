@@ -40,11 +40,22 @@
       loop_control:
         loop_var: matomo_site_check_url
 
-    - name: Loop though all the URLs checking for URL duplicates
+    - name: Loop though all the URLs checking for URL duplicates with Ansible < 2.13
       ansible.builtin.set_fact:
-        # matomo_site_duplicates: "{{ matomo_site_duplicates }} + [ '{{ site_check.idsite }}' ]"
-        matomo_site_duplicates: "{{ [ matomo_site_duplicates ] + [ site_check.idsite ] }}"
-      when: matomo_site_url == matomo_site_check_url
+        matomo_site_duplicates: "{{ matomo_site_duplicates | default([]) }} + [ '{{ site_check.idsite }}' ]"
+      when:
+        - ansible_version.full is version('2.13.0', '>=')
+        - matomo_site_url == matomo_site_check_url
+      loop: "{{ matomo_get_site_check_urls_from_id.json }}"
+      loop_control:
+        loop_var: matomo_site_check_url
+
+    - name: Loop though all the URLs checking for URL duplicates with Ansible >= 2.13
+      ansible.builtin.set_fact:
+        matomo_site_duplicates: "{{ matomo_site_duplicates | default([]) + [ site_check.idsite ] }}"
+      when:
+        - ansible_version.full is version('2.13.0', '>=')
+        - matomo_site_url == matomo_site_check_url
       loop: "{{ matomo_get_site_check_urls_from_id.json }}"
       loop_control:
         loop_var: matomo_site_check_url
