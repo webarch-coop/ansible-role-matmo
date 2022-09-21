@@ -111,9 +111,11 @@
           ansible.builtin.debug:
             var: matomo_diagnostics_run.stdout_lines
 
-        - name: Fail if problems found
+        - name: Fail if problems found, unless the site is not yet installed
           ansible.builtin.fail:
-          when: matomo_diagnostics_fail | bool
+          when:
+            - matomo_diagnostics_fail | bool
+            - ( matomo_config_check is defined ) and ( not matomo_config_check.stat.exists | bool )
 
   tags:
     - matomo
