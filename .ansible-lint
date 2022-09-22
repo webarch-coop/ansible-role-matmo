@@ -1,6 +1,8 @@
 ---
 # https://docs.ansible.com/ansible-lint/rules/default_rules.html
 skip_list:
+  # Jinja2 spacing could be improved:
+  - jinja[spacing]
   # Use FQCN for builtin actions
   # - fqcn-builtins
   # Commands should not change things if nothing needs doing
