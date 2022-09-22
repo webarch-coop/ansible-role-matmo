@@ -1,4 +1,7 @@
 ---
+# https://github.com/ansible/schemas/issues/386
+# ERROR! 'version' is not a valid attribute for a RoleMetadata
+# version: 2
 galaxy_info:
   role_name: matomo
   author: Chris Croome
