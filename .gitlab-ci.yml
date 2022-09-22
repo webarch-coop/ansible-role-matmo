@@ -1,5 +1,5 @@
 ---
-image: registry.git.coop/webarch/containers/images/ansible:0.10.0
+image: registry.git.coop/webarch/containers/images/ansible:0.11.0
 variables:
   PY_COLORS: "1"
   ANSIBLE_FORCE_COLOR: "1"

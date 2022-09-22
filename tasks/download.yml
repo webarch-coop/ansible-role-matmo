@@ -60,7 +60,7 @@
         group: "{{ matomo_group }}"
         mode: 0640
 
-    - name: Matomo GPG signature checked
+    - name: Matomo GPG signature checked for Matomo >= 4.8.0
       ansible.builtin.command: >
         gpg --no-tty --verify --logger-fd 1
         "{{ matomo_private }}/matomo-{{ matomo_required }}.tar.gz.asc"
