@@ -87,9 +87,11 @@
 
     - name: "Run php console core:create-security-files for {{ matomo_user }}"
       ansible.builtin.command: php console --no-ansi -n core:create-security-files
-      changed_when: true
       args:
         chdir: "{{ matomo_html }}"
+      become: true
+      become_user: "{{ matomo_user }}"
+      changed_when: true
       register: matomo_core_create_security_files
       failed_when: ( "Done" not in matomo_core_create_security_files.stdout )
 
@@ -102,6 +104,8 @@
             chdir: "{{ matomo_html }}"
           changed_when: false
           check_mode: false
+          become: true
+          become_user: "{{ matomo_user }}"
           register: matomo_diagnostics_run
           failed_when: ( "There are no problems with your Matomo setup" not in matomo_diagnostics_run.stdout )
 
