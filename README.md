@@ -108,7 +108,7 @@ check_site.yml
 
 ## Ansible Galaxy and repo URL
 
-The primary URL of this repo is [`https://git.coop/webarch/matomo`](https://git.coop/webarch/matomo) however it is also [mirrored to GitHub](https://github.com/webarch-coop/ansible-role-matomo) and [available via Ansible Galaxy](https://galaxy.ansible.com/chriscroome/matomo).
+The primary URL of this repo is [`https://git.coop/webarch/matomo`](https://git.coop/webarch/matomo) however it is also [mirrored to GitHub](https://github.com/webarch-coop/ansible-role-matmo) and [available via Ansible Galaxy](https://galaxy.ansible.com/chriscroome/matomo).
 
 If you use this role please use a tagged release, see [the release notes](https://git.coop/webarch/matomo/-/releases).
 
