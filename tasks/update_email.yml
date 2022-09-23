@@ -139,7 +139,7 @@
         - ( matomo_accounts_file_path is defined ) and ( matomo_accounts_file_path.stat.exists )
 
     - name: "Email address update notification email sent to {{ matomo_login_email }}"
-      mail:
+      community.general.mail:
         from: "{{ matomo_email_from | default('Webarchitects') | quote }} <root@{{ inventory_hostname }}>"
         to: "{{ matomo_login_email }}"
         subject: "[{{ matomo_email_subject_tag | default('webarchitects') }}] Matomo email address updated for {{ matomo_login }} on {{ matomo_url }}"
