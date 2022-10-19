@@ -1,13 +1,9 @@
 ---
 # https://docs.ansible.com/ansible-lint/rules/default_rules.html
 skip_list:
-  # Jinja2 spacing could be improved:
   - jinja[spacing]
-  # Use FQCN for builtin actions
-  # - fqcn-builtins
-  # Commands should not change things if nothing needs doing
-  # - no-changed-when
-  # The metadata schema validation fails as it expect the versions of Debian to be intergers and not strings
+  - key-order[task]
+  - name[template]
   - schema[meta]
   # Lines should be no longer than 160 chars
   - "204"
