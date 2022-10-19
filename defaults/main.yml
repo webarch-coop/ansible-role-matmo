@@ -4,7 +4,7 @@
 matomo_autoupdate: false
 # The matomo_version is used if matomo_autoupdate is false
 # https://github.com/matomo-org/matomo/releases
-matomo_version: 4.12.0
+matomo_version: 4.12.1
 # Matomo versions for which a list of files to delete is present:
 matomo_delete_files_scripts:
   - 4.6.1
