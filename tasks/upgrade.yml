@@ -54,7 +54,9 @@
       loop:
         - assets
         - cache
+        - latest
         - logs
+        - sessions
         - tcpdf
         - templates_c
       loop_control:
