@@ -16,7 +16,6 @@ matomo_delete_files_scripts:
   - 4.10.0
   - 4.11.0
   - 4.12.0
-  - 4.12.1
 # The system user name for the account (for example www-data), matomo_user is
 # also used for the Matomo super user acount username
 matomo_user: stats

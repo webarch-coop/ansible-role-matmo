@@ -47,13 +47,14 @@
       become_user: "{{ matomo_user }}"
       when: matomo_installed is version('3.14.1', '<=')
 
-    - name: Delete sub-directories in the tmp/ dir
+    - name: Delete sub-directories in the tmp dir
       ansible.builtin.file:
-        path: "{{ matomo_html }}/{{ dir }}"
+        path: "{{ matomo_html }}/tmp/{{ dir }}"
         state: absent
       loop:
         - assets
         - cache
+        - climulti
         - latest
         - logs
         - sessions
