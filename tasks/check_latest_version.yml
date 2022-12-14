@@ -7,6 +7,8 @@
         url: https://builds.matomo.org/LATEST
         return_content: true
         force: true
+      check_mode: false
+      changed_when: false
       register: matomo_latest_get
 
     - name: Set a variable for the latest Matomo version
