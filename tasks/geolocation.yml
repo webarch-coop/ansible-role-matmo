@@ -72,7 +72,6 @@
         path: "{{ matomo_private }}/dbip-city-lite-{{ lookup('pipe','date +%Y-%m') }}.mmdb"
       register: matomo_dbip_mmdb
 
-
     - name: Update the DBIP City Lite database when the database exists
       block:
 
@@ -90,6 +89,7 @@
               - "Check if https://download.db-ip.com/free/dbip-city-lite-{{ lookup('pipe','date +%Y-%m') }}.mmdb.gz exists"
               - "Check if {{ matomo_private }}/dbip-city-lite-{{ lookup('pipe','date +%Y-%m') }}.mmdb.gz exists"
               - "Check if {{ matomo_private }}/dbip-city-lite-{{ lookup('pipe','date +%Y-%m') }}.mmdb exists"
+          when: not matomo_dbip_mmdb.stat.exists | bool
 
         - name: DBIP City Lite database in place
           ansible.builtin.copy:
@@ -99,11 +99,11 @@
             owner: "{{ matomo_user }}"
             group: "{{ matomo_group }}"
             mode: 0644
+          when: matomo_dbip_mmdb.stat.exists | bool
 
       when:
         - matomo_dbip_mmdb is defined
         - matomo_dbip_mmdb.stat is defined
-        - matomo_dbip_mmdb.stat.exists | bool
 
   tags:
     - matomo
