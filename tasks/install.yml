@@ -42,7 +42,7 @@
       ansible.builtin.include_tasks: install_web.yml
 
     - name: "Password notification email sent to {{ matomo_first_user_email }}"
-      community.general.notification.mail:
+      community.general.mail:
         from: "{{ matomo_notify_from }}"
         to: '"{{ matomo_first_user | quote }}" <{{ matomo_first_user_email }}>'
         subject: "[{{ matomo_notify_subject_tag | default('webarchitects') }}] Matomo superuser password for {{ matomo_url }}"
