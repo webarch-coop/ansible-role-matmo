@@ -51,6 +51,11 @@
         group: "{{ matomo_group }}"
         mode: 0640
 
+    - name: Stat Matomo GPG signature
+      ansible.builtin.stat:
+        path: "{{ matomo_private }}/matomo-{{ matomo_required }}.tar.gz.asc"
+      register: matomo_sig
+
     - name: Required Matomo downloaded
       ansible.builtin.get_url:
         url: "https://builds.matomo.org/matomo-{{ matomo_required }}.tar.gz"
@@ -59,6 +64,11 @@
         owner: "{{ matomo_user }}"
         group: "{{ matomo_group }}"
         mode: 0640
+
+    - name: Stat Matomo TGZ
+      ansible.builtin.stat:
+        path: "{{ matomo_private }}/matomo-{{ matomo_required }}.tar.gz"
+      register: matomo_tgz
 
     - name: Matomo GPG signature checked
       ansible.builtin.command: >
@@ -71,6 +81,9 @@
       failed_when: >
         ( matomo_signature_check.rc != 0 ) or
         ( "Good signature from" not in matomo_signature_check.stdout )
+      when:
+        - matomo_sig.stat.exists | bool
+        - matomo_tgz.stat.exists | bool
       become: true
       become_user: "{{ matomo_user }}"
 
@@ -78,6 +91,9 @@
       ansible.builtin.debug:
         var: matomo_signature_check.stdout_lines
         verbosity: 2
+      when:
+        - matomo_signature_check is defined
+        - matomo_signature_check.stdout is defined
 
     - name: Private directory for Matomo to be unarchived into absent
       ansible.builtin.file:
@@ -91,6 +107,10 @@
         dest: "{{ matomo_private }}"
         owner: "{{ matomo_user }}"
         group: "{{ matomo_group }}"
+      when:
+        - matomo_signature_check.rc is defined
+        - matomo_signature_check.rc == 0
+        - matomo_tgz.stat.exists | bool
 
   tags:
     - matomo

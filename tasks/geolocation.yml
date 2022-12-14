@@ -25,6 +25,17 @@
             group: "{{ matomo_group }}"
             mode: 0640
 
+        - name: Check if the downloaded DBIP City Lite database exists
+          ansible.builtin.stat:
+            path: "{{ matomo_private }}/dbip-city-lite-{{ lookup('pipe','date +%Y-%m') }}.mmdb.gz"
+          register: matomo_dbip_mmdb_gz
+
+        - name: Debug the check if the downloaded DBIP City Lite database exists
+          ansible.builtin.debug:
+            var: matomo_dbip_mmdb_gz.stat.exists
+            verbosity: 2
+          when: matomo_dbip_mmdb_gz is defined
+
         - name: DBIP City Lite database unarchived
           block:
 
@@ -48,6 +59,12 @@
                 path: "{{ matomo_private }}/dbip-city-lite-{{ lookup('pipe','date +%Y-%m') }}.mmdb"
                 state: absent
 
+          when:
+            - matomo_dbip_mmdb_gz is defined
+            - matomo_dbip_mmdb_gz.stat is defined
+            - matomo_dbip_mmdb_gz.stat is defined
+            - matomo_dbip_mmdb_gz.stat.exists | bool
+
       when: ( not matomo_dbip_mmdb.stat.exists )
 
     - name: Check if a current DBIP City Lite database exists
@@ -55,32 +72,38 @@
         path: "{{ matomo_private }}/dbip-city-lite-{{ lookup('pipe','date +%Y-%m') }}.mmdb"
       register: matomo_dbip_mmdb
 
-    - name: Debug the check if a current DBIP City Lite database exists
-      ansible.builtin.debug:
-        var: matomo_dbip_mmdb.stat.exists
-        verbosity: 2
-      when: matomo_dbip_mmdb is defined
 
-    - name: Error updating the DBIP City Lite database
-      ansible.builtin.fail:
-        msg:
-          - "There has been an error downloading, unarchiving and copying the DBIP City Lite database for Matomo."
-          - "If the downloaded file was corrupted and couldn't be unarchived then simply running this again might fix the issue."
-          - "For further debugging:"
-          - "Check if https://download.db-ip.com/free/dbip-city-lite-{{ lookup('pipe','date +%Y-%m') }}.mmdb.gz exists"
-          - "Check if {{ matomo_private }}/dbip-city-lite-{{ lookup('pipe','date +%Y-%m') }}.mmdb.gz exists"
-          - "Check if {{ matomo_private }}/dbip-city-lite-{{ lookup('pipe','date +%Y-%m') }}.mmdb exists"
-      when: not matomo_dbip_mmdb.stat.exists
+    - name: Update the DBIP City Lite database when the database exists
+      block:
 
-    - name: DBIP City Lite database in place
-      ansible.builtin.copy:
-        src: "{{ matomo_private }}/dbip-city-lite-{{ lookup('pipe','date +%Y-%m') }}.mmdb"
-        dest: "{{ matomo_html }}/misc/DBIP-City.mmdb"
-        remote_src: true
-        owner: "{{ matomo_user }}"
-        group: "{{ matomo_group }}"
-        mode: 0644
-      when: matomo_dbip_mmdb.stat.exists
+        - name: Debug the check if a current DBIP City Lite database exists
+          ansible.builtin.debug:
+            var: matomo_dbip_mmdb.stat.exists
+            verbosity: 2
+
+        - name: Error updating the DBIP City Lite database
+          ansible.builtin.fail:
+            msg:
+              - "There has been an error downloading, unarchiving and copying the DBIP City Lite database for Matomo."
+              - "If the downloaded file was corrupted and couldn't be unarchived then simply running this again might fix the issue."
+              - "For further debugging:"
+              - "Check if https://download.db-ip.com/free/dbip-city-lite-{{ lookup('pipe','date +%Y-%m') }}.mmdb.gz exists"
+              - "Check if {{ matomo_private }}/dbip-city-lite-{{ lookup('pipe','date +%Y-%m') }}.mmdb.gz exists"
+              - "Check if {{ matomo_private }}/dbip-city-lite-{{ lookup('pipe','date +%Y-%m') }}.mmdb exists"
+
+        - name: DBIP City Lite database in place
+          ansible.builtin.copy:
+            src: "{{ matomo_private }}/dbip-city-lite-{{ lookup('pipe','date +%Y-%m') }}.mmdb"
+            dest: "{{ matomo_html }}/misc/DBIP-City.mmdb"
+            remote_src: true
+            owner: "{{ matomo_user }}"
+            group: "{{ matomo_group }}"
+            mode: 0644
+
+      when:
+        - matomo_dbip_mmdb is defined
+        - matomo_dbip_mmdb.stat is defined
+        - matomo_dbip_mmdb.stat.exists | bool
 
   tags:
     - matomo
