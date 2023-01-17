@@ -1,13 +1,10 @@
 ---
-# https://docs.ansible.com/ansible-lint/rules/default_rules.html
+# https://ansible-lint.readthedocs.io/rules/
 skip_list:
+  - command-instead-of-module
   - jinja[spacing]
   - key-order[task]
   - name[template]
   - schema[meta]
-  # Lines should be no longer than 160 chars
-  - "204"
-  # rsync used in place of synchronize module
-  - "303"
 # vim: syntax=yaml
 ...
