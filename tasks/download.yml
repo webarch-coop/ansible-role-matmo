@@ -18,6 +18,7 @@
         owner: "{{ matomo_user }}"
         group: "{{ matomo_user }}"
         mode: 0644
+        force: true
 
     - name: The Matomo < 4.8.0 GPG public key is imported
       ansible.builtin.command: "gpg --no-tty --import '{{ matomo_private }}/matomo.pub'"
@@ -34,6 +35,7 @@
         owner: "{{ matomo_user }}"
         group: "{{ matomo_user }}"
         mode: 0644
+        force: true
 
     - name: The Matomo >= 4.8.0 GPG public key is imported
       ansible.builtin.command: "gpg --no-tty --import '{{ matomo_private }}/matomo.asc'"
@@ -44,12 +46,12 @@
 
     - name: Required Matomo GPG signature downloaded
       ansible.builtin.get_url:
-        url: "https://builds.matomo.org/matomo-{{ matomo_required }}.tar.gz.asc"
+        url: "https://github.com/matomo-org/matomo/releases/download/{{ matomo_required }}/matomo-{{ matomo_required }}.tar.gz.asc"
         dest: "{{ matomo_private }}/matomo-{{ matomo_required }}.tar.gz.asc"
-        force: true
         owner: "{{ matomo_user }}"
         group: "{{ matomo_group }}"
         mode: 0640
+        force: true
 
     - name: Stat Matomo GPG signature
       ansible.builtin.stat:
@@ -58,12 +60,12 @@
 
     - name: Required Matomo downloaded
       ansible.builtin.get_url:
-        url: "https://builds.matomo.org/matomo-{{ matomo_required }}.tar.gz"
+        url: "https://github.com/matomo-org/matomo/releases/download/{{ matomo_required }}/matomo-{{ matomo_required }}.tar.gz"
         dest: "{{ matomo_private }}/matomo-{{ matomo_required }}.tar.gz"
-        force: true
         owner: "{{ matomo_user }}"
         group: "{{ matomo_group }}"
         mode: 0640
+        force: true
 
     - name: Stat Matomo TGZ
       ansible.builtin.stat:
