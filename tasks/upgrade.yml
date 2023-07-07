@@ -38,6 +38,7 @@
       become: true
       become_user: "{{ matomo_user }}"
       when: matomo_installed is version('3.14.1', '<=')
+      changed_when: true
 
     - name: Convert database to utf8mb4 after upgrade from Matomo 3.x
       ansible.builtin.command: php console --no-ansi -n core:convert-to-utf8mb4
@@ -46,6 +47,7 @@
       become: true
       become_user: "{{ matomo_user }}"
       when: matomo_installed is version('3.14.1', '<=')
+      changed_when: true
 
     - name: Delete sub-directories in the tmp dir
       ansible.builtin.file:

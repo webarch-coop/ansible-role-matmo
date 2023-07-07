@@ -1,9 +1,27 @@
 ---
-# https://yamllint.readthedocs.io/en/stable/integration.html
-# https://github.com/adrienverge/yamllint/tags
 repos:
+  # https://github.com/adrienverge/yamllint/tags
   - repo: https://github.com/adrienverge/yamllint.git
-    rev: v1.28.0
+    rev: v1.32.0
     hooks:
       - id: yamllint
+        name: YAML Lint
+  # https://github.com/ansible/ansible-lint/releases
+  - repo: https://github.com/ansible/ansible-lint.git
+    rev: v6.17.2
+    hooks:
+      - id: ansible-lint
+        name: Ansible Lint
+        language: python
+        additional_dependencies:
+          # https://github.com/kellyjonbrazil/jc/releases
+          - jc==1.23.2
+          # https://github.com/jmespath/jmespath.py/tags
+          - jmespath==1.0.1
+  # https://github.com/jackdewinter/pymarkdown/releases
+  - repo: https://github.com/jackdewinter/pymarkdown
+    rev: v0.9.11
+    hooks:
+      - id: pymarkdown
+        name: Markdown Lint
 ...
