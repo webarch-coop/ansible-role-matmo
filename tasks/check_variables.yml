@@ -6,6 +6,7 @@
       ansible.builtin.assert:
         that:
           - ( matomo_user is defined ) and ( matomo_user is regex("^[a-z0-9]*$") )
+        quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
 
     - name: "Populate the getent_passwd array for {{ inventory_hostname }}"
       ansible.builtin.getent:
@@ -24,6 +25,7 @@
           - matomo_html is defined
           - matomo_private is defined
           - matomo_logs is defined
+        quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
 
     - name: "Stat directories for {{ matomo_user }}"
       ansible.builtin.stat:
@@ -75,6 +77,7 @@
           - ( matomo_notify_subject_tag is defined )
           - ( matomo_notify_signature is defined )
           - ( matomo_autoupdate is defined )
+        quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
 
     - name: Check for config.ini.php
       ansible.builtin.stat:

@@ -9,6 +9,7 @@
           - ( matomo_token_auth is defined ) and ( matomo_token_auth | length > 0 )
           - ( matomo_get_all_sites.json is defined ) and ( matomo_get_all_sites.json | length > 0 )
           - ( matomo_proposed_url is defined ) and ( matomo_proposed_url is regex("^http:\/\/.*$") )
+        quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
 
    # NOTE The main_url shouldn't be multiple URLs seperated by commas but due
    #      to earlier bugs this was the case with the Matomo site used for

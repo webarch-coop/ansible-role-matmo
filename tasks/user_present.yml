@@ -11,6 +11,7 @@
           - ( matomo_login is defined ) and ( matomo_login is regex("^[a-zA-Z0-9-]{2,14}$") )
           - ( matomo_login_email is defined ) and ( matomo_login_email is regex("^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$") )
         msg: "Please ensure that all the required variables are defined"
+        quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
 
     - name: "Get a list of the Matomo superusers for {{ matomo_url }}"
       ansible.builtin.uri:
@@ -39,6 +40,7 @@
           - matomo_existing_superuser.login != matomo_login
           - matomo_existing_superuser.email != matomo_login_email
         msg: "Please use a different email address (or alias) and login username for the Matomo superuser and regular users"
+        quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
       loop: "{{ matomo_api_get_users_having_super_user_access.json }}"
       loop_control:
         loop_var: matomo_existing_superuser

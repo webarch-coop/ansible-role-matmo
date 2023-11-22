@@ -9,6 +9,7 @@
           - ( matomo_token_auth is defined ) and ( matomo_token_auth | length > 0 )
           - ( matomo_site_name is defined ) and ( matomo_site_name | length > 0 )
           - ( matomo_site_main_url is defined ) and ( matomo_site_main_url is regex("^http:\/\/.*$") )
+        quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
 
     - name: Include Matomo getAllSites API tasks
       ansible.builtin.include_tasks: get_all_sites.yml

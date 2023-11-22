@@ -11,6 +11,7 @@
           - ( matomo_proposed_url is defined ) and ( matomo_proposed_url is regex("^http:\/\/.*$") )
           - ( matomo_existing_id is defined ) and ( matomo_existing_id is regex("^[0-9]{1,6}$") )
           - ( matomo_existing_main_urls is defined ) and ( matomo_existing_main_urls[0] is defined )
+        quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
 
     - name: Debug matomo_existing_main_urls
       ansible.builtin.debug:

@@ -10,6 +10,7 @@
           - ( matomo_accounts_file is defined )
           - ( matomo_url is defined )
           - ( matomo_token_auth is defined )
+        quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
 
     - name: "Get the existing email address for the Matomo {{ matomo_login }} user using the API"
       ansible.builtin.uri:

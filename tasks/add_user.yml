@@ -10,6 +10,7 @@
           - ( matomo_token_auth is defined )
           - ( matomo_login is defined ) and ( matomo_login is regex("^[a-zA-Z0-9-]{2,14}$") )
           - ( matomo_login_email is defined ) and ( matomo_login_email is regex("^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$") )
+        quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
 
     - name: Generate a random string for Matomo password
       ansible.builtin.command: "pwgen -n {{ 24 | random(14) }} 1"

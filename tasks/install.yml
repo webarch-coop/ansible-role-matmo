@@ -37,6 +37,7 @@
           - ( matomo_first_user is defined ) and ( matomo_first_user | length > 0 )
           - ( matomo_first_user_email is defined ) and ( matomo_first_user_email | length > 0 )
           - ( matomo_first_user_pass is defined ) and ( matomo_first_user_pass | length > 0 )
+        quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
 
     - name: Include web install tasks
       ansible.builtin.include_tasks: install_web.yml
