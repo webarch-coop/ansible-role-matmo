@@ -45,7 +45,7 @@
 
     - name: Loop though the matomo_existing_main_urls and set matomo_existing_site_ids when defined for Ansible >= 2.13
       ansible.builtin.set_fact:
-        matomo_existing_site_ids: "{{ matomo_existing_site_ids | default([]) + [ site.idsite ] }}"
+        matomo_existing_site_ids: "{{ matomo_existing_site_ids | default([]) + [ site.idsite ] | unique }}"
       when:
         - ( ansible_version.full is version('2.13.0', '>=') )
         - ( matomo_proposed_url == url )

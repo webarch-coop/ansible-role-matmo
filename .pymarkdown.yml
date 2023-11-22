@@ -1,0 +1,6 @@
+---
+# https://github.com/jackdewinter/pymarkdown
+plugins:
+  md013:
+    enabled: false
+...
