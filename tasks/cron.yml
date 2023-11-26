@@ -4,7 +4,7 @@
     name: "Matomo Archiving"
     user: "{{ matomo_user }}"
     minute: "{{ 59 | random }}"
-    job: "cd {{ matomo_html }} && php console core:archive --force-all-websites > {{ matomo_logs }}/matomo-archive.log && php core:run-scheduled-tasks > {{ matomo_logs }}/matomo-archive.log"
+    job: "cd {{ matomo_html }} && {{ matomo_php }} console core:archive --force-all-websites > {{ matomo_logs }}/matomo-archive.log && {{ matomo_php }} core:run-scheduled-tasks > {{ matomo_logs }}/matomo-archive.log"
   tags:
     - matomo
 ...

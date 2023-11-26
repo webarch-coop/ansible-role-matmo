@@ -12,7 +12,7 @@
         quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
 
     - name: Unblock all currently blocked IPs
-      ansible.builtin.command: php console --no-ansi -n login:unblock-blocked-ips
+      ansible.builtin.command: "{{ matomo_php }} console --no-ansi -n login:unblock-blocked-ips"
       args:
         chdir: "{{ matomo_html }}"
       changed_when: false

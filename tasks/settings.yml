@@ -8,7 +8,7 @@
     #   login_allow_logme: 1
 
     - name: "Check the Matomo force_ssl setting for {{ matomo_user }}"
-      ansible.builtin.command: php console --no-ansi -n config:get --section="General" --key="force_ssl" --format="text"
+      ansible.builtin.command: "{{ matomo_php }} console --no-ansi -n config:get --section='General' --key='force_ssl' --format='text'"
       args:
         chdir: "{{ matomo_html }}"
       changed_when: false
@@ -19,7 +19,7 @@
       become_user: "{{ matomo_user }}"
 
     - name: "Set force_ssl to true for {{ matomo_user }}"
-      ansible.builtin.command: php console --no-ansi -n config:set --section="General" --key="force_ssl" --value="1"
+      ansible.builtin.command: "{{ matomo_php }} console --no-ansi -n config:set --section='General' --key='force_ssl' --value='1'"
       args:
         chdir: "{{ matomo_html }}"
       become: true
@@ -28,7 +28,7 @@
       changed_when: true
 
     - name: "Check the Matomo login_allow_logme setting for {{ matomo_user }}"
-      ansible.builtin.command: php console --no-ansi -n config:get --section="General" --key="login_allow_logme" --format="text"
+      ansible.builtin.command: "{{ matomo_php }} console --no-ansi -n config:get --section='General' --key='login_allow_logme' --format='text'"
       args:
         chdir: "{{ matomo_html }}"
       changed_when: false
@@ -39,7 +39,7 @@
       become_user: "{{ matomo_user }}"
 
     - name: "Set login_allow_logme to true for {{ matomo_user }}"
-      ansible.builtin.command: php console --no-ansi -n config:set --section="General" --key="login_allow_logme" --value="1"
+      ansible.builtin.command: "{{ matomo_php }} console --no-ansi -n config:set --section='General' --key='login_allow_logme' --value='1'"
       args:
         chdir: "{{ matomo_html }}"
       become: true
@@ -48,7 +48,7 @@
       changed_when: true
 
     - name: "Check the Matomo salt setting for {{ matomo_user }}"
-      ansible.builtin.command: php console --no-ansi -n config:get --section="General" --key="salt" --format="text"
+      ansible.builtin.command: "{{ matomo_php }} console --no-ansi -n config:get --section='General' --key='salt' --format='text'"
       args:
         chdir: "{{ matomo_html }}"
       changed_when: false
@@ -77,7 +77,7 @@
           # no_log: true
 
         - name: "Set salt for {{ matomo_user }}"
-          ansible.builtin.command: 'php console --no-ansi -n config:set --section="General" --key="salt" --value="{{ matomo_salt }}"'
+          ansible.builtin.command: '{{ matomo_php }} console --no-ansi -n config:set --section="General" --key="salt" --value="{{ matomo_salt }}"'
           args:
             chdir: "{{ matomo_html }}"
           changed_when: true
@@ -88,7 +88,7 @@
       when: ( matomo_get_salt.rc == 1 ) or ( matomo_get_salt.stdout == "Nothing found" )
 
     - name: "Run php console core:create-security-files for {{ matomo_user }}"
-      ansible.builtin.command: php console --no-ansi -n core:create-security-files
+      ansible.builtin.command: "{{ matomo_php }} console --no-ansi -n core:create-security-files"
       args:
         chdir: "{{ matomo_html }}"
       become: true
@@ -101,7 +101,7 @@
       block:
 
         - name: "Run php console diagnostics:run for {{ matomo_user }}"
-          ansible.builtin.command: php console --no-ansi -n diagnostics:run
+          ansible.builtin.command: "{{ matomo_php }} console --no-ansi -n diagnostics:run"
           args:
             chdir: "{{ matomo_html }}"
           changed_when: false
