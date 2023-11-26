@@ -9,6 +9,60 @@
 # You should have received a copy of the GNU General Public License along with the Webarchitects Matomo Ansible role. If not, see <https://www.gnu.org/licenses/>.
 ---
 argument_specs:
+  check_auth:
+    author: Chris Croome
+    description: Ansible role for installing and configuring Matomo on Debian.
+    short_description: The check_auth entry point for the Matomo role.
+    options:
+      matomo_html:
+        type: str
+        required: true
+        description: Matomo DocumentRoot.
+      matomo_password:
+        type: str
+        required: true
+        description: Matomo passsword.
+      matomo_php:
+        type: str
+        required: true
+        description: Matomo PHP binary path.
+      matomo_php_version:
+        type: str
+        required: true
+        description: Matomo PHP version.
+      matomo_token_auth:
+        type: str
+        required: true
+        description: Matomo token auth.
+      matomo_url:
+        type: str
+        required: true
+        description: Matomo URL.
+      matomo_user:
+        type: str
+        required: true
+        description: Matomo user.
+  check_version:
+    author: Chris Croome
+    description: Ansible role for installing and configuring Matomo on Debian.
+    short_description: The check_version entry point for the Matomo role.
+    options:
+      matomo_html:
+        type: str
+        required: true
+        description: Matomo DocumentRoot.
+      matomo_php:
+        type: str
+        required: true
+        description: Matomo PHP binary path.
+      matomo_php_version:
+        type: str
+        required: true
+        description: Matomo PHP version.
+      matomo_user:
+        type: str
+        required: true
+        description: Matomo user.
   main:
     author: Chris Croome
     description: Ansible role for installing and configuring Matomo on Debian.

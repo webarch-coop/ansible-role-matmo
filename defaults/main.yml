@@ -37,9 +37,6 @@ matomo_user: stats
 matomo_group: "{{ matomo_user }}"
 matomo_home: "/home/{{ matomo_user }}"
 matomo_html: "{{ matomo_home }}/sites/default"
-matomo_php_bin: "/usr/bin/php{{ matomo_php_version }}"
-matomo_php_ini: "{{ matomo_home }}/.php.ini"
-matomo_php_version: "8.2"
 matomo_private: "{{ matomo_home }}/private"
 matomo_logs: "{{ matomo_private }}"
 matomo_db_username: "{{ matomo_user }}"
@@ -68,4 +65,7 @@ matomo_notify_headers:
 matomo_cron: false
 # Set matomo_diagnostics_fail to false to prevent a fail when warnings detected
 matomo_diagnostics_fail: true
+matomo_php_bin: "/usr/bin/php{{ matomo_php_version }}"
+matomo_php_ini: "{{ matomo_home }}/.php.ini"
+matomo_php_version: "8.2"
 ...
