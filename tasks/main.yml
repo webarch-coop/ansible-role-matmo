@@ -1,4 +1,20 @@
+# Copyright 2018-2023 Chris Croome
+#
+# This file is part of the Webarchitects Matomo Ansible role.
+#
+# The Webarchitects Matomo Ansible role is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+#
+# The Webarchitects Matomo Ansible role is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with the Webarchitects Matomo Ansible role. If not, see <https://www.gnu.org/licenses/>.
 ---
+- name: Matomo role skipped
+  ansible.builtin.debug:
+    msg: "The tasks in the Matomo role are not being run since the matomo variable is not true."
+  when: not matomo | bool
+  tags:
+    - matomo
+
 - name: Install, configure and upgrade Matomo
   block:
 
@@ -52,6 +68,7 @@
       ansible.builtin.include_tasks: cron.yml
       when: ( matomo_cron is defined ) and ( matomo_cron | bool )
 
+  when: matomo | bool
   tags:
     - matomo
 ...

@@ -1,3 +1,12 @@
+# Copyright 2018-2023 Chris Croome
+#
+# This file is part of the Webarchitects Matomo Ansible role.
+#
+# The Webarchitects Matomo Ansible role is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+#
+# The Webarchitects Matomo Ansible role is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with the Webarchitects Matomo Ansible role. If not, see <https://www.gnu.org/licenses/>.
 ---
 - name: Check variables
   block:
@@ -62,22 +71,63 @@
     - name: "Check that required variables are defined for {{ matomo_user }}"
       ansible.builtin.assert:
         that:
-          - ( matomo_db_username is defined )
-          - ( matomo_db_host is defined )
-          - ( matomo_dbname is defined )
-          - ( matomo_url is defined )
-          - ( matomo_first_site_name is defined )
-          - ( matomo_first_site_url is defined )
-          - ( matomo_first_user is defined )
-          - ( matomo_first_user_email is defined )
-          - ( matomo_notify_passwd is defined )
-          - ( matomo_notify_from is defined )
-          - ( matomo_notify_reply_to is defined )
-          - ( matomo_notify_headers is defined )
-          - ( matomo_notify_subject_tag is defined )
-          - ( matomo_notify_signature is defined )
-          - ( matomo_autoupdate is defined )
+          - matomo_autoupdate is defined
+          - matomo_db_host is defined
+          - matomo_db_username is defined
+          - matomo_dbname is defined
+          - matomo_first_site_name is defined
+          - matomo_first_site_url is defined
+          - matomo_first_user is defined
+          - matomo_first_user_email is defined
+          - matomo_notify_from is defined
+          - matomo_notify_headers is defined
+          - matomo_notify_passwd is defined
+          - matomo_notify_reply_to is defined
+          - matomo_notify_signature is defined
+          - matomo_notify_subject_tag is defined
+          - matomo_php_bin is defined
+          - matomo_php_version is defined
+          - matomo_url is defined
         quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
+
+    - name: Check the versions of PHP available
+      ansible.builtin.command: /usr/sbin/phpquery -V
+      check_mode: false
+      changed_when: false
+      register: matomo_php_query
+
+    - name: Set a fact for the PHP versions
+      ansible.builtin.set_fact:
+        matomo_php_versions: "{{ matomo_php_query.stdout_lines }}"
+
+    - name: The PHP version specified must be available
+      ansible.builtin.assert:
+        that:
+          - matomo_php_version in matomo_php_versions
+        quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
+
+    - name: PHP ini path check
+      ansible.builtin.stat:
+        path: "{{ matomo_php_ini }}"
+      register: matomo_php_ini_path
+      when:
+        - matomo_php_ini is defined
+        - matomo_php_ini | length > 0
+
+    - name: PHP bin path check
+      ansible.builtin.stat:
+        path: "{{ matomo_php_bin }}"
+      register: matomo_php_bin_path
+
+    - name: The PHP bin path must exist
+      ansible.builtin.assert:
+        that:
+          - matomo_php_bin_path.stat.exists | bool
+        quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
+
+    - name: Set a fact for the PHP CLI
+      ansible.builtin.set_fact:
+        matomo_php: "{{ matomo_php_bin }}{% if matomo_php_ini is defined and matomo_php_ini_path.stat.exists | bool %} --php-ini {{ matomo_php_ini }}{% endif %}"
 
     - name: Check for config.ini.php
       ansible.builtin.stat:
