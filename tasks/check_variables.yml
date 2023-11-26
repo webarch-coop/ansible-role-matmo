@@ -84,7 +84,6 @@
           - matomo_notify_passwd is defined
           - matomo_notify_reply_to is defined
           - matomo_notify_signature is defined
-          - matomo_notify_subject_tag is defined
           - matomo_php_bin is defined
           - matomo_php_version is defined
           - matomo_url is defined

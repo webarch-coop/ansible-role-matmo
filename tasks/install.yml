@@ -55,7 +55,7 @@
       community.general.mail:
         from: "{{ matomo_notify_from }}"
         to: '"{{ matomo_first_user | quote }}" <{{ matomo_first_user_email }}>'
-        subject: "[{{ matomo_notify_subject_tag | default('webarchitects') }}] Matomo superuser password for {{ matomo_url }}"
+        subject: "{% if matomo_notify_subject_tag is defined %}[{{ matomo_notify_subject_tag }}] {% endif %}Matomo superuser password for {{ matomo_url }}"
         # https://github.com/ansible/ansible/issues/58543
         charset: us-ascii
         body: "{{ lookup('template', 'notify_matomo_install_passwd.j2') }}"

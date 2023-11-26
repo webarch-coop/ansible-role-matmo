@@ -104,25 +104,92 @@ argument_specs:
         type: str
         required: true
         description: MariaDB database username.
-      # matomo_delete_files_scripts:
-      # matomo_diagnostics_fail:
-      # matomo_first_site_name:
-      # matomo_first_site_tz:
-      # matomo_first_site_url:
-      # matomo_first_user_email:
-      # matomo_first_user:
-      # matomo_group:
-      # matomo_home:
-      # matomo_html:
-      # matomo_logs:
-      # matomo_notify_from:
-      # matomo_notify_headers:
-      # matomo_notify_passwd:
-      # matomo_notify_reply_to:
-      # matomo_notify_subject_tag:
-      # matomo_php_bin:
-      # matomo_private:
-      # matomo_user:
+      matomo_delete_files_scripts:
+        type: list
+        elements: str
+        required: true
+        description: A list of Matomo versions for which a list of files to delete is present.
+      matomo_diagnostics_fail:
+        type: bool
+        required: true
+        description: Fail when there is a failure when running php console diagnostics:run.
+      matomo_first_site_name:
+        type: str
+        required: true
+        description: Domain name of the first Matomo site.
+      matomo_first_site_tz:
+        type: str
+        required: true
+        description: Time zone of the first Matomo site.
+      matomo_first_site_url:
+        type: str
+        required: true
+        description: URL of the first Matomo site.
+      matomo_first_user_email:
+        type: str
+        required: true
+        description: Email address for the first Matomo user.
+      matomo_first_user:
+        type: str
+        required: true
+        description: Username for the first Matomo user.
+      matomo_group:
+        type: str
+        required: true
+        description: Group for the first Matomo user.
+      matomo_home:
+        type: str
+        required: true
+        description: Home directory for the Matomo user.
+      matomo_html:
+        type: str
+        required: true
+        description: DocumentRoot for the Matomo site.
+      matomo_logs:
+        type: str
+        required: true
+        description: Directory for the Matomo site logs.
+      matomo_notify_from:
+        type: str
+        required: true
+        description: From email address for the account creation notification email.
+      matomo_notify_headers:
+        type: list
+        elements: str
+        required: true
+        description: A list of email headers for the account creation notification email.
+      matomo_notify_passwd:
+        type: bool
+        required: true
+        description: Email the Matomo account login to the first Matomo user.
+      matomo_notify_reply_to:
+        type: str
+        required: true
+        description: Reply-to email address for the account creation notification email.
+      matomo_notify_subject_tag:
+        type: str
+        required: false
+        description: Tag for the subject string of the account creation notification email.
+      matomo_php_bin:
+        type: str
+        required: true
+        description: Path to PHP CLI binary.
+      matomo_php_ini:
+        type: str
+        required: false
+        description: Path to a PHP ini file to use on with the PHP CLI binary.
+      matomo_php_version:
+        type: str
+        required: true
+        description: The version of PHP that Matomo CLI commands should use.
+      matomo_private:
+        type: str
+        required: true
+        description: Private directory for the Matomo user.
+      matomo_user:
+        type: str
+        required: true
+        description: Matomo username.
   site_present:
     author: Chris Croome
     description: Ansible role for installing and configuring Matomo on Debian.
