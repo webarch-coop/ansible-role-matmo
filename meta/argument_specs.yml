@@ -123,4 +123,54 @@ argument_specs:
       # matomo_php_bin:
       # matomo_private:
       # matomo_user:
+  site_present:
+    author: Chris Croome
+    description: Ansible role for installing and configuring Matomo on Debian.
+    short_description: The site_present entry point for the Matomo role.
+    options:
+      matomo_login_email:
+        type: str
+        required: true
+        description: The Matomo login email address.
+      matomo_site_main_url:
+        type: str
+        required: true
+        description: The Matomo site ID.
+      matomo_site_name:
+        type: str
+        required: true
+        description: The Matomo site name.
+      matomo_token_auth:
+        type: str
+        required: true
+        description: The Matomo token auth.
+      matomo_url:
+        type: str
+        required: true
+        description: The Matomo site URL.
+  user_present:
+    author: Chris Croome
+    description: Ansible role for installing and configuring Matomo on Debian.
+    short_description: The user_present entry point for the Matomo role.
+    options:
+      matomo_login:
+        type: str
+        required: true
+        description: The Matomo login.
+      matomo_login_email:
+        type: str
+        required: true
+        description: The Matomo login email address.
+      matomo_password:
+        type: str
+        required: true
+        description: The Matomo login password.
+      matomo_token_auth:
+        type: str
+        required: true
+        description: The Matomo token auth.
+      matomo_url:
+        type: str
+        required: true
+        description: The Matomo site URL.
 ...
