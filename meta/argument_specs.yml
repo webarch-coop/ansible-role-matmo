@@ -1,0 +1,72 @@
+# Copyright 2018-2023 Chris Croome
+#
+# This file is part of the Webarchitects Matomo Ansible role.
+#
+# The Webarchitects Matomo Ansible role is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+#
+# The Webarchitects Matomo Ansible role is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with the Webarchitects Matomo Ansible role. If not, see <https://www.gnu.org/licenses/>.
+---
+argument_specs:
+  main:
+    author: Chris Croome
+    description: Ansible role for installing and configuring Matomo on Debian.
+    short_description: The main entry point for the Matomo role.
+    options:
+      matomo:
+        type: bool
+        required: true
+        description: Run the tasks in this role.
+      matomo_autoupdate:
+        type: bool
+        required: true
+        description: Automatically update Matomo.
+      matomo_cron:
+        type: bool
+        required: true
+        description: Configure cron for Matomo.
+      matomo_db_adaptor:
+        type: str
+        required: true
+        description: MariaDB adaptor for Matomo database configuration
+      matomo_db_host:
+        type: str
+        required: true
+        description: MariaDB host.
+      matomo_dbname:
+        type: str
+        required: true
+        description: MariaDB database name.
+      matomo_db_pass:
+        type: str
+        required: true
+        description: MariaDB database user password.
+      matomo_db_prefix:
+        type: str
+        required: true
+        description: MariaDB database table prefix.
+      matomo_db_username:
+        type: str
+        required: true
+        description: MariaDB database username.
+      # matomo_delete_files_scripts:
+      # matomo_diagnostics_fail:
+      # matomo_first_site_name:
+      # matomo_first_site_tz:
+      # matomo_first_site_url:
+      # matomo_first_user_email:
+      # matomo_first_user:
+      # matomo_group:
+      # matomo_home:
+      # matomo_html:
+      # matomo_logs:
+      # matomo_notify_from:
+      # matomo_notify_headers:
+      # matomo_notify_passwd:
+      # matomo_notify_reply_to:
+      # matomo_notify_subject_tag:
+      # matomo_php_bin:
+      # matomo_private:
+      # matomo_user:
+...
