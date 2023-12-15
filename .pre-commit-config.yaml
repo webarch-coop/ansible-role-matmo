@@ -33,4 +33,7 @@ repos:
     hooks:
       - id: pymarkdown
         name: Markdown Lint
+        args:
+          - 'scan'
+          - 'README.md'
 ...
