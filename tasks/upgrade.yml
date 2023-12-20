@@ -113,7 +113,7 @@
         verbosity: 1
 
     - name: Check for unexpected files to be deleted
-      ansible.builtin.command: "{{ matomo_php }} php console diagnostics:unexpected-files"
+      ansible.builtin.command: "{{ matomo_php }} console diagnostics:unexpected-files"
       args:
         chdir: "{{ matomo_html }}"
       become: true
@@ -129,7 +129,7 @@
       when: matomo_unexpected_files.stdout | length > 0
 
     - name: Delete unexpected files
-      ansible.builtin.command: "{{ matomo_php }} php console diagnostics:unexpected-files --delete -n"
+      ansible.builtin.command: "{{ matomo_php }} console diagnostics:unexpected-files --delete -n"
       args:
         chdir: "{{ matomo_html }}"
       become: true
