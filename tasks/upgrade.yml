@@ -77,6 +77,14 @@
       when: matomo_installed is version('3.14.1', '<=')
       changed_when: true
 
+    - name: Create some web server security files if they haven't existed previously
+      ansible.builtin.command: "{{ matomo_php }} console --no-ansi -n core:create-security-files"
+      args:
+        chdir: "{{ matomo_html }}"
+      become: true
+      become_user: "{{ matomo_user }}"
+      changed_when: true
+
     - name: Delete sub-directories in the tmp dir
       ansible.builtin.file:
         path: "{{ matomo_html }}/tmp/{{ dir }}"
