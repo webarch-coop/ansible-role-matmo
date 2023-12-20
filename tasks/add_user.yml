@@ -66,7 +66,7 @@
               ---
             insertbefore: BOF
             marker: "# Ansible managed Matomo accounts {mark}"
-            mode: 0600
+            mode: "0600"
             owner: "{{ matomo_user }}"
             group: "{{ matomo_group }}"
 
@@ -78,7 +78,7 @@
                 email: {{ matomo_login_email | quote }}
                 password: {{ matomo_login_password | quote }}
             marker: "# {{ matomo_login }} <{{ matomo_login_email }}> {mark}"
-            mode: 0600
+            mode: "0600"
             owner: "{{ matomo_user }}"
             group: "{{ matomo_group }}"
 
@@ -112,7 +112,7 @@
             insertafter: EOF
             owner: root
             group: "{{ matomo_login }}"
-            mode: 0640
+            mode: "0640"
           when: ( matomo_login_home is defined ) and ( matomo_login_home | length > 0 )
 
       when: matomo_api_add_user.json.result == "success"

@@ -76,7 +76,7 @@
 
     - name: Set a variable for the installed Matomo version number
       ansible.builtin.set_fact:
-        matomo_installed: "{{ matomo_installed_check.stdout.split(' ')[2] }}"
+        matomo_installed: "{{ matomo_installed_check.stdout.split(' ')[-1] }}"
 
     - name: Print the installed version of Matomo
       ansible.builtin.debug:

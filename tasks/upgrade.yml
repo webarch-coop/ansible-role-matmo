@@ -14,19 +14,38 @@
     - name: Matomo download tgz tasks included
       ansible.builtin.include_tasks: download.yml
 
-    - name: Backup up the Matomo config file
+    - name: Set a fact for the config file and site backup paths
+      ansible.builtin.set_fact:
+        matomo_config_file_backup: "{{ matomo_private }}/config.ini.php.{{ ansible_date_time.date }}.{{ ansible_date_time.time }}.bak"
+        matomo_site_backup: "{{ matomo_private }}/matomo_site.{{ ansible_date_time.date }}.{{ ansible_date_time.time }}"
+
+    - name: "Backup up the Matomo config file to {{ matomo_config_file_backup }}"
       ansible.builtin.copy:
         remote_src: true
         src: "{{ matomo_html }}/config/config.ini.php"
-        dest: "{{ matomo_private }}/config.ini.php.{{ ansible_date_time.date }}.{{ ansible_date_time.time }}.bak"
+        dest: "{{ matomo_config_file_backup }}"
         owner: "{{ matomo_user }}"
         group: "{{ matomo_group }}"
-        mode: 0600
+        mode: "0600"
 
-    - name: Required Matomo rsynced over last version
-      ansible.builtin.command: "rsync -aq {{ matomo_private }}/matomo/ {{ matomo_html }}/"
-      register: matomo_rsync_command
-      changed_when: ( "total size is 0" not in matomo_rsync_command.stdout_lines )
+    - name: "Move the Matomo site to the backup path {{ matomo_site_backup }}"
+      ansible.builtin.command: "mv {{ matomo_html }} {{ matomo_site_backup }}"
+      args:
+        creates: "{{ matomo_site_backup }}"
+      become: true
+      become_user: "{{ matomo_user }}"
+
+    - name: "Required Matomo moved into place at {{ matomo_html }}"
+      ansible.builtin.command: "mv {{ matomo_private }}/matomo {{ matomo_html }}"
+      args:
+        creates: "{{ matomo_html }}"
+      become: true
+      become_user: "{{ matomo_user }}"
+
+    - name: Matomo config file backup copied into place
+      ansible.builtin.command: "cp -a {{ matomo_config_file_backup }} {{ matomo_html }}/config/config.ini.php"
+      args:
+        creates: "{{ matomo_html }}/config/config.ini.php"
       become: true
       become_user: "{{ matomo_user }}"
 
@@ -86,12 +105,39 @@
 
     - name: Set a variable for the installed Matomo version number
       ansible.builtin.set_fact:
-        matomo_installed: "{{ matomo_installed_check.stdout.split(' ')[2] }}"
+        matomo_installed: "{{ matomo_installed_check.stdout.split(' ')[-1] }}"
 
     - name: Print the installed version of Matomo
       ansible.builtin.debug:
         msg: "The installed version of Matomo is {{ matomo_installed }}"
         verbosity: 1
+
+    - name: Check for unexpected files to be deleted
+      ansible.builtin.command: "{{ matomo_php }} php console diagnostics:unexpected-files"
+      args:
+        chdir: "{{ matomo_html }}"
+      become: true
+      become_user: "{{ matomo_user }}"
+      changed_when: false
+      check_mode: false
+      register: matomo_unexpected_files
+
+    - name: Debug the list of files to be deleted
+      ansible.builtin.debug:
+        var: matomo_unexpected_files.stdout_lines
+        verbosity: 1
+      when: matomo_unexpected_files.stdout | length > 0
+
+    - name: Delete unexpected files
+      ansible.builtin.command: "{{ matomo_php }} php console diagnostics:unexpected-files --delete -n"
+      args:
+        chdir: "{{ matomo_html }}"
+      become: true
+      become_user: "{{ matomo_user }}"
+      changed_when: true
+      when:
+        - matomo_unexpected_files.rc == 0
+        - matomo_unexpected_files.stdout | length > 0
 
   tags:
     - matomo

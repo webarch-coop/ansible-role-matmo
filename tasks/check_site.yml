@@ -89,7 +89,7 @@
           ansible.builtin.file:
             path: "{{ matomo_private }}/.matomo_site_duplicates"
             state: directory
-            mode: 0600
+            mode: "0600"
             owner: "{{ matomo_user }}"
             group: "{{ matomo_group }}"
 
@@ -107,7 +107,7 @@
                     idsite: {{ matomo_site_checked_result.json.idsite }}
                     main_url: {{ matomo_site_checked_result.json.main_url }}
               ...
-            mode: 0600
+            mode: "0600"
             owner: "{{ matomo_user }}"
             group: "{{ matomo_group }}"
           loop: "{{ matomo_sites_checked.results }}"

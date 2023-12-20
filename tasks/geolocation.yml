@@ -32,7 +32,7 @@
             timeout: 120
             owner: "{{ matomo_user }}"
             group: "{{ matomo_group }}"
-            mode: 0640
+            mode: "0640"
 
         - name: Check if the downloaded DBIP City Lite database exists
           ansible.builtin.stat:
@@ -108,7 +108,7 @@
             remote_src: true
             owner: "{{ matomo_user }}"
             group: "{{ matomo_group }}"
-            mode: 0644
+            mode: "0644"
           when: matomo_dbip_mmdb.stat.exists | bool
 
       when:

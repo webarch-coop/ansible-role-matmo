@@ -17,7 +17,7 @@
         state: directory
         owner: "{{ matomo_user }}"
         group: "{{ matomo_user }}"
-        mode: 0700
+        mode: "0700"
 
     # https://matomo.org/blog/2014/11/verify-signatures-piwik-packages/
     - name: The Matomo < 4.8.0 GPG public key is present
@@ -26,7 +26,7 @@
         dest: "{{ matomo_private }}/matomo.pub"
         owner: "{{ matomo_user }}"
         group: "{{ matomo_user }}"
-        mode: 0644
+        mode: "0644"
         force: true
 
     - name: The Matomo < 4.8.0 GPG public key is imported
@@ -43,7 +43,7 @@
         dest: "{{ matomo_private }}/matomo.asc"
         owner: "{{ matomo_user }}"
         group: "{{ matomo_user }}"
-        mode: 0644
+        mode: "0644"
         force: true
 
     - name: The Matomo >= 4.8.0 GPG public key is imported
@@ -59,7 +59,7 @@
         dest: "{{ matomo_private }}/matomo-{{ matomo_required }}.tar.gz.asc"
         owner: "{{ matomo_user }}"
         group: "{{ matomo_group }}"
-        mode: 0640
+        mode: "0640"
         force: true
 
     - name: Stat Matomo GPG signature
@@ -73,7 +73,7 @@
         dest: "{{ matomo_private }}/matomo-{{ matomo_required }}.tar.gz"
         owner: "{{ matomo_user }}"
         group: "{{ matomo_group }}"
-        mode: 0640
+        mode: "0640"
         force: true
 
     - name: Stat Matomo TGZ

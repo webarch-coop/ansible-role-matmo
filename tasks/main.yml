@@ -37,20 +37,22 @@
         - name: Warn if the installed version is older than the latest version
           ansible.builtin.debug:
             msg: "The installed Matomo version {{ matomo_installed }}, is older than the latest Matomo {{ matomo_latest }}."
-          when: matomo_installed is version(matomo_latest, '<')
+          when: matomo_installed is ansible.builtin.version(matomo_latest, '<')
 
         - name: Warn if the installed version is newer than the required version
           ansible.builtin.debug:
             msg: "Downgrading from the installed Matomo version {{ matomo_installed }}, to the required version, Matomo {{ matomo_required }}, is not supported so has been skipped."
-          when: matomo_installed is version(matomo_required, '>')
+          when: matomo_installed is ansible.builtin.version(matomo_required, '>')
 
         - name: Include upgrade tasks
           ansible.builtin.include_tasks: upgrade.yml
-          when: matomo_installed is version(matomo_required, '<')
+          when: matomo_installed is ansible.builtin.version(matomo_required, '<')
 
         - name: Include file delete tasks
           ansible.builtin.include_tasks: delete_files.yml
-          when: matomo_installed in matomo_delete_files_scripts
+          when:
+            - matomo_installed is ansible.builtin.version('5.0.0', '<')
+            - matomo_installed in matomo_delete_files_scripts
 
       when: ( matomo_autoupdate is defined ) and ( matomo_installed is defined) and ( matomo_required is defined )
 
