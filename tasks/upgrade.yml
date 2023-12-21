@@ -11,6 +11,16 @@
 - name: Upgrade Matomo
   block:
 
+    - name: Check that the variables for the installed and required versions of Matomo are defined
+      ansible.builtin.assert:
+        that:
+          - matomo_installed is defined
+          - matomo_installed_semver is defined
+          - matomo_required is defined
+          - matomo_required_semver is defined
+          - matomo_installed is ansible.builtin.version('3.0.0', 'ge', version_type='semver')
+          - matomo_required is ansible.builtin.version('3.0.0', 'ge', version_type='semver')
+
     - name: Matomo download tgz tasks included
       ansible.builtin.include_tasks: download.yml
 
@@ -28,26 +38,43 @@
         group: "{{ matomo_group }}"
         mode: "0600"
 
-    - name: "Move the Matomo site to the backup path {{ matomo_site_backup }}"
-      ansible.builtin.command: "mv {{ matomo_html }} {{ matomo_site_backup }}"
-      args:
-        creates: "{{ matomo_site_backup }}"
-      become: true
-      become_user: "{{ matomo_user }}"
+    - name: Replace Matomo when upgrading major versions
+      block:
 
-    - name: "Required Matomo moved into place at {{ matomo_html }}"
-      ansible.builtin.command: "mv {{ matomo_private }}/matomo {{ matomo_html }}"
-      args:
-        creates: "{{ matomo_html }}"
-      become: true
-      become_user: "{{ matomo_user }}"
+        - name: "Move the Matomo site to the backup path {{ matomo_site_backup }}"
+          ansible.builtin.command: "mv {{ matomo_html }} {{ matomo_site_backup }}"
+          args:
+            creates: "{{ matomo_site_backup }}"
+          become: true
+          become_user: "{{ matomo_user }}"
 
-    - name: Matomo config file backup copied into place
-      ansible.builtin.command: "cp -a {{ matomo_config_file_backup }} {{ matomo_html }}/config/config.ini.php"
-      args:
-        creates: "{{ matomo_html }}/config/config.ini.php"
-      become: true
-      become_user: "{{ matomo_user }}"
+        - name: "Required Matomo moved into place at {{ matomo_html }}"
+          ansible.builtin.command: "mv {{ matomo_private }}/matomo {{ matomo_html }}"
+          args:
+            creates: "{{ matomo_html }}"
+          become: true
+          become_user: "{{ matomo_user }}"
+
+        - name: Matomo config file backup copied into place
+          ansible.builtin.command: "cp -a {{ matomo_config_file_backup }} {{ matomo_html }}/config/config.ini.php"
+          args:
+            creates: "{{ matomo_html }}/config/config.ini.php"
+          become: true
+          become_user: "{{ matomo_user }}"
+
+      when: matomo_required_semver.major is ansible.builtin.version(matomo_installed_semver.major, 'gt')
+
+    - name: Rsync Matomo when not upgrading major versions
+      block:
+
+        - name: Required Matomo rsynced over last version
+          ansible.builtin.command: "rsync -aq {{ matomo_private }}/matomo/ {{ matomo_html }}/"
+          register: matomo_rsync_command
+          changed_when: ( "total size is 0" not in matomo_rsync_command.stdout_lines )
+          become: true
+          become_user: "{{ matomo_user }}"
+
+      when: matomo_required_semver.major is ansible.builtin.version(matomo_installed_semver.major, 'eq')
 
     - name: Matomo database upgraded
       ansible.builtin.command: "{{ matomo_php }} console --no-ansi -n core:update --yes"

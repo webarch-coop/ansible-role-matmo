@@ -32,6 +32,20 @@
         group: "{{ matomo_group }}"
         validate: "{{ ansible_local.bash.path }} -n %s"
 
+    - name: Matomo console alias present in ~/.bash_aliases
+      ansible.builtin.lineinfile:
+        path: "{{ matomo_home }}/.bash_aliases"
+        line: "{{ matomo_console_alias }}"
+        regex: '^alias console='
+        state: present
+        create: true
+        mode: "0600"
+        owner: "{{ matomo_user }}"
+        group: "{{ matomo_group }}"
+        validate: "{{ ansible_local.bash.path }} -n %s"
+      vars:
+        matomo_console_alias: 'alias console="{{ matomo_php }} {{ matomo_html}}/console"'
+
   tags:
     - matomo
 ...
