@@ -8,33 +8,28 @@
 #
 # You should have received a copy of the GNU General Public License along with the Webarchitects Matomo Ansible role. If not, see <https://www.gnu.org/licenses/>.
 ---
-- name: Check the latest version of Matomo
+- name: Verify Matomo variables
   block:
 
-    - name: Get the latest Matomo version number file
-      ansible.builtin.uri:
-        url: https://builds.matomo.org/LATEST
-        return_content: true
-        force: true
-      check_mode: false
-      changed_when: false
-      register: matomo_latest_get
-
-    - name: Set variables for the latest Matomo version
-      ansible.builtin.set_fact:
-        matomo_latest: "{{ matomo_latest_get.content | trim }}"
-        matomo_latest_semver: "{{ matomo_latest_get.content | trim | string | community.general.jc('semver') }}"
-
-    - name: Print the latest version
+    - name: Debug the hostvars variable names that start with matomo_
       ansible.builtin.debug:
-        msg: "The latest version of Matomo is {{ matomo_latest | quote }}"
-        verbosity: 1
+        var: matomovarnames
+        verbosity: "{% if ansible_check_mode | bool %}3{% else %}4{% endif %}"
 
-    - name: Debug matomo_latest_semver
+    - name: Debug the hostvars variable names that start with matomo_
       ansible.builtin.debug:
-        var: matomo_latest_semver
-        verbosity: 2
+        var: matomohostvars
+        verbosity: "{% if ansible_check_mode | bool %}3{% else %}4{% endif %}"
 
+    - name: Check matomo_ variables using meta/argument_specs.yml
+      ansible.builtin.validate_argument_spec:
+        argument_spec: "{{ (lookup('ansible.builtin.file', 'meta/argument_specs.yml') | from_yaml)['argument_specs']['main']['options'] }}"
+        provided_arguments: "{{ matomohostvars }}"
+
+  when:
+    - matomo_verify is defined
+    - matomo_verify | bool
   tags:
     - matomo
+    - matomo_verify
 ...

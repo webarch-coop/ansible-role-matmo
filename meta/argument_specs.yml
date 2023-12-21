@@ -72,6 +72,10 @@ argument_specs:
         type: bool
         required: true
         description: Run the tasks in this role.
+      matomo_accounts_file:
+        type: str
+        required: true
+        description: Path to a file that will store the account details.
       matomo_autoupdate:
         type: bool
         required: true
@@ -166,10 +170,18 @@ argument_specs:
         type: str
         required: true
         description: Reply-to email address for the account creation notification email.
+      matomo_notify_signature:
+        type: str
+        required: true
+        description: Email signature for the account creation notification email.
       matomo_notify_subject_tag:
         type: str
         required: false
         description: Tag for the subject string of the account creation notification email.
+      matomo_password:
+        type: str
+        required: false
+        description: Matomo account passsword.
       matomo_php_bin:
         type: str
         required: true
@@ -186,10 +198,26 @@ argument_specs:
         type: str
         required: true
         description: Private directory for the Matomo user.
+      matomo_token_auth:
+        type: str
+        required: false
+        description: The Matomo token auth.
+      matomo_url:
+        type: str
+        required: true
+        description: The Matomo site URL.
       matomo_user:
         type: str
         required: true
         description: Matomo username.
+      matomo_verify:
+        type: bool
+        required: false
+        description: Verify all matomo_ variables using the arg spec.
+      matomo_version:
+        type: str
+        required: true
+        description: Matomo version string, either latest or the semver.
   site_present:
     author: Chris Croome
     description: Ansible role for installing and configuring Matomo on Debian.

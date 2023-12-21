@@ -18,6 +18,14 @@
 - name: Install, configure and upgrade Matomo
   block:
 
+    - name: Include Matomo verify variables tasks
+      ansible.builtin.include_tasks: verify.yml
+      when:
+        - matomo_verify is defined
+        - matomo_verify | bool
+      tags:
+        - matomo_verify
+
     - name: Include variables checks
       ansible.builtin.include_tasks: check_variables.yml
 
@@ -31,7 +39,7 @@
               - "Matomo version (from defaults): {{ matomo_version }}"
               - "Matomo installed (checked on the server): {{ matomo_installed }}"
               - "Matomo required (based on autoupdate): {{ matomo_required }}"
-              - "Matomo latest (checked on GitHub): {{ matomo_latest }}"
+              - "Matomo latest (checked via https://builds.matomo.org/LATEST): {{ matomo_latest }}"
             verbosity: 1
 
         - name: Warn if the installed version is older than the latest version

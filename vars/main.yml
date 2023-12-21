@@ -8,29 +8,26 @@
 #
 # You should have received a copy of the GNU General Public License along with the Webarchitects Matomo Ansible role. If not, see <https://www.gnu.org/licenses/>.
 ---
-variables:
-  ANSIBLE_CALLBACK_RESULT_FORMAT: "yaml"
-  ANSIBLE_DISPLAY_SKIPPED_HOSTS: "0"
-  ANSIBLE_FORCE_COLOR: "1"
-  ANSIBLE_NOCOWS: "1"
-  DEBIAN_FRONTEND: noninteractive
-  PY_COLORS: "1"
-before_script:
-  - whoami
-  - pwd
-  - chmod 700 $(pwd)
-  - which ansible-galaxy
-  - ansible-galaxy --version
-  - which ansible-lint
-  - ansible-lint --version
-  - which yamllint
-  - yamllint --version
-stages:
-  - bookworm
-bookworm:
-  image: registry.git.coop/webarch/containers/images/bookworm:20231213
-  stage: bookworm
-  script:
-    - yamllint -f colored -c .yamllint .
-    - ansible-lint -c .ansible-lint --force-color .
+# https://docs.ansible.com/ansible/latest/playbook_guide/complex_data_manipulation.html
+matomovarnames: "{{ q('varnames', '^matomo_') | sort }}"
+matomohostvars: "{{ dict(matomovarnames | list | zip(q('vars', *matomovarnames))) }}"
+
+# Matomo versions for which a list of files to delete is present this
+# is only needed for older versions as newer version have a console
+# command to delete these files:
+matomo_delete_files_scripts:
+  - 4.6.1
+  - 4.6.2
+  - 4.7.0
+  - 4.7.1
+  - 4.8.0
+  - 4.9.1
+  - 4.10.0
+  - 4.11.0
+  - 4.12.0
+  - 4.12.2
+  - 4.12.3
+  - 4.13.0
+  - 4.15.0
+  - 4.16.0
 ...

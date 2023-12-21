@@ -21,14 +21,20 @@
       changed_when: false
       register: matomo_installed_check
 
-    - name: Set a variable for the installed Matomo version number
+    - name: Set variables for the installed Matomo version number
       ansible.builtin.set_fact:
         matomo_installed: "{{ matomo_installed_check.stdout.split(' ')[-1] | trim }}"
+        matomo_installed_semver: "{{ matomo_installed_check.stdout.split(' ')[-1] | string | community.general.jc('semver') }}"
 
     - name: Print the installed version of Matomo
       ansible.builtin.debug:
         msg: "The installed version of Matomo is {{ matomo_installed | quote }}"
         verbosity: 1
+
+    - name: Debug matomo_installed_semver
+      ansible.builtin.debug:
+        var: matomo_installed_semver
+        verbosity: 2
 
   tags:
     - matomo

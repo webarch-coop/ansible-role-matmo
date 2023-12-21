@@ -152,9 +152,29 @@
     - name: Include latest version check
       ansible.builtin.include_tasks: check_latest_version.yml
 
+    - name: Set matomo_version to matomo_latest when matomo_version is set to latest
+      ansible.builtin.set_fact:
+        matomo_version: "{{ matomo_latest }}"
+      when: matomo_version == "latest"
+
     - name: Set the matomo_required variable
       ansible.builtin.set_fact:
         matomo_required: "{% if matomo_autoupdate %}{{ matomo_latest }}{% else %}{{ matomo_version }}{% endif %}"
+
+    - name: Set facts for version and required semvers
+      ansible.builtin.set_fact:
+        matomo_version_semver: "{{ matomo_version | string | community.general.jc('semver') }}"
+        matomo_required_semver: "{{ matomo_required | string | community.general.jc('semver') }}"
+
+    - name: Debug matomo_version_semver
+      ansible.builtin.debug:
+        var: matomo_version_semver
+        verbosity: 2
+
+    - name: Debug matomo_required_semver
+      ansible.builtin.debug:
+        var: matomo_required_semver
+        verbosity: 2
 
   tags:
     - matomo
