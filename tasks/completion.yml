@@ -1,0 +1,37 @@
+# Copyright 2018-2023 Chris Croome
+#
+# This file is part of the Webarchitects Matomo Ansible role.
+#
+# The Webarchitects Matomo Ansible role is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+#
+# The Webarchitects Matomo Ansible role is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with the Webarchitects Matomo Ansible role. If not, see <https://www.gnu.org/licenses/>.
+---
+- name: Matomo completion
+  block:
+
+    - name: Generate completion
+      ansible.builtin.command: "{{ matomo_php }} console --no-ansi -n completion"
+      args:
+        chdir: "{{ matomo_html }}"
+      changed_when: false
+      check_mode: false
+      become: true
+      become_user: "{{ matomo_user }}"
+      register: matomo_console_completion
+
+    - name: Bash autocompletion present in ~/.bash_completion
+      ansible.builtin.blockinfile:
+        path: "{{ matomo_home }}/.bash_completion"
+        block: "{{ matomo_console_completion.stdout }}"
+        marker: "# {mark} ANSIBLE MANAGED BLOCK Matomo console"
+        create: true
+        mode: "0600"
+        owner: "{{ matomo_user }}"
+        group: "{{ matomo_group }}"
+        validate: "{{ ansible_local.bash.path }} -n %s"
+
+  tags:
+    - matomo
+...

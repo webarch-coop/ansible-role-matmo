@@ -29,6 +29,16 @@
     - name: Include variables checks
       ansible.builtin.include_tasks: check_variables.yml
 
+    - name: Include apt role local fact tasks
+      ansible.builtin.include_role:
+        name: apt
+        tasks_from: local_facts.yml
+      when: >-
+        ( ansible_local.dpkg.arch is not defined ) or
+        ( ansible_local.dpkg.installed is not defined ) or
+        ( ansible_local.gpg.version is not defined ) or
+        ( ansible_local.bash.path is not defined )
+
     - name: Matomo upgrade
       block:
 
@@ -77,6 +87,9 @@
     - name: Include cron tasks
       ansible.builtin.include_tasks: cron.yml
       when: ( matomo_cron is defined ) and ( matomo_cron | bool )
+
+    - name: Include completion tasks
+      ansible.builtin.include_tasks: completion.yml
 
   when: matomo | bool
   tags:
