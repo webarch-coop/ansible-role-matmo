@@ -90,6 +90,7 @@
 
     - name: Include completion tasks
       ansible.builtin.include_tasks: completion.yml
+      when: matomo_installed is ansible.builtin.version('5.0.0', '>=')
 
   when: matomo | bool
   tags:
