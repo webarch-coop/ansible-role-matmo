@@ -103,7 +103,7 @@ argument_specs:
       matomo_db_prefix:
         type: str
         required: true
-        description: MariaDB database table prefix.
+        description: MariaDB database table prefix, this is only used for installing Matomo.
       matomo_db_username:
         type: str
         required: true
