@@ -67,7 +67,7 @@
     - name: Rsync Matomo when not upgrading major versions
       block:
 
-        - name: Required Matomo rsynced over last version
+        - name: Required Matomo rsynced over last version  # noqa: command-instead-of-module
           ansible.builtin.command: "rsync -aq {{ matomo_private }}/matomo/ {{ matomo_html }}/"
           register: matomo_rsync_command
           changed_when: ( "total size is 0" not in matomo_rsync_command.stdout_lines )

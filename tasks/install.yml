@@ -14,7 +14,7 @@
     - name: Matomo download tgz tasks included
       ansible.builtin.include_tasks: download.yml
 
-    - name: Matomo files rsync'd into place
+    - name: Matomo files rsync'd into place  # noqa: command-instead-of-module
       ansible.builtin.command: "rsync -aq {{ matomo_private }}/matomo/ {{ matomo_html }}/"
       register: matomo_rsync_command
       changed_when: ( "total size is 0" not in matomo_rsync_command.stdout_lines )
