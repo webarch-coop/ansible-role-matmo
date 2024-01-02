@@ -1,4 +1,4 @@
-# Copyright 2018-2023 Chris Croome
+# Copyright 2018-2024 Chris Croome
 #
 # This file is part of the Webarchitects Matomo Ansible role.
 #
@@ -27,6 +27,14 @@ repos:
           - jc==1.24.0
           # https://github.com/jmespath/jmespath.py/tags
           - jmespath==1.0.1
+  # https://github.com/aristanetworks/j2lint/releases
+  - repo: https://github.com/aristanetworks/j2lint.git
+    rev: v1.1.0
+    hooks:
+      - id: j2lint
+        name: Jinja2-Linter
+        args:
+          - templates
   # https://github.com/jackdewinter/pymarkdown/releases
   - repo: https://github.com/jackdewinter/pymarkdown
     rev: v0.9.15
@@ -34,6 +42,6 @@ repos:
       - id: pymarkdown
         name: Markdown Lint
         args:
-          - 'scan'
-          - 'README.md'
+          - scan
+          - README.md
 ...

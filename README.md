@@ -12,7 +12,7 @@ Note that this role don't add the `matomo_user` user account or the `matomo_grou
 
 By default only these tasks are run:
 
-```
+```tree
 main.yml
   |
   \-- check_variables.yml
@@ -48,8 +48,7 @@ If a superuser username, password and token authentication string are provided (
 
 To add a Matomo user account include this role with tasks from `user_present.yml` and then the tasks in these files will be run:
 
-
-```
+```tree
 user_present.yml
   |
   \-- check_login.yml
@@ -68,7 +67,7 @@ Since a users password is needed to generate a `token_auth` which is in turn nee
 ```yml
 ---
 matomo_accounts:
-  - login: user 
+  - login: user
     email: user@example.org
     password: XXX
     superuser_access: false
@@ -80,7 +79,7 @@ matomo_accounts:
 
 To add a Matomo site include this role with tasks from `site_present.yml` and then the tasks in these files will be run:
 
-```
+```tree
 site_present.yml
   |
   \-- get_all_sites.yml
@@ -98,13 +97,13 @@ site_present.yml
 
 To check (in a rather slow manner) for two sites having the same URL include this role with tasks from `check_sites.yml` and then the tasks in these files wil be run:
 
-```
+```tree
 check_site.yml
   |
   \-- check_duplicate_urls.yml
         |
         \-- check_duplicate_url.yml
-``` 
+```
 
 ## Ansible Galaxy and repo URL
 
@@ -114,3 +113,8 @@ If you use this role please use a tagged release, see [the release notes](https:
 
 This role can also be used with the [localhost repo](https://git.coop/webarch/localhost) to install `matomo` locally.
 
+## Copyright
+
+Copyright 2018-2024 Chris Croome, &lt;[chris@webarchitects.co.uk](mailto:chris@webarchitects.co.uk)&gt;.
+
+This role is released under [the same terms as Ansible itself](https://github.com/ansible/ansible/blob/devel/COPYING), the [GNU GPLv3](LICENSE).
