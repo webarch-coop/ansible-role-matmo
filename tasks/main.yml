@@ -18,6 +18,9 @@
 - name: Install, configure and upgrade Matomo
   block:
 
+    - name: Gather facts
+      ansible.builtin.setup:
+
     - name: Include Matomo verify variables tasks
       ansible.builtin.include_tasks: verify.yml
       when:
