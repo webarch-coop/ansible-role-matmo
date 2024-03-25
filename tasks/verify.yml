@@ -21,9 +21,18 @@
         var: matomohostvars
         verbosity: "{% if ansible_check_mode | bool %}3{% else %}4{% endif %}"
 
-    - name: Check matomo_ variables using meta/argument_specs.yml
+    - name: Set a fact for the argument spec and internal argument spec
+      ansible.builtin.set_fact:
+        matomo_argument_spec: "{{ (lookup('ansible.builtin.file', 'meta/argument_specs.yml') | from_yaml) }}"
+        matomo_internal_argument_spec: "{{ (lookup('ansible.builtin.file', 'meta/internal_argument_specs.yml') | from_yaml) }}"
+
+    - name: Set a fact for the combined argument spec and internal argument spec
+      ansible.builtin.set_fact:
+        matomo_combined_argument_spec: "{{ matomo_argument_spec | ansible.builtin.combine(matomo_internal_argument_spec, recursive=true) }}"
+
+    - name: Check matomo_ variables using the combined argument spec
       ansible.builtin.validate_argument_spec:
-        argument_spec: "{{ (lookup('ansible.builtin.file', 'meta/argument_specs.yml') | from_yaml)['argument_specs']['main']['options'] }}"
+        argument_spec: "{{ matomo_combined_argument_spec['argument_specs']['main']['options'] }}"
         provided_arguments: "{{ matomohostvars }}"
 
   when:

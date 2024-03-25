@@ -24,8 +24,8 @@
       ansible.builtin.command: "{{ matomo_php }} console --no-ansi -n login:unblock-blocked-ips"
       args:
         chdir: "{{ matomo_html }}"
-      register: matomo_unblock_locked_ips
-      failed_when: matomo_unblock_locked_ips.stdout != "Done"
+      register: matomo_unblock_blocked_ips
+      failed_when: matomo_unblock_blocked_ips.stdout != "Done"
       changed_when: false
       check_mode: false
       become: true
