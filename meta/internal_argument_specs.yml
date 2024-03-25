@@ -84,6 +84,14 @@ argument_specs:
         type: dict
         required: false
         description: The results from POST'ing UsersManager.setUserAccess to the Matomo API.
+      matomo_argument_spec:
+        type: dict
+        required: false
+        description: The arg spec for this role.
+      matomo_combined_argument_spec:
+        type: dict
+        required: false
+        description: The combined arg spec for this role.
       matomo_existing_role:
         type: str
         required: false
@@ -130,6 +138,10 @@ argument_specs:
             type: str
             required: false
             description: The build version number.
+      matomo_internal_argument_spec:
+        type: dict
+        required: false
+        description: The internal arg spec for this role.
       matomo_login_existing:
         type: str
         required: false
