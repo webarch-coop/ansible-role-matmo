@@ -6,7 +6,13 @@
   "siteName": "{{ matomo_site_name }}",
   "idSite": "{{ matomo_site_id }}",
   "urls[0]": "{{ matomo_site_main_url }}",
-{% if matomo_site_urls is defined and matomo_site_urls != [] %}{% for u in matomo_site_urls %}
-  "urls[{{ loop.index }}]": "{{ u }}"{% if not loop.last %},{% endif %}
-{% endfor %}{% endif %}
+{% if matomo_site_urls is defined and matomo_site_urls != [] %}
+{%     for u in matomo_site_urls %}
+{%         if not loop.last | bool %}
+  "urls[{{ loop.index }}]": "{{ u }}",
+{%         else %}
+  "urls[{{ loop.index }}]": "{{ u }}"
+{%         endif %}
+{%     endfor %}
+{% endif %}
 }
