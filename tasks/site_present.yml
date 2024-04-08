@@ -55,7 +55,7 @@
 
     - name: "Add Matomo site IDs to the list of existing site IDs for the main URL {{ matomo_site_main_url }}"
       ansible.builtin.set_fact:
-        matomo_existing_site_ids: "{{ matomo_existing_site_ids + [ ( matomo_get_all_sites.json | community.general.json_query(matomo_jmespath_query_site_ids) ) ] }}"
+        matomo_existing_site_ids: "{{ ( matomo_existing_site_ids + [ ( matomo_get_all_sites.json | community.general.json_query(matomo_jmespath_query_site_ids) ) ] ) | unique }}"
       vars:
         matomo_jmespath_query_site_ids: >-
           [{{- matomo_site_urls |
@@ -74,24 +74,19 @@
         verbosity: 2
       when: matomo_existing_site_ids is defined
 
-    - name: Debug fail
-      ansible.builtin.fail:
+    # This is made redundant with the above set_fact
+    # - name: "Check if there is a Matomo site ID for site URLs other than the main one"
+    #   ansible.builtin.include_tasks: get_sites_id_from_site_url.yml
+    #   loop: "{{ matomo_site_urls }}"
+    #   loop_control:
+    #     loop_var: matomo_proposed_url
+    #   when: ( matomo_site_urls is defined ) and ( matomo_site_urls != [] )
 
-    - name: "Check if there is a Matomo site ID for site URLs other than the main one"
-      ansible.builtin.include_tasks: get_sites_id_from_site_url.yml
-      loop: "{{ matomo_site_urls }}"
-      loop_control:
-        loop_var: matomo_proposed_url
-      when: ( matomo_site_urls is defined ) and ( matomo_site_urls != [] )
-
-    - name: Print the matomo_existing_site_ids
-      ansible.builtin.debug:
-        var: matomo_existing_site_ids
-        verbosity: 2
-      when: matomo_existing_site_ids is defined
-
-    - name: Debug fail
-      ansible.builtin.fail:
+    # - name: Print the matomo_existing_site_ids
+    #   ansible.builtin.debug:
+    #     var: matomo_existing_site_ids
+    #     verbosity: 2
+    #   when: matomo_existing_site_ids is defined
 
     - name: This Ansible role only supports having one Matomo site per URL
       ansible.builtin.fail:
@@ -99,8 +94,10 @@
           - "There appears to be more than one Matomo site with the same URL"
           - "Please login and check these site IDs: {{ matomo_existing_site_ids }}"
           - "and this main URL {{ matomo_site_main_url }}"
-          - "{% if matomo_site_urls is defined %}and these other URLs {{ matomo_site_urls }}{% endif %}"
-      when: ( matomo_existing_site_ids is defined ) and ( matomo_existing_site_ids[1] is defined )
+          - "{% if matomo_site_urls is defined %}and these other URLs {{ matomo_site_urls | join(', ') }}{% endif %}"
+      when:
+        - matomo_existing_site_ids is defined
+        - matomo_existing_site_ids[1] is defined
 
     - name: Check and update URLs
       block:
@@ -168,6 +165,9 @@
             var: matomo_proposed_site_urls_sorted
             verbosity: 2
           when: matomo_proposed_site_urls_sorted is defined
+
+        - name: Debug
+          ansible.builtin.fail:
 
         - name: Include update Matomo site tasks when existing URLs don't match the proposed ones
           ansible.builtin.include_tasks: update_site.yml
