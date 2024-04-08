@@ -34,8 +34,13 @@
           method: UsersManager.getUsersHavingSuperUserAccess
         status_code: 200
         return_content: true
-      register: matomo_api_get_users_having_super_user_access
+        use_netrc: false
+      become: true
+      become_user: "{{ matomo_user }}"
+      check_mode: false
+      delegate_to: "{{ inventory_hostname }}"
       changed_when: false
+      register: matomo_api_get_users_having_super_user_access
       failed_when: ( matomo_api_get_users_having_super_user_access.json is not defined )
 
     - name: Debug matomo_api_get_users_having_super_user_access
@@ -43,17 +48,13 @@
         var: matomo_api_get_users_having_super_user_access
         verbosity: 2
 
-    - name: Loop through the superusers accounts to check that we are not configuring one
+    - name: Check that we are not configuring a super user
       ansible.builtin.assert:
         that:
-          - matomo_existing_superuser.login != matomo_login
-          - matomo_existing_superuser.email != matomo_login_email
-        msg: "Please use a different email address (or alias) and login username for the Matomo superuser and regular users"
+          - matomo_login not in ( matomo_api_get_users_having_super_user_access.json | community.general.json_query('[].login') )
+          - matomo_login_email not in ( matomo_api_get_users_having_super_user_access.json | community.general.json_query('[].email') )
+        fail_msg: "Please use a different email address (or alias) and login username for the Matomo superuser and regular users"
         quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
-      loop: "{{ matomo_api_get_users_having_super_user_access.json }}"
-      loop_control:
-        loop_var: matomo_existing_superuser
-        label: "{{ matomo_existing_superuser.login }}"
 
     - name: Set the matomo_login_existing to an empty value
       ansible.builtin.set_fact:
@@ -72,8 +73,13 @@
           userEmail: "{{ matomo_login_email }}"
         status_code: 200
         return_content: true
-      register: matomo_api_get_user_login_from_user_email
+        use_netrc: false
+      become: true
+      become_user: "{{ matomo_user }}"
+      check_mode: false
+      delegate_to: "{{ inventory_hostname }}"
       changed_when: false
+      register: matomo_api_get_user_login_from_user_email
       failed_when: ( matomo_api_get_user_login_from_user_email.json is not defined )
 
     - name: Debug matomo_api_get_user_login_from_user_email

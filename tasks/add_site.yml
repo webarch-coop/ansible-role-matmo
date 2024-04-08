@@ -47,6 +47,11 @@
         body: "{{ matomo_add_site_json }}"
         status_code: 200
         return_content: true
+        use_netrc: false
+      become: true
+      become_user: "{{ matomo_user }}"
+      delegate_to: "{{ inventory_hostname }}"
+      changed_when: true
       register: matomo_add_site
       failed_when: ( matomo_add_site.failed is defined and matomo_add_site.failed ) or ( matomo_add_site.json is defined and matomo_add_site.json.value is not regex("^[0-9]{1,6}$") )
 

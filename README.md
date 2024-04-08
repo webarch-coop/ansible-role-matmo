@@ -105,6 +105,15 @@ check_site.yml
         \-- check_duplicate_url.yml
 ```
 
+## Debugging
+
+Using `curl` for testing / development:
+
+```bash
+export TOKEN_AUTH=foo
+curl -d "module=API&token_auth=${TOKEN_AUTH}&method=SitesManager.getAllSites&format=JSON" https://matomo.example.org/
+```
+
 ## Ansible Galaxy and repo URL
 
 The primary URL of this repo is [`https://git.coop/webarch/matomo`](https://git.coop/webarch/matomo) however it is also [mirrored to GitHub](https://github.com/webarch-coop/ansible-role-matmo) and [available via Ansible Galaxy](https://galaxy.ansible.com/chriscroome/matomo).

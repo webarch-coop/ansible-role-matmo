@@ -32,6 +32,7 @@
       loop: "{{ matomo_get_all_sites.json }}"
       loop_control:
         loop_var: site
+        label: "{{ site.name }}"
 
     - name: Debug matomo_existing_site_ids
       ansible.builtin.debug:

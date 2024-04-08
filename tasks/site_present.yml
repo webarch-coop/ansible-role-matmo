@@ -29,16 +29,53 @@
 
     # TODO Add a quick check that if the matomo_site_name exists and the URLs match then skip slower checks
 
-    - name: "Check if there is a Matomo site ID for {{ matomo_site_main_url }}"
-      ansible.builtin.include_tasks: get_sites_id_from_site_url.yml
+    - name: "Set a fact for the Matomo site ID for the main URL {{ matomo_site_main_url }}"
+      ansible.builtin.set_fact:
+        matomo_existing_site_ids: "{{ matomo_get_all_sites.json | community.general.json_query(matomo_jmespath_query_site_ids) }}"
       vars:
-        matomo_proposed_url: "{{ matomo_site_main_url }}"
+        matomo_jmespath_query_site_ids: "[?main_url=='{{ matomo_site_main_url }}'].idsite"
+
+    # This is made redundant with the above JMESPath query
+    # - name: "Check if there is a Matomo site ID for {{ matomo_site_main_url }}"
+    #   ansible.builtin.include_tasks: get_sites_id_from_site_url.yml
+    #   vars:
+    #     matomo_proposed_url: "{{ matomo_site_main_url }}"
 
     - name: Print the matomo_existing_site_ids
       ansible.builtin.debug:
         var: matomo_existing_site_ids
         verbosity: 2
       when: matomo_existing_site_ids is defined
+
+    - name: Print the matomo_site_urls
+      ansible.builtin.debug:
+        var: matomo_site_urls
+        verbosity: 2
+      when: matomo_site_urls is defined
+
+    - name: "Add Matomo site IDs to the list of existing site IDs for the main URL {{ matomo_site_main_url }}"
+      ansible.builtin.set_fact:
+        matomo_existing_site_ids: "{{ matomo_existing_site_ids + [ ( matomo_get_all_sites.json | community.general.json_query(matomo_jmespath_query_site_ids) ) ] }}"
+      vars:
+        matomo_jmespath_query_site_ids: >-
+          [{{- matomo_site_urls |
+          map("ansible.builtin.regex_replace", "^", "main_url=='") |
+          map("ansible.builtin.regex_replace", "$", "'") | join('||') -}}].idsite
+      when:
+        - matomo_site_urls is defined
+        - matomo_site_urls != []
+        - matomo_site_urls != None
+        - ( matomo_get_all_sites.json | community.general.json_query(matomo_jmespath_query_site_ids) ) != []
+        - ( matomo_get_all_sites.json | community.general.json_query(matomo_jmespath_query_site_ids) ) != None
+
+    - name: Print the matomo_existing_site_ids
+      ansible.builtin.debug:
+        var: matomo_existing_site_ids
+        verbosity: 2
+      when: matomo_existing_site_ids is defined
+
+    - name: Debug fail
+      ansible.builtin.fail:
 
     - name: "Check if there is a Matomo site ID for site URLs other than the main one"
       ansible.builtin.include_tasks: get_sites_id_from_site_url.yml
@@ -52,6 +89,9 @@
         var: matomo_existing_site_ids
         verbosity: 2
       when: matomo_existing_site_ids is defined
+
+    - name: Debug fail
+      ansible.builtin.fail:
 
     - name: This Ansible role only supports having one Matomo site per URL
       ansible.builtin.fail:
@@ -160,9 +200,13 @@
               userEmail: "{{ matomo_login_email }}"
             status_code: 200
             return_content: true
-          register: matomo_api_get_user_login_from_user_email
+            use_netrc: false
+          become: true
+          become_user: "{{ matomo_user }}"
+          check_mode: false
+          delegate_to: "{{ inventory_hostname }}"
           changed_when: false
-          failed_when: ( matomo_api_get_user_login_from_user_email.json.value is not defined )
+          register: matomo_api_get_user_login_from_user_email
 
         - name: Debug matomo_api_get_user_login_from_user_email
           ansible.builtin.debug:
@@ -194,6 +238,11 @@
                   method: UsersManager.getUsersPlusRole
                   idSite: "{{ matomo_site_id }}"
                 status_code: 200
+              become: true
+              become_user: "{{ matomo_user }}"
+              check_mode: false
+              delegate_to: "{{ inventory_hostname }}"
+              changed_when: false
               register: matomo_api_get_users_plus_role
 
             - name: Debug matomo_api_get_users_plus_role
@@ -223,6 +272,9 @@
                   access: "view"
                   idSites: "{{ matomo_site_id }}"
                   status_code: 200
+              become: true
+              become_user: "{{ matomo_user }}"
+              delegate_to: "{{ inventory_hostname }}"
               register: matomo_api_set_user_access
               failed_when: ( matomo_api_set_user_access.json is not defined ) or ( matomo_api_set_user_access.json is defined and matomo_api_set_user_access.json.result != "success" )
 

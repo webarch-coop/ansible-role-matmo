@@ -24,10 +24,10 @@
       ansible.builtin.command: "{{ matomo_php }} console --no-ansi -n login:unblock-blocked-ips"
       args:
         chdir: "{{ matomo_html }}"
-      changed_when: false
       check_mode: false
       become: true
       become_user: "{{ matomo_user }}"
+      changed_when: false
       register: matomo_unblock_blocked_ips
       failed_when: ( matomo_unblock_blocked_ips.rc != 0 ) or ( matomo_unblock_blocked_ips.stdout != "Done" )
 
@@ -48,8 +48,11 @@
           hasSuperUserAccess: true
           passwordConfirmation: "{{ matomo_password }}"
         status_code: 200
-      changed_when: false
+      become: true
+      become_user: "{{ matomo_user }}"
       check_mode: false
+      delegate_to: "{{ inventory_hostname }}"
+      changed_when: false
       register: matomo_api_set_super_user_access
 
     - name: Debug matomo_api_set_super_user_access

@@ -28,6 +28,12 @@
           idSite: "{{ site.idsite }}"
           status_code: 200
           return_content: true
+        use_netrc: false
+      become: true
+      become_user: "{{ matomo_user }}"
+      check_mode: false
+      delegate_to: "{{ inventory_hostname }}"
+      changed_when: false
       register: matomo_get_site_urls_from_id
       failed_when: ( matomo_get_site_urls_from_id.failed is defined ) and ( matomo_get_site_urls_from_id.failed )
 
@@ -56,6 +62,12 @@
               token_auth: "{{ matomo_token_auth }}"
               method: SitesManager.getSiteFromId
               idSite: "{{ site.idsite }}"
+            use_netrc: false
+          become: true
+          become_user: "{{ matomo_user }}"
+          check_mode: false
+          delegate_to: "{{ inventory_hostname }}"
+          changed_when: false
           register: matomo_site_checked
           failed_when: ( matomo_site_checked.failed is defined ) and ( matomo_site_checked.failed | bool )
 
@@ -75,6 +87,12 @@
               token_auth: "{{ matomo_token_auth }}"
               method: SitesManager.getSiteFromId
               idSite: "{{ matomo_siteid_dupe }}"
+            use_netrc: false
+          become: true
+          become_user: "{{ matomo_user }}"
+          check_mode: false
+          delegate_to: "{{ inventory_hostname }}"
+          changed_when: false
           register: matomo_sites_checked
           loop: "{{ matomo_site_duplicates | unique }}"
           loop_control:

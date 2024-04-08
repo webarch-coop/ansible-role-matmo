@@ -30,6 +30,12 @@
           method: SitesManager.getAllSites
           status_code: 200
           return_content: true
+        use_netrc: false
+      become: true
+      become_user: "{{ matomo_user }}"
+      check_mode: false
+      delegate_to: "{{ inventory_hostname }}"
+      changed_when: false
       register: matomo_get_all_sites
       failed_when: ( matomo_get_all_sites.failed is defined ) and ( matomo_get_all_sites.failed )
 
@@ -42,6 +48,22 @@
       ansible.builtin.debug:
         msg: "The matomo_get_all_sites.json variable type: {{ matomo_get_all_sites.json | type_debug }}"
         verbosity: 2
+
+    - name: Set a fact for the Matomo main URLs
+      ansible.builtin.set_fact:
+        matomo_main_urls: "{{ matomo_get_all_sites.json | community.general.json_query('[].main_url') }}"
+
+    - name: Debug matomo_main_urls
+      ansible.builtin.debug:
+        var: matomo_main_urls
+        verbosity: 1
+
+    - name: Check that the main_url for the sites doesn't contain multiple URLs seperated by commas
+      ansible.builtin.assert:
+        that:
+          - ( matomo_main_urls | select('ansible.builtin.regex', ',') ) == []
+        quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
+        fail_msg: It appears that one of the {{ matomo_main_urls | join(' ') }} contains multiple URLs seperated by commas, please fix this, the field should contain one URL.
 
   tags:
     - matomo

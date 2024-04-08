@@ -44,8 +44,13 @@
           userLogin: "{{ matomo_login }}"
         status_code: 200
         return_content: true
-      register: matomo_api_user_exists
+        use_netrc: false
+      become: true
+      become_user: "{{ matomo_user }}"
+      check_mode: false
+      delegate_to: "{{ inventory_hostname }}"
       changed_when: false
+      register: matomo_api_user_exists
       failed_when: ( matomo_api_user_exists.json is not defined )
 
     - name: Debug matomo_api_user_exists

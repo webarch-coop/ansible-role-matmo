@@ -16,6 +16,7 @@
         url: https://builds.matomo.org/LATEST
         return_content: true
         force: true
+        use_netrc: false
       check_mode: false
       changed_when: false
       register: matomo_latest_get
