@@ -1,0 +1,34 @@
+# Copyright 2018-2024 Chris Croome
+#
+# This file is part of the Webarchitects Matomo Ansible role.
+#
+# The Webarchitects Matomo Ansible role is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+#
+# The Webarchitects Matomo Ansible role is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with the Webarchitects Matomo Ansible role. If not, see <https://www.gnu.org/licenses/>.
+---
+- name: Query MariaDB to get all Matomo sites
+  block:
+
+    - name: Query Matomo database for sites and users
+      community.mysql.mysql_query:
+        config_file: "{{ matomo_home }}/.my.cnf"
+        login_db: "{{ matomo_dbname }}"
+        login_host: "{{ matomo_db_host }}"
+        login_unix_socket: /run/mysqld/mysqld.sock
+        query: "SELECT {{ matomo_db_prefix }}site.name AS name, {{ matomo_db_prefix }}site.main_url AS url, (SELECT GROUP_CONCAT({{ matomo_db_prefix }}site_url.url) FROM {{ matomo_db_prefix }}site_url WHERE {{ matomo_db_prefix }}site.idsite = {{ matomo_db_prefix }}site_url.idsite) AS urls, (SELECT GROUP_CONCAT({{ matomo_db_prefix }}access.login) FROM {{ matomo_db_prefix }}access WHERE {{ matomo_db_prefix }}site.idsite = {{ matomo_db_prefix }}access.idsite) AS users FROM {{ matomo_db_prefix }}site"
+        single_transaction: true
+      check_mode: false
+      become: true
+      become_user: "{{ matomo_user }}"
+      changed_when: false
+      register: matomo_mariadb_sites_query
+
+    - name: Debug matomo_mariadb_sites_query.query_result
+      ansible.builtin.debug:
+        var: matomo_mariadb_sites_query.query_result
+
+  tags:
+    - matomo
+...

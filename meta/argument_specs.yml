@@ -88,6 +88,10 @@ argument_specs:
         type: str
         required: true
         description: MariaDB adaptor for Matomo database configuration
+      matomo_db_config:
+        type: str
+        required: true
+        description: Path to the MariaDB ~/.my.cnf file.
       matomo_db_host:
         type: str
         required: true
@@ -104,6 +108,10 @@ argument_specs:
         type: str
         required: true
         description: MariaDB database table prefix, this is only used for installing Matomo.
+      matomo_db_socket:
+        type: str
+        required: true
+        description: Path to the MariaDB UNIX socket.
       matomo_db_username:
         type: str
         required: true
@@ -149,6 +157,10 @@ argument_specs:
         type: str
         required: true
         description: DocumentRoot for the Matomo site.
+      matomo_local_facts:
+        type: bool
+        required: true
+        description: Install Matomo Ansible local facts script.
       matomo_logs:
         type: str
         required: true

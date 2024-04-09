@@ -20,6 +20,9 @@
           - ( matomo_site_main_url is defined ) and ( matomo_site_main_url is regex("^http:\/\/.*$") )
         quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
 
+    - name: Include Matomo sites tasks
+      ansible.builtin.include_tasks: sites.yml
+
     - name: Include Matomo getAllSites API tasks
       ansible.builtin.include_tasks: get_all_sites.yml
 

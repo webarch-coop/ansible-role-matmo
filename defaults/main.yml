@@ -25,12 +25,14 @@ matomo_home: "/home/{{ matomo_user }}"
 matomo_html: "{{ matomo_home }}/sites/default"
 matomo_private: "{{ matomo_home }}/private"
 matomo_logs: "{{ matomo_private }}"
-matomo_db_username: "{{ matomo_user }}"
-matomo_db_pass: ""
-matomo_db_host: localhost
-matomo_dbname: "{{ matomo_user }}"
-matomo_db_prefix: "matomo_"
 matomo_db_adaptor: "PDO\\MYSQL"
+matomo_db_config: "{{ matomo_home }}/.my.cnf"
+matomo_db_host: localhost
+matomo_db_pass: ""
+matomo_db_prefix: "matomo_"
+matomo_db_socket: "/run/mysqld/mysqld.sock"
+matomo_db_username: "{{ matomo_user }}"
+matomo_dbname: "{{ matomo_user }}"
 matomo_url: "https://{{ matomo_user }}.{{ inventory_hostname }}/"
 matomo_first_site_name: "{{ inventory_hostname }}"
 matomo_first_site_url: "http://{{ inventory_hostname }}/"
@@ -53,6 +55,7 @@ matomo_cron: false
 matomo_diagnostics_fail: true
 matomo_php_bin: "/usr/bin/php{{ matomo_php_version }}"
 matomo_php_ini: "{{ matomo_home }}/.php.ini"
-matomo_php_version: "8.2"
+matomo_php_version: "8.3"
+matomo_local_facts: true
 matomo_verify: true
 ...

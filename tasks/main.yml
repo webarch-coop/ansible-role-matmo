@@ -32,6 +32,12 @@
     - name: Include variables checks
       ansible.builtin.include_tasks: check_variables.yml
 
+    - name: Include Matomo local facts tasks
+      ansible.builtin.include_tasks: local_facts.yml
+      when:
+        - matomo_local_facts is defined
+        - matomo_local_facts is defined
+
     - name: Include apt role local fact tasks
       ansible.builtin.include_role:
         name: apt
