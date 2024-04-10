@@ -20,8 +20,31 @@
           - ( matomo_site_main_url is defined ) and ( matomo_site_main_url is regex("^http:\/\/.*$") )
         quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
 
+    - name: Set a fact for the site that should be present
+      ansible.builtin.set_fact:
+        matomo_site_required:
+          name: "{{ matomo_site_name }}"
+          main_url: "{{ matomo_site_main_url }}"
+          urls: "{{ matomo_site_urls }}"
+          users:
+            - "{{ matomo_login }}"
+
+    - name: Debug matomo_site_required
+      ansible.builtin.debug:
+        var: matomo_site_required
+
     - name: Include Matomo sites tasks
       ansible.builtin.include_tasks: sites.yml
+
+    - name: Matomo site present check
+      ansible.builtin.debug:
+        msg: "The required site, {{ matomo_site_name }}, is present."
+      when: matomo_site_required in matomo_mariadb_sites_query.query_result
+
+    - name: Matomo site absent check
+      ansible.builtin.debug:
+        msg: "The required site, {{ matomo_site_name }}, is absent."
+      when: matomo_site_required not in matomo_mariadb_sites_query.query_result
 
     - name: Include Matomo getAllSites API tasks
       ansible.builtin.include_tasks: get_all_sites.yml
