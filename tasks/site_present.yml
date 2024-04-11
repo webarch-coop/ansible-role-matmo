@@ -24,10 +24,9 @@
       ansible.builtin.set_fact:
         matomo_site_required:
           name: "{{ matomo_site_name }}"
-          main_url: "{{ matomo_site_main_url }}"
-          urls: "{{ matomo_site_urls }}"
-          users:
-            - "{{ matomo_login }}"
+          url: "{{ matomo_site_main_url }}"
+          urls: "{{ matomo_site_urls | join(',') }}"
+          users: "{{ matomo_login }}"
 
     - name: Debug matomo_site_required
       ansible.builtin.debug:
@@ -39,12 +38,17 @@
     - name: Matomo site present check
       ansible.builtin.debug:
         msg: "The required site, {{ matomo_site_name }}, is present."
-      when: matomo_site_required in matomo_mariadb_sites_query.query_result
+      when:
+        - matomo_site_required.name == matomo_site_item.name
+        - matomo_site_required.url == matomo_site_item.url
+        - matomo_site_required.urls == matomo_site_item.urls
+        - matomo_site_required.users == matomo_site_item.users
+      loop: "{{ matomo_mariadb_sites_query.query_result[0] }}"
+      loop_control:
+        loop_var: matomo_site_item
+        label: "{{ matomo_site_item.name }}"
 
-    - name: Matomo site absent check
-      ansible.builtin.debug:
-        msg: "The required site, {{ matomo_site_name }}, is absent."
-      when: matomo_site_required not in matomo_mariadb_sites_query.query_result
+    # - fail:
 
     - name: Include Matomo getAllSites API tasks
       ansible.builtin.include_tasks: get_all_sites.yml

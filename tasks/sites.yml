@@ -25,9 +25,9 @@
       changed_when: false
       register: matomo_mariadb_sites_query
 
-    - name: Debug matomo_mariadb_sites_query.query_result
+    - name: Debug matomo_mariadb_sites_query.query_result[0]
       ansible.builtin.debug:
-        var: matomo_mariadb_sites_query.query_result
+        var: matomo_mariadb_sites_query.query_result[0]
 
   tags:
     - matomo
