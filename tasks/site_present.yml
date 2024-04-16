@@ -186,9 +186,6 @@
             verbosity: 2
           when: matomo_proposed_site_urls_sorted is defined
 
-        - name: Debug
-          ansible.builtin.fail:
-
         - name: Include update Matomo site tasks when existing URLs don't match the proposed ones
           ansible.builtin.include_tasks: update_site.yml
           when:
