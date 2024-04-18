@@ -22,6 +22,8 @@
 
     - name: Set a fact for the site that should be present
       ansible.builtin.set_fact:
+        matomo_site_present_and_correct: None
+        matomo_site_present_and_incorrect: None
         matomo_site_required:
           name: "{{ matomo_site_name }}"
           url: "{{ matomo_site_main_url }}"
@@ -31,6 +33,7 @@
     - name: Debug matomo_site_required
       ansible.builtin.debug:
         var: matomo_site_required
+        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
 
     - name: Include Matomo sites tasks
       ansible.builtin.include_tasks: sites.yml
@@ -47,6 +50,54 @@
       loop_control:
         loop_var: matomo_site_item
         label: "{{ matomo_site_item.name }}"
+
+    - name: Matomo site present and correct
+      ansible.builtin.set_fact:
+        matomo_site_present_and_correct: true
+      when:
+        - matomo_site_required.name == matomo_site_item.name
+        - matomo_site_required.url == matomo_site_item.url
+        - matomo_site_required.urls == matomo_site_item.urls
+        - matomo_site_required.users == matomo_site_item.users
+      loop: "{{ matomo_mariadb_sites_query.query_result[0] }}"
+      loop_control:
+        loop_var: matomo_site_item
+        label: "{{ matomo_site_item.name }}"
+
+    - name: Debug matomo_site_present_and_correct
+      ansible.builtin.debug:
+        var: matomo_site_present_and_correct
+        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
+
+    - name: Matomo site present and incorrect
+      ansible.builtin.set_fact:
+        matomo_site_present_and_incorrect: true
+      when: >-
+        ( ( matomo_site_required.name == matomo_site_item.name ) and
+        ( matomo_site_required.url == matomo_site_item.url ) and
+        ( matomo_site_required.urls == matomo_site_item.urls ) and
+        ( matomo_site_required.users != matomo_site_item.users ) ) or
+        ( ( matomo_site_required.name == matomo_site_item.name ) and
+        ( matomo_site_required.url == matomo_site_item.url ) and
+        ( matomo_site_required.urls != matomo_site_item.urls ) and
+        ( matomo_site_required.users == matomo_site_item.users ) ) or
+        ( ( matomo_site_required.name == matomo_site_item.name ) and
+        ( matomo_site_required.url != matomo_site_item.url ) and
+        ( matomo_site_required.urls == matomo_site_item.urls ) and
+        ( matomo_site_required.users == matomo_site_item.users ) ) or
+        ( ( matomo_site_required.name != matomo_site_item.name ) and
+        ( matomo_site_required.url == matomo_site_item.url ) and
+        ( matomo_site_required.urls == matomo_site_item.urls ) and
+        ( matomo_site_required.users == matomo_site_item.users ) )
+      loop: "{{ matomo_mariadb_sites_query.query_result[0] }}"
+      loop_control:
+        loop_var: matomo_site_item
+        label: "{{ matomo_site_item.name }}"
+
+    - name: Debug matomo_site_present_and_incorrect
+      ansible.builtin.debug:
+        var: matomo_site_present_and_incorrect
+        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
 
     # - fail:
 
