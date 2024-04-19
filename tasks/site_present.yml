@@ -38,7 +38,7 @@
     - name: Include Matomo sites tasks
       ansible.builtin.include_tasks: sites.yml
 
-    - name: Matomo site present check
+    - name: Debug Matomo site present check
       ansible.builtin.debug:
         msg: "The required site, {{ matomo_site_name }}, is present."
       when:
@@ -51,53 +51,69 @@
         loop_var: matomo_site_item
         label: "{{ matomo_site_item.name }}"
 
-    - name: Matomo site present and correct
+    - name: Test the Matomo site status
       ansible.builtin.set_fact:
-        matomo_site_present_and_correct: true
-      when:
-        - matomo_site_required.name == matomo_site_item.name
-        - matomo_site_required.url == matomo_site_item.url
-        - matomo_site_required.urls == matomo_site_item.urls
-        - matomo_site_required.users == matomo_site_item.users
+        matomo_site_status_test: >-
+          {%- if
+          ( matomo_site_required.name == matomo_site_item.name ) and
+          ( matomo_site_required.url == matomo_site_item.url ) and
+          ( matomo_site_required.urls == matomo_site_item.urls ) and
+          ( matomo_site_required.users == matomo_site_item.users )
+          -%}correct{%- elif
+          ( matomo_site_required.name != matomo_site_item.name ) and
+          ( matomo_site_required.url == matomo_site_item.url ) and
+          ( matomo_site_required.urls == matomo_site_item.urls ) and
+          ( matomo_site_required.users == matomo_site_item.users )
+          -%}name-incorrect{%- elif
+          ( matomo_site_required.name == matomo_site_item.name ) and
+          ( matomo_site_required.url != matomo_site_item.url ) and
+          ( matomo_site_required.urls == matomo_site_item.urls ) and
+          ( matomo_site_required.users == matomo_site_item.users )
+          -%}url-incorrect{%- elif
+          ( matomo_site_required.name == matomo_site_item.name ) and
+          ( matomo_site_required.url == matomo_site_item.url ) and
+          ( matomo_site_required.urls != matomo_site_item.urls ) and
+          ( matomo_site_required.users == matomo_site_item.users )
+          -%}urls-incorrect{%- elif
+          ( matomo_site_required.name == matomo_site_item.name ) and
+          ( matomo_site_required.users == matomo_site_item.users ) and
+          ( matomo_site_urls + [matomo_site_main_url] | intersect(matomo_site_item.urls + [matomo_site_item.url]) | length > 0 )
+          -%}url-and-urls-incorrect{%- elif
+          ( matomo_site_required.name != matomo_site_item.name ) and
+          ( matomo_site_required.users == matomo_site_item.users ) and
+          ( matomo_site_urls + [matomo_site_main_url] | intersect(matomo_site_item.urls + [matomo_site_item.url]) | length > 0 )
+          -%}name-and-url-and-urls-incorrect{%-
+          else -%}nomatch{%- endif -%}
+      register: matomo_site_status_test
       loop: "{{ matomo_mariadb_sites_query.query_result[0] }}"
       loop_control:
         loop_var: matomo_site_item
         label: "{{ matomo_site_item.name }}"
 
-    - name: Debug matomo_site_present_and_correct
+    - name: Debug matomo_site_status_test
       ansible.builtin.debug:
-        var: matomo_site_present_and_correct
+        var: matomo_site_status_test
         verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
 
-    - name: Matomo site present and incorrect
+    - name: Set a fact for the Matomo site status test
       ansible.builtin.set_fact:
-        matomo_site_present_and_incorrect: true
-      when: >-
-        ( ( matomo_site_required.name == matomo_site_item.name ) and
-        ( matomo_site_required.url == matomo_site_item.url ) and
-        ( matomo_site_required.urls == matomo_site_item.urls ) and
-        ( matomo_site_required.users != matomo_site_item.users ) ) or
-        ( ( matomo_site_required.name == matomo_site_item.name ) and
-        ( matomo_site_required.url == matomo_site_item.url ) and
-        ( matomo_site_required.urls != matomo_site_item.urls ) and
-        ( matomo_site_required.users == matomo_site_item.users ) ) or
-        ( ( matomo_site_required.name == matomo_site_item.name ) and
-        ( matomo_site_required.url != matomo_site_item.url ) and
-        ( matomo_site_required.urls == matomo_site_item.urls ) and
-        ( matomo_site_required.users == matomo_site_item.users ) ) or
-        ( ( matomo_site_required.name != matomo_site_item.name ) and
-        ( matomo_site_required.url == matomo_site_item.url ) and
-        ( matomo_site_required.urls == matomo_site_item.urls ) and
-        ( matomo_site_required.users == matomo_site_item.users ) )
-      loop: "{{ matomo_mariadb_sites_query.query_result[0] }}"
-      loop_control:
-        loop_var: matomo_site_item
-        label: "{{ matomo_site_item.name }}"
+        matomo_site_status: "{{ matomo_site_status_test | community.general.json_query('results[].ansible_facts[].matomo_site_status_test') | reject('ansible.builtin.regex', 'nomatch') }}"
 
-    - name: Debug matomo_site_present_and_incorrect
+    - name: Debug matomo_site_status
       ansible.builtin.debug:
-        var: matomo_site_present_and_incorrect
+        var: matomo_site_status
         verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
+
+    - name: If more than one site matches then manual intervention is required to adjust the Matomo sites
+      ansible.builtin.assert:
+        that:
+          - matomo_site_status | length <= 1
+        quiet: "{% if ansible_check_mode or ansible_verbosity >= 1 %}false{% else %}true{% endif %}"
+        fail_msg: Please login to Matomo as an admin and manually adjust the sites as the site to be added appears to have attributes that match more than one existing site."
+
+    # TODO Skip all the following tasks if matomo_site_status[0] == correct
+    #      Add site if matomo_site_status[0] == nomatch
+    #      Amend site if matomo_site_status[0] is regex('incorrect')
 
     # - fail:
 
@@ -179,6 +195,8 @@
       when:
         - matomo_existing_site_ids is defined
         - matomo_existing_site_ids[1] is defined
+
+    # - fail:
 
     - name: Check and update URLs
       block:
