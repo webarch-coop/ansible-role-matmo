@@ -17,7 +17,7 @@
         login_db: "{{ matomo_dbname }}"
         login_host: "{{ matomo_db_host }}"
         login_unix_socket: /run/mysqld/mysqld.sock
-        query: "SELECT {{ matomo_db_prefix }}site.name AS name, {{ matomo_db_prefix }}site.main_url AS url, (SELECT GROUP_CONCAT({{ matomo_db_prefix }}site_url.url) FROM {{ matomo_db_prefix }}site_url WHERE {{ matomo_db_prefix }}site.idsite = {{ matomo_db_prefix }}site_url.idsite) AS urls, (SELECT GROUP_CONCAT({{ matomo_db_prefix }}access.login) FROM {{ matomo_db_prefix }}access WHERE {{ matomo_db_prefix }}site.idsite = {{ matomo_db_prefix }}access.idsite) AS users FROM {{ matomo_db_prefix }}site"
+        query: "SELECT {{ matomo_db_prefix }}site.idsite AS id, {{ matomo_db_prefix }}site.name AS name, {{ matomo_db_prefix }}site.main_url AS url, (SELECT GROUP_CONCAT({{ matomo_db_prefix }}site_url.url) FROM {{ matomo_db_prefix }}site_url WHERE {{ matomo_db_prefix }}site.idsite = {{ matomo_db_prefix }}site_url.idsite) AS urls, (SELECT GROUP_CONCAT({{ matomo_db_prefix }}access.login) FROM {{ matomo_db_prefix }}access WHERE {{ matomo_db_prefix }}site.idsite = {{ matomo_db_prefix }}access.idsite) AS users FROM {{ matomo_db_prefix }}site"
         single_transaction: true
       check_mode: false
       become: true

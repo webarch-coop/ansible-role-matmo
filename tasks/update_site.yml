@@ -11,6 +11,42 @@
 - name: Update an existing Matomo site
   block:
 
+    - name: Debug matomo_url
+      ansible.builtin.debug:
+        var: matomo_url
+        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
+      when: matomo_url is defined
+
+    - name: Debug matomo_token_auth
+      ansible.builtin.debug:
+        var: matomo_token_auth
+        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
+      when: matomo_token_auth is defined
+
+    - name: Debug matomo_site_id
+      ansible.builtin.debug:
+        var: matomo_site_id
+        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
+      when: matomo_site_id is defined
+
+    - name: Debug matomo_site_name
+      ansible.builtin.debug:
+        var: matomo_site_name
+        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
+      when: matomo_site_name is defined
+
+    - name: Debug matomo_site_main_url
+      ansible.builtin.debug:
+        var: matomo_site_main_url
+        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
+      when: matomo_site_main_url is defined
+
+    - name: Debug matomo_url
+      ansible.builtin.debug:
+        var: matomo_url
+        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
+      when: matomo_url is defined
+
     - name: Check that required variables are defined
       ansible.builtin.assert:
         that:
@@ -38,7 +74,7 @@
     - name: Debug the update site POST data
       ansible.builtin.debug:
         var: matomo_update_site_json
-        verbosity: 2
+        # verbosity: 2
 
     - name: "Update Matomo site {{ matomo_site_name }} with main URL {{ matomo_site_main_url }}"
       ansible.builtin.uri:
