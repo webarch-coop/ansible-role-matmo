@@ -99,7 +99,7 @@
     - name: Debug matomo_site_status_test
       ansible.builtin.debug:
         var: matomo_site_status_test
-        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
+        # verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
 
     - name: Set a fact for the Matomo site status test
       ansible.builtin.set_fact:
@@ -108,7 +108,7 @@
     - name: Debug matomo_site_status
       ansible.builtin.debug:
         var: matomo_site_status
-        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
+        # verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
 
     - name: If more than one site matches then manual intervention is required to adjust the Matomo sites
       ansible.builtin.assert:
@@ -137,166 +137,15 @@
         verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
       when: matomo_site_id is defined
 
-    # TODO Skip all the following tasks if matomo_site_status[0] == correct
-    #      Add site if matomo_site_status[0] == nomatch
-    #      Amend site if matomo_site_status[0] is regex('incorrect')
-
-    # - fail:
-
-    # - name: Include Matomo getAllSites API tasks
-    #   ansible.builtin.include_tasks: get_all_sites.yml
-
-    # - name: Set matomo_site_ids to an empty array
-    #   ansible.builtin.set_fact:
-    #     matomo_existing_site_ids: []
-
-    # # TODO Add a quick check that if the matomo_site_name exists and the URLs match then skip slower checks
-
-    # - name: "Set a fact for the Matomo site ID for the main URL {{ matomo_site_main_url }}"
-    #   ansible.builtin.set_fact:
-    #     matomo_existing_site_ids: "{{ matomo_get_all_sites.json | community.general.json_query(matomo_jmespath_query_site_ids) }}"
-    #   vars:
-    #     matomo_jmespath_query_site_ids: "[?main_url=='{{ matomo_site_main_url }}'].idsite"
-
-    # This is made redundant with the above JMESPath query
-    # - name: "Check if there is a Matomo site ID for {{ matomo_site_main_url }}"
-    #   ansible.builtin.include_tasks: get_sites_id_from_site_url.yml
-    #   vars:
-    #     matomo_proposed_url: "{{ matomo_site_main_url }}"
-
-    # - name: Print the matomo_existing_site_ids
-    #   ansible.builtin.debug:
-    #     var: matomo_existing_site_ids
-    #     verbosity: 2
-    #   when: matomo_existing_site_ids is defined
-
-    # - name: Print the matomo_site_urls
-    #   ansible.builtin.debug:
-    #     var: matomo_site_urls
-    #     verbosity: 2
-    #   when: matomo_site_urls is defined
-
-    # - name: "Add Matomo site IDs to the list of existing site IDs for the main URL {{ matomo_site_main_url }}"
-    #   ansible.builtin.set_fact:
-    #     matomo_existing_site_ids: "{{ ( matomo_existing_site_ids + [ ( matomo_get_all_sites.json | community.general.json_query(matomo_jmespath_query_site_ids) ) ] ) | unique }}"
-    #   vars:
-    #     matomo_jmespath_query_site_ids: >-
-    #       [{{- matomo_site_urls |
-    #       map("ansible.builtin.regex_replace", "^", "main_url=='") |
-    #       map("ansible.builtin.regex_replace", "$", "'") | join('||') -}}].idsite
-    #   when:
-    #     - matomo_site_urls is defined
-    #     - matomo_site_urls != []
-    #     - matomo_site_urls != None
-    #     - ( matomo_get_all_sites.json | community.general.json_query(matomo_jmespath_query_site_ids) ) != []
-    #     - ( matomo_get_all_sites.json | community.general.json_query(matomo_jmespath_query_site_ids) ) != None
-
-    # - name: Print the matomo_existing_site_ids
-    #   ansible.builtin.debug:
-    #     var: matomo_existing_site_ids
-    #     verbosity: 2
-    #   when: matomo_existing_site_ids is defined
-
-    # This is made redundant with the above set_fact
-    # - name: "Check if there is a Matomo site ID for site URLs other than the main one"
-    #   ansible.builtin.include_tasks: get_sites_id_from_site_url.yml
-    #   loop: "{{ matomo_site_urls }}"
-    #   loop_control:
-    #     loop_var: matomo_proposed_url
-    #   when: ( matomo_site_urls is defined ) and ( matomo_site_urls != [] )
-
-    # - name: Print the matomo_existing_site_ids
-    #   ansible.builtin.debug:
-    #     var: matomo_existing_site_ids
-    #     verbosity: 2
-    #   when: matomo_existing_site_ids is defined
-
-    # - name: This Ansible role only supports having one Matomo site per URL
-    #   ansible.builtin.fail:
-    #     msg:
-    #       - "There appears to be more than one Matomo site with the same URL"
-    #       - "Please login and check these site IDs: {{ matomo_existing_site_ids }}"
-    #       - "and this main URL {{ matomo_site_main_url }}"
-    #       - "{% if matomo_site_urls is defined %}and these other URLs {{ matomo_site_urls | join(', ') }}{% endif %}"
-    #   when:
-    #     - matomo_existing_site_ids is defined
-    #     - matomo_existing_site_ids[1] is defined
-
-    # - fail:
-
-    - name: Check and update URLs
-      block:
-
-        # - name: Set a matomo_site_id variable and add the matomo_site_main_url to a matomo_proposed_site_urls array
-        #   ansible.builtin.set_fact:
-        #     matomo_site_id: "{{ matomo_existing_site_ids[0] }}"
-        #     matomo_proposed_site_urls:
-        #       - "{{ matomo_site_main_url }}"
-
-        # # NOTE The main_url shouldn't be multiple URLs seperated by commas but
-        # #      due to earlier bugs this was the case with the Matomo site used
-        # #      for development of this role, so this could probably be changed
-        # #      in the future.
-        # - name: Set a matomo_existing_site_urls array
-        #   ansible.builtin.set_fact:
-        #     matomo_existing_site_urls: "{{ site.main_url.split(', ') | list }}"
-        #   when: matomo_site_id == site.idsite
-        #   loop: "{{ matomo_get_all_sites.json }}"
-        #   loop_control:
-        #     loop_var: site
-
-        # - name: Add matomo_site_urls URLs to Matomo site proposed URLs
-        #   ansible.builtin.set_fact:
-        #     matomo_proposed_site_urls: "{{ matomo_proposed_site_urls | default([]) + [ url ] }}"
-        #   loop: "{{ matomo_site_urls }}"
-        #   loop_control:
-        #     loop_var: url
-        #   when:
-        #     - ( ansible_version.full is version('2.13.0', '>=') )
-        #     - ( matomo_site_urls is defined ) and ( matomo_site_urls != [] )
-
-        # - name: Set variable for the sorted and unique existing URLs
-        #   ansible.builtin.set_fact:
-        #     matomo_existing_site_urls_sorted: "{{ matomo_existing_site_urls | sort | unique }}"
-        #   when:
-        #     - matomo_existing_site_urls is defined
-        #     - matomo_existing_site_urls | type_debug == "list"
-
-        # - name: Set variable for the sorted and unique proposed URLs
-        #   ansible.builtin.set_fact:
-        #     matomo_proposed_site_urls_sorted: "{{ matomo_proposed_site_urls | sort | unique }}"
-        #   when:
-        #     - matomo_proposed_site_urls is defined
-        #     - matomo_proposed_site_urls | type_debug == "list"
-
-        # - name: Debug existing URLs
-        #   ansible.builtin.debug:
-        #     var: matomo_existing_site_urls_sorted
-        #     verbosity: 2
-        #   when: matomo_existing_site_urls_sorted is defined
-
-        # - name: Debug matomo_proposed_site_urls_sorted
-        #   ansible.builtin.debug:
-        #     var: matomo_proposed_site_urls_sorted
-        #     verbosity: 2
-        #   when: matomo_proposed_site_urls_sorted is defined
-
-        - name: Include update Matomo site tasks when existing URLs don't match the proposed ones
-          ansible.builtin.include_tasks: update_site.yml
-        #   when:
-        #     - ( matomo_existing_site_urls_sorted is defined ) and ( matomo_proposed_site_urls_sorted is defined )
-        #     - ( matomo_existing_site_urls_sorted | difference(matomo_proposed_site_urls_sorted) | length > 0 ) or ( matomo_proposed_site_urls_sorted | difference(matomo_existing_site_urls_sorted) | length > 0 )
-
-      # when: ( matomo_existing_site_ids is defined ) and ( matomo_existing_site_ids[0] is defined )
-
+    - name: Include update Matomo site tasks when existing URLs don't match the proposed ones
+      ansible.builtin.include_tasks: update_site.yml
       when:
-        - matomo_site_status_test != "correct"
+        - matomo_site_status[0] != "correct"
         - matomo_site_id is defined
 
-    - name: Add new site to Matomo server
+    - name: Include add new site to Matomo server tasks when there is no match for the proposed site
       ansible.builtin.include_tasks: add_site.yml
-      # when: ( matomo_existing_site_ids is not defined ) or ( matomo_existing_site_ids[0] is not defined )
-      when: matomo_site_status_test == "nomatch"
+      when: matomo_site_status[0] == "nomatch"
 
     - name: Grant site access to Matomo accout
       block:
