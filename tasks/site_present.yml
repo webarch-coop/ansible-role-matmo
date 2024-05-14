@@ -20,7 +20,7 @@
           - ( matomo_site_main_url is defined ) and ( matomo_site_main_url is regex("^http:\/\/.*$") )
         quiet: "{% if ansible_check_mode or ansible_verbosity >= 1 %}false{% else %}true{% endif %}"
 
-    - name: Set a fact for the site that should be present
+    - name: Set a fact for the site that should be present and set site status to None
       ansible.builtin.set_fact:
         matomo_site_present_and_correct: None
         matomo_site_present_and_incorrect: None
@@ -29,6 +29,7 @@
           url: "{{ matomo_site_main_url }}"
           urls: "{{ matomo_site_urls | join(',') }}"
           users: "{{ matomo_login }}"
+        matomo_site_status: None
 
     - name: Debug matomo_site_required
       ansible.builtin.debug:
@@ -177,6 +178,57 @@
     #     loop_var: matomo_site_item
     #     label: "{{ matomo_site_item.name }}"
 
+    - name: Debug the Matomo site status
+      ansible.builtin.debug:
+        msg: >-
+          The required name is {{ matomo_site_required.name }},
+          required url is {{ matomo_site_required.url }},
+          required urls is {% if matomo_site_required.urls | ansible.builtin.type_debug != "NoneType" %}{{ matomo_site_required.urls | ansible.builtin.split(',') | join(', ') }}{% else %}{{ matomo_site_required.urls }}{% endif %} and
+          required users is {{ matomo_site_required.users }}.
+          The existing name is {{ matomo_site_item.name }},
+          existing url is {{ matomo_site_item.url }},
+          existing urls is {% if matomo_site_item.urls | ansible.builtin.type_debug != "NoneType" %}{{ matomo_site_item.urls | ansible.builtin.split(',') | join(', ') }}{% else %}{{ matomo_site_item.urls }}{% endif %} and
+          existing users is {{ matomo_site_item.users }}.
+          The determined site status is
+          {%- if
+          ( matomo_site_required.name == matomo_site_item.name ) and
+          ( matomo_site_required.url == matomo_site_item.url ) and
+          ( matomo_site_required.urls == matomo_site_item.urls ) and
+          ( matomo_site_required.users == matomo_site_item.users )
+          -%}correct{%- elif
+          ( matomo_site_required.name != matomo_site_item.name ) and
+          ( matomo_site_required.url == matomo_site_item.url ) and
+          ( matomo_site_required.urls == matomo_site_item.urls ) and
+          ( matomo_site_required.users == matomo_site_item.users )
+          -%}name-incorrect{%- elif
+          ( matomo_site_required.name == matomo_site_item.name ) and
+          ( matomo_site_required.url != matomo_site_item.url ) and
+          ( matomo_site_required.urls == matomo_site_item.urls ) and
+          ( matomo_site_required.users == matomo_site_item.users )
+          -%}url-incorrect{%- elif
+          ( matomo_site_required.name == matomo_site_item.name ) and
+          ( matomo_site_required.url == matomo_site_item.url ) and
+          ( matomo_site_required.urls != matomo_site_item.urls ) and
+          ( matomo_site_required.users == matomo_site_item.users )
+          -%}urls-incorrect{%- elif
+          ( matomo_site_required.name == matomo_site_item.name ) and
+          ( matomo_site_required.users == matomo_site_item.users ) and
+          ( matomo_site_urls | ansible.builtin.type_debug != "NoneType" ) and
+          ( matomo_site_item.urls | ansible.builtin.type_debug != "NoneType" ) and
+          ( matomo_site_urls + [matomo_site_main_url] | intersect(matomo_site_item.urls + [matomo_site_item.url]) | length > 0 )
+          -%}url-and-urls-incorrect{%- elif
+          ( matomo_site_required.name != matomo_site_item.name ) and
+          ( matomo_site_required.users == matomo_site_item.users ) and
+          ( matomo_site_urls | ansible.builtin.type_debug != "NoneType" ) and
+          ( matomo_site_item.urls | ansible.builtin.type_debug != "NoneType" ) and
+          ( matomo_site_urls + [matomo_site_main_url] | intersect(matomo_site_item.urls + [matomo_site_item.url]) | length > 0 )
+          -%}name-and-url-and-urls-incorrect{%-
+          else -%}nomatch{%- endif -%}
+      loop: "{{ matomo_mariadb_sites_query.query_result[0] }}"
+      loop_control:
+        loop_var: matomo_site_item
+        label: "{{ matomo_site_item.name }}"
+
     - name: Test the Matomo site status
       ansible.builtin.set_fact:
         matomo_site_status_test: >-
@@ -225,21 +277,30 @@
         var: matomo_site_status_test
         # verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
 
-    - name: Set a fact for the Matomo site status test
+    - name: Set a fact for all the Matomo site status test results omitting nomatch
       ansible.builtin.set_fact:
-        matomo_site_status: "{{ matomo_site_status_test | community.general.json_query('results[].ansible_facts[].matomo_site_status_test') | reject('ansible.builtin.regex', 'nomatch') }}"
+        matomo_site_status_all: "{{ matomo_site_status_test | community.general.json_query('results[].ansible_facts[].matomo_site_status_test') | reject('ansible.builtin.regex', 'nomatch') }}"
 
-    - name: Debug matomo_site_status
+    - name: Debug matomo_site_status_all
       ansible.builtin.debug:
-        var: matomo_site_status
+        var: matomo_site_status_all
         # verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
 
     - name: If more than one site matches then manual intervention is required to adjust the Matomo sites
       ansible.builtin.assert:
         that:
-          - matomo_site_status | length <= 1
+          - matomo_site_status_all | length <= 1
         quiet: "{% if ansible_check_mode or ansible_verbosity >= 1 %}false{% else %}true{% endif %}"
         fail_msg: Please login to Matomo as an admin and manually adjust the sites as the site to be added appears to have attributes that match more than one existing site."
+
+    - name: Set a fact for all the Matomo site status
+      ansible.builtin.set_fact:
+        matomo_site_status: "{{ matomo_site_status_all[0] }}"
+
+    - name: Debug matomo_site_status
+      ansible.builtin.debug:
+        var: matomo_site_status
+        # verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
 
     - name: Set a fact for matomo_site_id for the existing site
       ansible.builtin.set_fact:
@@ -264,12 +325,12 @@
     - name: Include update Matomo site tasks when existing URLs don't match the proposed ones
       ansible.builtin.include_tasks: update_site.yml
       when:
-        - matomo_site_status[0] != "correct"
+        - matomo_site_status != "correct"
         - matomo_site_id is defined
 
     - name: Include add new site to Matomo server tasks when there is no match for the proposed site
       ansible.builtin.include_tasks: add_site.yml
-      when: matomo_site_status[0] == "nomatch"
+      when: matomo_site_status == "nomatch"
 
     - name: Grant site access to Matomo accout
       block:
