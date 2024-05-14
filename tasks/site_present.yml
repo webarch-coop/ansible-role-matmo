@@ -293,9 +293,15 @@
         quiet: "{% if ansible_check_mode or ansible_verbosity >= 1 %}false{% else %}true{% endif %}"
         fail_msg: Please login to Matomo as an admin and manually adjust the sites as the site to be added appears to have attributes that match more than one existing site."
 
-    - name: Set a fact for all the Matomo site status
+    - name: Set a fact for all the Matomo site status when the status was determined
       ansible.builtin.set_fact:
         matomo_site_status: "{{ matomo_site_status_all[0] }}"
+      when: matomo_site_status_all != []
+
+    - name: Set a fact for all the Matomo site status when the status was not determined
+      ansible.builtin.set_fact:
+        matomo_site_status: nomatch
+      when: matomo_site_status_all == []
 
     - name: Debug matomo_site_status
       ansible.builtin.debug:
