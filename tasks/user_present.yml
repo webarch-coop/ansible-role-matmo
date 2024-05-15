@@ -53,7 +53,9 @@
         that:
           - matomo_login not in ( matomo_api_get_users_having_super_user_access.json | community.general.json_query('[].login') )
           - matomo_login_email not in ( matomo_api_get_users_having_super_user_access.json | community.general.json_query('[].email') )
-        fail_msg: "Please use a different email address (or alias) and login username for the Matomo superuser and regular users"
+        fail_msg: >-
+          Please use a different email address (or alias) and login username for the Matomo superuser and regular users.
+          The username and email that triggered this failure is {{ matomo_login }} <{{ matomo_login_email }}>.
         quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
 
     - name: Set the matomo_login_existing to an empty value

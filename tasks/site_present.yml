@@ -150,8 +150,8 @@
     - name: Debug url and urls types
       ansible.builtin.debug:
         msg:
-          - "type for matomo_site_item.urls: {{ matomo_site_item.urls | ansible.builtin.type_debug }}"
-          - "type for matomo_site_item.url: {{ matomo_site_item.url | ansible.builtin.type_debug }}"
+          - "The value of matomo_site_item.urls is {{ matomo_site_item.urls }} and the type for matomo_site_item.urls: {{ matomo_site_item.urls | ansible.builtin.type_debug }}"
+          - "The value of  matomo_site_item.url is and the type for matomo_site_item.url: {{ matomo_site_item.url | ansible.builtin.type_debug }}"
         verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
       loop: "{{ matomo_mariadb_sites_query.query_result[0] }}"
       loop_control:
@@ -190,40 +190,40 @@
           existing urls is {% if matomo_site_item.urls | ansible.builtin.type_debug != "NoneType" %}{{ matomo_site_item.urls | ansible.builtin.split(',') | join(', ') }}{% else %}{{ matomo_site_item.urls }}{% endif %} and
           existing users is {{ matomo_site_item.users }}.
           The determined site status is
-          {%- if
+          {% if
           ( matomo_site_required.name == matomo_site_item.name ) and
           ( matomo_site_required.url == matomo_site_item.url ) and
           ( matomo_site_required.urls == matomo_site_item.urls ) and
           ( matomo_site_required.users == matomo_site_item.users )
-          -%}correct{%- elif
+          %}correct{% elif
           ( matomo_site_required.name != matomo_site_item.name ) and
           ( matomo_site_required.url == matomo_site_item.url ) and
           ( matomo_site_required.urls == matomo_site_item.urls ) and
           ( matomo_site_required.users == matomo_site_item.users )
-          -%}name-incorrect{%- elif
+          %}name-incorrect{% elif
           ( matomo_site_required.name == matomo_site_item.name ) and
           ( matomo_site_required.url != matomo_site_item.url ) and
           ( matomo_site_required.urls == matomo_site_item.urls ) and
           ( matomo_site_required.users == matomo_site_item.users )
-          -%}url-incorrect{%- elif
+          %}url-incorrect{% elif
           ( matomo_site_required.name == matomo_site_item.name ) and
           ( matomo_site_required.url == matomo_site_item.url ) and
           ( matomo_site_required.urls != matomo_site_item.urls ) and
           ( matomo_site_required.users == matomo_site_item.users )
-          -%}urls-incorrect{%- elif
+          %}urls-incorrect{% elif
           ( matomo_site_required.name == matomo_site_item.name ) and
           ( matomo_site_required.users == matomo_site_item.users ) and
           ( matomo_site_urls | ansible.builtin.type_debug != "NoneType" ) and
           ( matomo_site_item.urls | ansible.builtin.type_debug != "NoneType" ) and
-          ( matomo_site_urls + [matomo_site_main_url] | intersect(matomo_site_item.urls + [matomo_site_item.url]) | length > 0 )
-          -%}url-and-urls-incorrect{%- elif
+          ( matomo_site_urls | ansible.builtin.split(',') + [matomo_site_main_url] | intersect(matomo_site_item.urls + [matomo_site_item.url]) | length > 0 )
+          %}url-and-urls-incorrect{% elif
           ( matomo_site_required.name != matomo_site_item.name ) and
           ( matomo_site_required.users == matomo_site_item.users ) and
           ( matomo_site_urls | ansible.builtin.type_debug != "NoneType" ) and
           ( matomo_site_item.urls | ansible.builtin.type_debug != "NoneType" ) and
-          ( matomo_site_urls + [matomo_site_main_url] | intersect(matomo_site_item.urls + [matomo_site_item.url]) | length > 0 )
-          -%}name-and-url-and-urls-incorrect{%-
-          else -%}nomatch{%- endif -%}
+          ( matomo_site_urls | ansible.builtin.split(',') + [matomo_site_main_url] | intersect(matomo_site_item.urls + [matomo_site_item.url]) | length > 0 )
+          %}name-and-url-and-urls-incorrect{%
+          else %}nomatch{% endif -%}
         verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
       loop: "{{ matomo_mariadb_sites_query.query_result[0] }}"
       loop_control:
@@ -258,13 +258,13 @@
           ( matomo_site_required.users == matomo_site_item.users ) and
           ( matomo_site_urls | ansible.builtin.type_debug != "NoneType" ) and
           ( matomo_site_item.urls | ansible.builtin.type_debug != "NoneType" ) and
-          ( matomo_site_urls + [matomo_site_main_url] | intersect(matomo_site_item.urls + [matomo_site_item.url]) | length > 0 )
+          ( matomo_site_urls | ansible.builtin.split(',') + [matomo_site_main_url] | intersect(matomo_site_item.urls + [matomo_site_item.url]) | length > 0 )
           -%}url-and-urls-incorrect{%- elif
           ( matomo_site_required.name != matomo_site_item.name ) and
           ( matomo_site_required.users == matomo_site_item.users ) and
           ( matomo_site_urls | ansible.builtin.type_debug != "NoneType" ) and
           ( matomo_site_item.urls | ansible.builtin.type_debug != "NoneType" ) and
-          ( matomo_site_urls + [matomo_site_main_url] | intersect(matomo_site_item.urls + [matomo_site_item.url]) | length > 0 )
+          ( matomo_site_urls | ansible.builtin.split(',') + [matomo_site_main_url] | intersect(matomo_site_item.urls + [matomo_site_item.url]) | length > 0 )
           -%}name-and-url-and-urls-incorrect{%-
           else -%}nomatch{%- endif -%}
       register: matomo_site_status_test
