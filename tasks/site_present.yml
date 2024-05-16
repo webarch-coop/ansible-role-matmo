@@ -347,10 +347,15 @@
       when:
         - matomo_site_status != "correct"
         - matomo_site_id is defined
+        - matomo_site_id != None
+        - matomo_site_id is regex("^[0-9]{1,9}$")
 
     - name: Include add new site to Matomo server tasks when there is no match for the proposed site
       ansible.builtin.include_tasks: add_site.yml
-      when: matomo_site_status == "nomatch"
+      when:
+        - matomo_site_status == "nomatch"
+        - matomo_site_id is defined
+        - matomo_site_id == None
 
     - name: Grant site access to Matomo accout
       block:
