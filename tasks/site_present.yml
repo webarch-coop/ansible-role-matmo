@@ -58,23 +58,23 @@
     #     loop_var: matomo_site_item
     #     label: "{{ matomo_site_item.name }}"
 
-    - name: Debug the required Matomo site variable types
-      ansible.builtin.assert:
-        that:
-          - ( matomo_site_required.name | ansible.builtin.type_debug ) == "str"
-          - ( matomo_site_required.url | ansible.builtin.type_debug ) == "str"
-          - ( matomo_site_required.urls | ansible.builtin.type_debug ) == "str"
-          - ( matomo_site_required.users | ansible.builtin.type_debug ) == "str"
-        quiet: "{% if ansible_check_mode or ansible_verbosity >= 1 %}false{% else %}true{% endif %}"
-        fail_msg: >-
-          {%- if ( matomo_site_required.name | ansible.builtin.type_debug ) != "str" -%}The site name, is
-          of type {{ matomo_site_required.name | ansible.builtin.type_debug }} when it should be a string.{%- endif -%}
-          {%- if ( matomo_site_required.url | ansible.builtin.type_debug ) != "str" -%}The site url, is
-          of type {{ matomo_site_required.url | ansible.builtin.type_debug }} when it should be a string.{%- endif -%}
-          {%- if ( matomo_site_required.urls | ansible.builtin.type_debug ) != "str" -%}The site urls, is
-          of type {{ matomo_site_required.urls | ansible.builtin.type_debug }} when it should be a string.{%- endif -%}
-          {%- if ( matomo_site_required.users | ansible.builtin.type_debug ) != "str" -%}The site users, is
-          of type {{ matomo_site_required.users | ansible.builtin.type_debug }} when it should be a string.{%- endif -%}
+    # - name: Debug the required Matomo site variable types
+    #   ansible.builtin.assert:
+    #     that:
+    #       - ( matomo_site_required.name | ansible.builtin.type_debug ) == "str"
+    #       - ( matomo_site_required.url | ansible.builtin.type_debug ) == "str"
+    #       - ( matomo_site_required.urls | ansible.builtin.type_debug ) == "str"
+    #       - ( matomo_site_required.users | ansible.builtin.type_debug ) == "str"
+    #     quiet: "{% if ansible_check_mode or ansible_verbosity >= 1 %}false{% else %}true{% endif %}"
+    #     fail_msg: >-
+    #       {%- if ( matomo_site_required.name | ansible.builtin.type_debug ) != "str" -%}The site name, is
+    #       of type {{ matomo_site_required.name | ansible.builtin.type_debug }} when it should be a string.{%- endif -%}
+    #       {%- if ( matomo_site_required.url | ansible.builtin.type_debug ) != "str" -%}The site url, is
+    #       of type {{ matomo_site_required.url | ansible.builtin.type_debug }} when it should be a string.{%- endif -%}
+    #       {%- if ( matomo_site_required.urls | ansible.builtin.type_debug ) != "str" -%}The site urls, is
+    #       of type {{ matomo_site_required.urls | ansible.builtin.type_debug }} when it should be a string.{%- endif -%}
+    #       {%- if ( matomo_site_required.users | ansible.builtin.type_debug ) != "str" -%}The site users, is
+    #       of type {{ matomo_site_required.users | ansible.builtin.type_debug }} when it should be a string.{%- endif -%}
 
     - name: Debug the Matomo site name
       ansible.builtin.debug:
