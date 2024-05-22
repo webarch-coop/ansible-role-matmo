@@ -34,7 +34,7 @@
     - name: Debug matomo_site_required
       ansible.builtin.debug:
         var: matomo_site_required
-        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
+        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}1{% else %}2{% endif %}"
 
     - name: Include Matomo sites tasks
       ansible.builtin.include_tasks: sites.yml
@@ -42,44 +42,13 @@
     - name: Debug matomo_site_item
       ansible.builtin.debug:
         var: matomo_site_item
-        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
+        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}1{% else %}2{% endif %}"
       when: matomo_site_item is defined
-
-    # - name: Debug Matomo site present check
-    #   ansible.builtin.debug:
-    #     msg: "The required site, {{ matomo_site_name }}, is present."
-    #   when:
-    #     - matomo_site_required.name == matomo_site_item.name
-    #     - matomo_site_required.url == matomo_site_item.url
-    #     - matomo_site_required.urls == matomo_site_item.urls
-    #     - matomo_site_required.users == matomo_site_item.users
-    #   loop: "{{ matomo_mariadb_sites_query.query_result[0] }}"
-    #   loop_control:
-    #     loop_var: matomo_site_item
-    #     label: "{{ matomo_site_item.name }}"
-
-    # - name: Debug the required Matomo site variable types
-    #   ansible.builtin.assert:
-    #     that:
-    #       - ( matomo_site_required.name | ansible.builtin.type_debug ) == "str"
-    #       - ( matomo_site_required.url | ansible.builtin.type_debug ) == "str"
-    #       - ( matomo_site_required.urls | ansible.builtin.type_debug ) == "str"
-    #       - ( matomo_site_required.users | ansible.builtin.type_debug ) == "str"
-    #     quiet: "{% if ansible_check_mode or ansible_verbosity >= 1 %}false{% else %}true{% endif %}"
-    #     fail_msg: >-
-    #       {%- if ( matomo_site_required.name | ansible.builtin.type_debug ) != "str" -%}The site name, is
-    #       of type {{ matomo_site_required.name | ansible.builtin.type_debug }} when it should be a string.{%- endif -%}
-    #       {%- if ( matomo_site_required.url | ansible.builtin.type_debug ) != "str" -%}The site url, is
-    #       of type {{ matomo_site_required.url | ansible.builtin.type_debug }} when it should be a string.{%- endif -%}
-    #       {%- if ( matomo_site_required.urls | ansible.builtin.type_debug ) != "str" -%}The site urls, is
-    #       of type {{ matomo_site_required.urls | ansible.builtin.type_debug }} when it should be a string.{%- endif -%}
-    #       {%- if ( matomo_site_required.users | ansible.builtin.type_debug ) != "str" -%}The site users, is
-    #       of type {{ matomo_site_required.users | ansible.builtin.type_debug }} when it should be a string.{%- endif -%}
 
     - name: Debug the Matomo site name
       ansible.builtin.debug:
         msg: "{{ matomo_site_item.name }} is type {{ matomo_site_item.name | ansible.builtin.type_debug }}"
-        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
+        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}1{% else %}2{% endif %}"
       loop: "{{ matomo_mariadb_sites_query.query_result[0] }}"
       loop_control:
         loop_var: matomo_site_item
@@ -88,7 +57,7 @@
     - name: Debug the Matomo site url
       ansible.builtin.debug:
         msg: "{{ matomo_site_item.url }} is type {{ matomo_site_item.url | ansible.builtin.type_debug }}"
-        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
+        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}1{% else %}2{% endif %}"
       loop: "{{ matomo_mariadb_sites_query.query_result[0] }}"
       loop_control:
         loop_var: matomo_site_item
@@ -97,7 +66,7 @@
     - name: Debug the Matomo site urls
       ansible.builtin.debug:
         msg: "{{ matomo_site_item.urls }} is type {{ matomo_site_item.urls | ansible.builtin.type_debug }}"
-        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
+        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}1{% else %}2{% endif %}"
       loop: "{{ matomo_mariadb_sites_query.query_result[0] }}"
       loop_control:
         loop_var: matomo_site_item
@@ -106,7 +75,7 @@
     - name: Debug the Matomo site variable users
       ansible.builtin.debug:
         msg: "{{ matomo_site_item.users }} is type {{ matomo_site_item.users | ansible.builtin.type_debug }}"
-        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
+        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}1{% else %}2{% endif %}"
       loop: "{{ matomo_mariadb_sites_query.query_result[0] }}"
       loop_control:
         loop_var: matomo_site_item
@@ -162,31 +131,11 @@
         msg:
           - "The value of matomo_site_item.urls is {{ matomo_site_item.urls }} and the type for matomo_site_item.urls: {{ matomo_site_item.urls | ansible.builtin.type_debug }}"
           - "The value of  matomo_site_item.url is and the type for matomo_site_item.url: {{ matomo_site_item.url | ansible.builtin.type_debug }}"
-        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
+        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}1{% else %}2{% endif %}"
       loop: "{{ matomo_mariadb_sites_query.query_result[0] }}"
       loop_control:
         loop_var: matomo_site_item
         label: "{{ matomo_site_item.name }}"
-
-    # - name: Debug urls
-    #   ansible.builtin.debug:
-    #     msg:
-    #       - "urls: {{ matomo_site_urls + [matomo_site_main_url] }}"
-    #       - "type: {{ matomo_site_urls + [matomo_site_main_url] | ansible.builtin.type_debug }}"
-    #   loop: "{{ matomo_mariadb_sites_query.query_result[0] }}"
-    #   loop_control:
-    #     loop_var: matomo_site_item
-    #     label: "{{ matomo_site_item.name }}"
-
-    # - name: Debug urls
-    #   ansible.builtin.debug:
-    #     msg:
-    #       - "urls: {{ matomo_site_item.urls + [matomo_site_item.url] }}"
-    #       - "type: {{ matomo_site_item.urls + [matomo_site_item.url] | ansible.builtin.type_debug }}"
-    #   loop: "{{ matomo_mariadb_sites_query.query_result[0] }}"
-    #   loop_control:
-    #     loop_var: matomo_site_item
-    #     label: "{{ matomo_site_item.name }}"
 
     - name: Debug the Matomo site status
       ansible.builtin.debug:
@@ -238,7 +187,7 @@
           ( matomo_site_urls | string | ansible.builtin.split(',') + [matomo_site_main_url | string] | intersect(matomo_site_item.urls + [matomo_site_item.url | string]) | length > 0 )
           %}name-and-url-and-urls-incorrect{%
           else %}nomatch{% endif -%}
-        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
+        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}1{% else %}2{% endif %}"
       loop: "{{ matomo_mariadb_sites_query.query_result[0] }}"
       loop_control:
         loop_var: matomo_site_item
@@ -294,7 +243,7 @@
     - name: Debug matomo_site_status_test
       ansible.builtin.debug:
         var: matomo_site_status_test
-        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
+        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}1{% else %}2{% endif %}"
 
     - name: Set a fact for all the Matomo site status test results omitting nomatch
       ansible.builtin.set_fact:
@@ -303,7 +252,7 @@
     - name: Debug matomo_site_status_all
       ansible.builtin.debug:
         var: matomo_site_status_all
-        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
+        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}1{% else %}2{% endif %}"
 
     - name: If more than one site matches then manual intervention is required to adjust the Matomo sites
       ansible.builtin.assert:
@@ -327,28 +276,12 @@
     - name: Debug matomo_site_status
       ansible.builtin.debug:
         var: matomo_site_status
-        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
-
-    # - name: Set a fact for matomo_site_id for the existing site
-    #   ansible.builtin.set_fact:
-    #     matomo_site_id: "{{ matomo_site_item.id }}"
-    #   when: >-
-    #     ( matomo_site_required.users == matomo_site_item.users ) and
-    #     ( ( matomo_site_required.name == matomo_site_item.name ) or
-    #     ( matomo_site_required.url == matomo_site_item.url ) or
-    #     ( ( matomo_site_item.urls | ansible.builtin.type_debug != "NoneType" ) and
-    #     ( matomo_site_required.url in matomo_site_item.urls | string | ansible.builtin.split(',') ) ) or
-    #     ( ( matomo_site_item.urls | ansible.builtin.type_debug != "NoneType" ) and
-    #     ( ( matomo_site_urls | string | ansible.builtin.split(',') + [matomo_site_main_url | string] | intersect(matomo_site_item.urls | string | ansible.builtin.split(',') + [matomo_site_item.url | string]) | length > 0 ) ) ) )
-    #   loop: "{{ matomo_mariadb_sites_query.query_result[0] }}"
-    #   loop_control:
-    #     loop_var: matomo_site_item
-    #     label: "{{ matomo_site_item.name }}"
+        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}1{% else %}2{% endif %}"
 
     - name: Debug matomo_site_id
       ansible.builtin.debug:
         var: matomo_site_id
-        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
+        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}1{% else %}2{% endif %}"
       when: matomo_site_id is defined
 
     - name: Include update Matomo site tasks when existing URLs don't match the proposed ones
@@ -396,7 +329,7 @@
         - name: Debug matomo_api_get_user_login_from_user_email
           ansible.builtin.debug:
             var: matomo_api_get_user_login_from_user_email
-            verbosity: 2
+            verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}1{% else %}2{% endif %}"
 
         - name: "Set the matomo_login_existing variable to {{ matomo_api_get_user_login_from_user_email.json.value }} as a Matomo account with a matching email address exists"
           ansible.builtin.set_fact:
@@ -409,7 +342,7 @@
             - name: Debug matomo_login_existing
               ansible.builtin.debug:
                 var: matomo_login_existing
-                verbosity: 2
+                verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}1{% else %}2{% endif %}"
 
             - name: "Get users and their roles for Matomo site with ID {{ matomo_site_id }}"
               ansible.builtin.uri:
@@ -433,7 +366,7 @@
             - name: Debug matomo_api_get_users_plus_role
               ansible.builtin.debug:
                 var: matomo_api_get_users_plus_role
-                verbosity: 2
+                verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}1{% else %}2{% endif %}"
 
             - name: "Set a variable for the role for Matomo login {{ matomo_login }}"
               ansible.builtin.set_fact:
@@ -466,7 +399,7 @@
             - name: Debug matomo_api_set_user_access
               ansible.builtin.debug:
                 var: matomo_api_set_user_access
-                verbosity: 2
+                verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}1{% else %}2{% endif %}"
 
             #  when: matomo_existing_role != "admin"
 

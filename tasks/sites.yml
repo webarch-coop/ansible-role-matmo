@@ -28,7 +28,7 @@
     - name: Debug matomo_mariadb_sites_query.query_result[0]
       ansible.builtin.debug:
         var: matomo_mariadb_sites_query.query_result[0]
-        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
+        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}1{% else %}2{% endif %}"
 
   tags:
     - matomo
