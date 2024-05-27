@@ -289,7 +289,6 @@
       when:
         - matomo_site_status != "correct"
         - matomo_site_id is defined
-        - matomo_site_id != None
         - matomo_site_id is regex("^[0-9]{1,9}$")
 
     - name: Include add new site to Matomo server tasks when there is no match for the proposed site
@@ -297,7 +296,7 @@
       when:
         - matomo_site_status == "nomatch"
         - matomo_site_id is defined
-        - matomo_site_id == None
+        - matomo_site_id is not regex("^[0-9]{1,9}$")
 
     - name: Grant site access to Matomo accout
       block:
@@ -394,7 +393,12 @@
               become_user: "{{ matomo_user }}"
               delegate_to: "{{ inventory_hostname }}"
               register: matomo_api_set_user_access
-              failed_when: ( matomo_api_set_user_access.json is not defined ) or ( matomo_api_set_user_access.json is defined and matomo_api_set_user_access.json.result != "success" )
+              failed_when: >-
+                ( matomo_api_set_user_access.json is not defined ) or
+                ( matomo_api_set_user_access.json is defined and matomo_api_set_user_access.json.result != "success" )
+              when:
+                - matomo_site_id is defined
+                - matomo_site_id is regex("^[0-9]{1,9}$")
 
             - name: Debug matomo_api_set_user_access
               ansible.builtin.debug:
