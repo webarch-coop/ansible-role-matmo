@@ -25,7 +25,7 @@ repos:
           - templates
   # https://github.com/jackdewinter/pymarkdown/releases
   - repo: https://github.com/jackdewinter/pymarkdown
-    rev: v0.9.19
+    rev: v0.9.20
     hooks:
       - id: pymarkdown
         name: Markdown Lint
@@ -34,14 +34,14 @@ repos:
           - README.md
   # https://github.com/ansible/ansible-lint/releases
   - repo: https://github.com/ansible/ansible-lint.git
-    rev: v24.5.0
+    rev: v24.6.0
     hooks:
       - id: ansible-lint
         name: Ansible Lint
         language: python
         additional_dependencies:
           # https://github.com/kellyjonbrazil/jc/releases
-          - jc==1.25.2
+          - jc==1.25.3
           # https://github.com/jmespath/jmespath.py/tags
           - jmespath==1.0.1
 ...

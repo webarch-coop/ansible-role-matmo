@@ -26,10 +26,10 @@ before_script:
   - which yamllint
   - yamllint --version
 stages:
-  - bookworm
-bookworm:
-  image: registry.git.coop/webarch/containers/images/bookworm:20231213
-  stage: bookworm
+  - lint
+lint:
+  image: registry.git.coop/webarch/containers/images/trixie:20240605
+  stage: lint
   script:
     - yamllint -f colored -c .yamllint .
     - ansible-lint -c .ansible-lint --force-color .
