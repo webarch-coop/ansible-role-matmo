@@ -110,12 +110,18 @@
 
     - name: Set a fact for the database type
       ansible.builtin.set_fact:
-        matomo_db_type: "{{ matomo_mysql_info.version.suffix | ansible.builtin.regex_replace('-.*$') | trim }}"
+        matomo_db_type: "{{ matomo_mysql_info.version.suffix | ansible.builtin.regex_replace('-.*$') | capitalize | trim }}"
 
     - name: Debug matomo_db_type
       ansible.builtin.debug:
         var: matomo_db_type
         verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
+
+    - name: The only supported DB schemas are Mariadb and Mysql
+      ansible.builtin.assert:
+        that:
+          - ( matomo_db_type == "Mariadb" ) or ( matomo_db_type == "Mysql" )
+        quiet: "{% if ansible_check_mode or ansible_verbosity >= 1 %}false{% else %}true{% endif %}"
 
     - name: Check the Matomo database schema
       ansible.builtin.command: "{{ matomo_php }} console --no-ansi -n config:get --section database --key schema"
@@ -142,7 +148,7 @@
         verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
 
     - name: Update the Matomo database schema
-      ansible.builtin.command: "{{ matomo_php }} console --no-ansi -n config:set {{ matomo_set_database_schema }}"
+      ansible.builtin.command: "{{ matomo_php }} console --no-ansi -n config:set '{{ matomo_set_database_schema }}'"
       args:
         chdir: "{{ matomo_html }}"
       vars:
