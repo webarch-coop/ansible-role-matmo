@@ -20,6 +20,7 @@
           - matomo_required_semver is defined
           - matomo_installed is ansible.builtin.version('3.0.0', 'ge', version_type='semver')
           - matomo_required is ansible.builtin.version('3.0.0', 'ge', version_type='semver')
+        quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
 
     - name: Matomo download tgz tasks included
       ansible.builtin.include_tasks: download.yml

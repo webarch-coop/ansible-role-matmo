@@ -61,7 +61,7 @@
       ansible.builtin.assert:
         that:
           - ( url is regex("^http[s]*:\/\/.*$") )
-        quiet: true
+        quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
       loop: "{{ matomo_site_urls }}"
       loop_control:
         loop_var: url
