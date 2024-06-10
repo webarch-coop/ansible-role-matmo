@@ -30,4 +30,5 @@ matomo_delete_files_scripts:
   - 4.13.0
   - 4.15.0
   - 4.16.0
+  - 5.1.0
 ...

@@ -78,7 +78,7 @@
         - name: Include file delete tasks
           ansible.builtin.include_tasks: delete_files.yml
           when:
-            - matomo_installed is ansible.builtin.version('5.0.0', '<')
+            - matomo_installed is ansible.builtin.version('5.1.0', '<=')
             - matomo_installed in matomo_delete_files_scripts
 
       when: ( matomo_autoupdate is defined ) and ( matomo_installed is defined) and ( matomo_required is defined )

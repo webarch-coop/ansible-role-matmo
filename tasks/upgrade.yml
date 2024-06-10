@@ -146,12 +146,12 @@
     - name: Print the installed version of Matomo
       ansible.builtin.debug:
         msg: "The installed version of Matomo is {{ matomo_installed }}"
-        verbosity: 1
+        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
 
     - name: Debug matomo_installed_semver
       ansible.builtin.debug:
         var: matomo_installed_semver
-        verbosity: 2
+        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}1{% else %}2{% endif %}"
 
     - name: Check for unexpected files to be deleted
       ansible.builtin.command: "{{ matomo_php }} console diagnostics:unexpected-files"

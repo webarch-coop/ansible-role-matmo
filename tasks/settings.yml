@@ -96,6 +96,62 @@
 
       when: ( matomo_get_salt.rc == 1 ) or ( matomo_get_salt.stdout == "Nothing found" )
 
+    - name: Check the database version using ~/.my.cnf
+      community.mysql.mysql_info:
+        config_file: "{{ matomo_db_config }}"
+        filter:
+          - version
+      register: matomo_mysql_info
+
+    - name: Debug matomo_mysql_info
+      ansible.builtin.debug:
+        var: matomo_mysql_info
+        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}1{% else %}2{% endif %}"
+
+    - name: Set a fact for the database type
+      ansible.builtin.set_fact:
+        matomo_db_type: "{{ matomo_mysql_info.version.suffix | ansible.builtin.regex_replace('-.*$') | trim }}"
+
+    - name: Debug matomo_db_type
+      ansible.builtin.debug:
+        var: matomo_db_type
+        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
+
+    - name: Check the Matomo database schema
+      ansible.builtin.command: "{{ matomo_php }} console --no-ansi -n config:get --section database --key schema"
+      args:
+        chdir: "{{ matomo_html }}"
+      become: true
+      become_user: "{{ matomo_user }}"
+      check_mode: false
+      changed_when: false
+      register: matomo_config_get_database_schema
+
+    - name: Debug matomo_mysql_info
+      ansible.builtin.debug:
+        var: matomo_config_get_database_schema
+        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}1{% else %}2{% endif %}"
+
+    - name: Set a fact for the existing Matomo database schema
+      ansible.builtin.set_fact:
+        matomo_database_schema: "{{ matomo_config_get_database_schema.stdout | community.dns.unquote_txt | trim }}"
+
+    - name: Debug matomo_database_schema
+      ansible.builtin.debug:
+        var: matomo_database_schema
+        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
+
+    - name: Update the Matomo database schema
+      ansible.builtin.command: "{{ matomo_php }} console --no-ansi -n config:set {{ matomo_set_database_schema }}"
+      args:
+        chdir: "{{ matomo_html }}"
+      vars:
+        matomo_set_database_schema: 'database.schema="{{ matomo_db_type }}"'
+      become: true
+      become_user: "{{ matomo_user }}"
+      changed_when: true
+      when: matomo_database_schema != matomo_db_type
+
     - name: "Run php console core:create-security-files for {{ matomo_user }}"
       ansible.builtin.command: "{{ matomo_php }} console --no-ansi -n core:create-security-files"
       args:

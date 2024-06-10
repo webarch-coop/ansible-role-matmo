@@ -92,6 +92,10 @@ argument_specs:
         type: dict
         required: false
         description: The combined arg spec for this role.
+      matomo_config_get_database_schema:
+        type: dict
+        required: false
+        description: Results from running php console config:get --section database --key schema.
       matomo_existing_role:
         type: str
         required: false
@@ -154,6 +158,10 @@ argument_specs:
         type: dict
         required: false
         description: The result of logme POST to the Matomo API.
+      matomo_mysql_info:
+        type: dict
+        required: false
+        description: The results from running the community.mysql.mysql_info module.
       matomo_proposed_site_urls:
         type: list
         elements: str
@@ -164,6 +172,10 @@ argument_specs:
         elements: str
         required: false
         description: A list of Matomo porposed site URLs.
+      matomo_set_database_schema:
+        type: str
+        required: false
+        description: Matomo database schema string for php console config:set.
       matomo_site_id:
         type: int
         required: false
