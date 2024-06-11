@@ -172,10 +172,6 @@ argument_specs:
         type: str
         required: true
         description: Directory for the Matomo site logs.
-      matomo_my_cnf:
-        type: str
-        required: true
-        description: Results from stating ~/.my.cnf.
       matomo_notify_from:
         type: str
         required: true
