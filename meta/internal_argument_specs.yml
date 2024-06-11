@@ -158,6 +158,10 @@ argument_specs:
         type: dict
         required: false
         description: The result of logme POST to the Matomo API.
+      matomo_my_cnf:
+        type: dict
+        required: false
+        description: The results from stating the database configuration file, typically ~/.my.cnf.
       matomo_mysql_info:
         type: dict
         required: false
