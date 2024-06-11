@@ -128,24 +128,78 @@
       ansible.builtin.set_fact:
         matomo_php: "{{ matomo_php_bin }}{% if matomo_php_ini is defined and matomo_php_ini_path.stat.exists | bool %} --php-ini {{ matomo_php_ini }}{% endif %}"
 
-    - name: Check ~/.my.cnf
+    - name: The ~/.my.cnf path should exist or be an empty string
+      ansible.builtin.assert:
+        that: >-
+          ( matomo_db_config | length == 0 ) or
+          ( matomo_db_config | length > 0 )
+        quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
+
+    - name: "Check {{ matomo_db_config }}"
       ansible.builtin.stat:
         path: "{{ matomo_db_config }}"
       register: matomo_my_cnf
 
-    - name: "The database configuration file is required to be present at {{ matomo_db_config }}"
+    - name: "The database configuration file is required to be present when defined at {{ matomo_db_config }}"
       ansible.builtin.assert:
-        that:
-          - matomo_my_cnf.stat.exists is defined
-          - matomo_my_cnf.stat.exists | bool
-          - matomo_my_cnf.stat.isreg | bool
+        that: >-
+          ( not matomo_my_cnf.stat.exists | bool ) or
+          ( matomo_my_cnf.stat.isreg | bool )
         quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
 
-    - name: "Check the database version using the details from {{ matomo_db_config }}"
+    - name: Check ~/.my.cnf
+      block:
+
+        - name: "Slurp {{ matomo_db_config }}"
+          ansible.builtin.slurp:
+            src: "{{ matomo_db_config }}"
+          register: matomo_db_config_file_b64encoded
+
+        - name: "Decode the base64 encoded version of {{ matomo_db_config }}"
+          ansible.builtin.set_fact:
+            matomo_db_config_file: "{{ matomo_db_config_file_b64encoded['content'] | ansible.builtin.b64decode | trim | community.general.jc('ini') }}"
+
+        - name: "Debug the contents of {{ matomo_db_config }}"
+          ansible.builtin.debug:
+            var: matomo_db_config_file
+
+        - name: Debug the (matomo_db_config_file.keys() | list)[0]
+          ansible.builtin.debug:
+            var: (matomo_db_config_file.keys() | list)[0]
+
+        - name: "Set a fact for the database password when not defined for DB user {{ matomo_db_username }}"
+          ansible.builtin.set_fact:
+            matomo_db_pass: "{{ matomo_db_config_file | community.general.json_query('client.password|[0]') }}"
+          when:
+            - (matomo_db_config_file.keys() | list)[0] == "client"
+            - (matomo_db_config_file | community.general.json_query('client.password|[0]')) is defined
+
+        # Note a * is used here for cases when the cnf file has a section name other than client
+        # https://docs.ansible.com/ansible/latest/collections/community/mysql/mysql_query_module.html#parameter-config_file
+        - name: "Set a fact for the database password when not defined for DB user {{ matomo_db_username }}"
+          ansible.builtin.set_fact:
+            matomo_db_pass: "{{ matomo_db_config_file | community.general.json_query('*.password|[0]') }}"
+            matomo_db_config: ""
+          when:
+            - (matomo_db_config_file.keys() | list)[0] != "client"
+            - (matomo_db_config_file | community.general.json_query('*.password|[0]')) is defined
+
+      when:
+        - matomo_db_config is defined
+        - matomo_db_config | length > 0
+
+    - name: "Check the database version for the db user {{ matomo_db_username }}"
       community.mysql.mysql_info:
+        login_user: "{{ matomo_db_username }}"
+        login_password: "{{ matomo_db_pass }}"
+        login_db: "{{ matomo_dbname }}"
+        login_host: "{{ matomo_db_host }}"
+        login_unix_socket: "{{ matomo_db_socket }}"
         config_file: "{{ matomo_db_config }}"
         filter:
           - version
+      become: true
+      become_user: "{{ matomo_user }}"
       register: matomo_mysql_info
 
     - name: Debug matomo_mysql_info

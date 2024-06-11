@@ -26,7 +26,7 @@ matomo_html: "{{ matomo_home }}/sites/default"
 matomo_private: "{{ matomo_home }}/private"
 matomo_logs: "{{ matomo_private }}"
 matomo_db_adaptor: "PDO\\MYSQL"
-matomo_db_config: "{{ matomo_home }}/.my.cnf"
+matomo_db_config: "{{ matomo_home }}/.my.cnf"  # Set this to "" if there is no ~/.my.cnf file
 matomo_db_host: localhost
 matomo_db_pass: ""
 matomo_db_prefix: "matomo_"

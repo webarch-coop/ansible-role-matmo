@@ -11,10 +11,11 @@
 - name: Query MariaDB to get all Matomo sites
   block:
 
-    - name: Query Matomo database for sites and users
+    - name: "Query Matomo database for sites and users using {{ matomo_db_config }}"
       community.mysql.mysql_query:
-        config_file: "{{ matomo_home }}/.my.cnf"
+        config_file: "{{ matomo_db_config }}"
         login_db: "{{ matomo_dbname }}"
+        login_user: "{{ matomo_db_username }}"
         login_host: "{{ matomo_db_host }}"
         login_unix_socket: /run/mysqld/mysqld.sock
         query: "SELECT {{ matomo_db_prefix }}site.idsite AS id, {{ matomo_db_prefix }}site.name AS name, {{ matomo_db_prefix }}site.main_url AS url, (SELECT GROUP_CONCAT({{ matomo_db_prefix }}site_url.url) FROM {{ matomo_db_prefix }}site_url WHERE {{ matomo_db_prefix }}site.idsite = {{ matomo_db_prefix }}site_url.idsite) AS urls, (SELECT GROUP_CONCAT({{ matomo_db_prefix }}access.login) FROM {{ matomo_db_prefix }}access WHERE {{ matomo_db_prefix }}site.idsite = {{ matomo_db_prefix }}access.idsite) AS users FROM {{ matomo_db_prefix }}site"
@@ -25,7 +26,7 @@
       changed_when: false
       register: matomo_mariadb_sites_query
 
-    - name: Debug matomo_mariadb_sites_query.query_result[0]
+    - name: "Debug matomo_mariadb_sites_query.query_result[0] for {{ matomo_db_config }}"
       ansible.builtin.debug:
         var: matomo_mariadb_sites_query.query_result[0]
         verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}1{% else %}2{% endif %}"
