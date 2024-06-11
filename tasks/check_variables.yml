@@ -128,6 +128,46 @@
       ansible.builtin.set_fact:
         matomo_php: "{{ matomo_php_bin }}{% if matomo_php_ini is defined and matomo_php_ini_path.stat.exists | bool %} --php-ini {{ matomo_php_ini }}{% endif %}"
 
+    - name: Check ~/.my.cnf
+      ansible.builtin.stat:
+        path: "{{ matomo_db_config }}"
+      register: matomo_my_cnf
+
+    - name: "The database configuration file is required to be present at {{ matomo_db_config }}"
+      ansible.builtin.assert:
+        that:
+          - matomo_my_cnf.stat.exists is defined
+          - matomo_my_cnf.stat.exists | bool
+          - matomo_my_cnf.stat.isreg | bool
+        quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
+
+    - name: "Check the database version using the details from {{ matomo_db_config }}"
+      community.mysql.mysql_info:
+        config_file: "{{ matomo_db_config }}"
+        filter:
+          - version
+      register: matomo_mysql_info
+
+    - name: Debug matomo_mysql_info
+      ansible.builtin.debug:
+        var: matomo_mysql_info
+        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}1{% else %}2{% endif %}"
+
+    - name: Set a fact for the database type
+      ansible.builtin.set_fact:
+        matomo_db_type: "{{ matomo_mysql_info.version.suffix | ansible.builtin.regex_replace('-.*$') | capitalize | trim }}"
+
+    - name: Debug matomo_db_type
+      ansible.builtin.debug:
+        var: matomo_db_type
+        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
+
+    - name: The only supported DB schemas are Mariadb and Mysql
+      ansible.builtin.assert:
+        that:
+          - ( matomo_db_type == "Mariadb" ) or ( matomo_db_type == "Mysql" )
+        quiet: "{% if ansible_check_mode or ansible_verbosity >= 1 %}false{% else %}true{% endif %}"
+
     - name: Check for config.ini.php
       ansible.builtin.stat:
         path: "{{ matomo_html }}/config/config.ini.php"

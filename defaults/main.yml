@@ -31,6 +31,7 @@ matomo_db_host: localhost
 matomo_db_pass: ""
 matomo_db_prefix: "matomo_"
 matomo_db_socket: "/run/mysqld/mysqld.sock"
+matomo_db_schema: Mariadb
 matomo_db_username: "{{ matomo_user }}"
 matomo_dbname: "{{ matomo_user }}"
 matomo_url: "https://{{ matomo_user }}.{{ inventory_hostname }}/"

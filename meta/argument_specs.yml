@@ -108,6 +108,13 @@ argument_specs:
         type: str
         required: true
         description: MariaDB database table prefix, this is only used for installing Matomo.
+      matomo_db_schema:
+        type: str
+        required: true
+        description: The MariaDB / MySQL database emgine.
+        choices:
+          - Mariadb
+          - Mysql
       matomo_db_socket:
         type: str
         required: true
@@ -165,6 +172,10 @@ argument_specs:
         type: str
         required: true
         description: Directory for the Matomo site logs.
+      matomo_my_cnf:
+        type: dict
+        required: true
+        description: Results from stating ~/.my.cnf.
       matomo_notify_from:
         type: str
         required: true
