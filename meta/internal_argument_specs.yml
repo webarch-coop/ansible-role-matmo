@@ -92,6 +92,14 @@ argument_specs:
         type: dict
         required: false
         description: The combined arg spec for this role.
+      matomo_config_get_database_charset:
+        type: dict
+        required: false
+        description: Results from running php console config:get --section database --key charset.
+      matomo_config_get_database_collation:
+        type: dict
+        required: false
+        description: Results from running php console config:get --section database --key collation.
       matomo_config_get_database_schema:
         type: dict
         required: false
@@ -176,6 +184,14 @@ argument_specs:
         elements: str
         required: false
         description: A list of Matomo porposed site URLs.
+      matomo_set_database_charset:
+        type: str
+        required: false
+        description: Matomo database charset string for php console config:set.
+      matomo_set_database_collation:
+        type: str
+        required: false
+        description: Matomo database collation string for php console config:set.
       matomo_set_database_schema:
         type: str
         required: false

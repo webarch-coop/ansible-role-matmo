@@ -88,6 +88,14 @@ argument_specs:
         type: str
         required: true
         description: MariaDB adaptor for Matomo database configuration
+      matomo_db_charset:
+        type: str
+        required: true
+        description: MariaDB database charset.
+      matomo_db_collation:
+        type: str
+        required: true
+        description: MariaDB database collation.
       matomo_db_config:
         type: str
         required: true
