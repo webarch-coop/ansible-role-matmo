@@ -1,0 +1,55 @@
+# Copyright 2018-2024 Chris Croome
+#
+# This file is part of the Webarchitects Matomo Ansible role.
+#
+# The Webarchitects Matomo Ansible role is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+#
+# The Webarchitects Matomo Ansible role is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with the Webarchitects Matomo Ansible role. If not, see <https://www.gnu.org/licenses/>.
+---
+- name: Matomo config section
+  block:
+
+    - name: Debug matomo_config_section
+      ansible.builtin.debug:
+        var: matomo_config_section
+        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
+
+    - name: "Get the existing Matomo settings for the section {{ matomo_config_section.key }}"
+      ansible.builtin.command: "{{ matomo_php }} console --no-ansi -n config:get --section='{{ matomo_config_section.key }}' --format='json'"
+      args:
+        chdir: "{{ matomo_html }}"
+      changed_when: false
+      check_mode: false
+      register: matomo_get_config_section
+      become: true
+      become_user: "{{ matomo_user }}"
+
+    - name: "Set a fact for the existing Matomo settings for the section {{ matomo_config_section.key }}"
+      ansible.builtin.set_fact:
+        matomo_config_section_existing: "{{ matomo_get_config_section.stdout | ansible.builtin.from_json }}"
+
+    - name: Debug matomo_config_section_existing
+      ansible.builtin.debug:
+        var: matomo_config_section_existing
+        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
+
+    - name: "Include Matomo config value setting tasks for section {{ matomo_config_section.key }}"
+      ansible.builtin.include_tasks: config_section_setting.yml
+      loop: "{{ matomo_config_section.value | ansible.builtin.dict2items }}"
+      loop_control:
+        loop_var: matomo_config_section_setting
+        label: "{{ matomo_config_section_setting.key }}"
+      when: matomo_config_section.value | ansible.builtin.dict2items | length > 0
+
+    # - name: "Update Matomo setting for the section {{ matomo_config_section.key }}"
+    #   loop: "{{ matomo_config_section.value }}"
+    #   loop_control:
+    #     loop_var: matomo_config_section_item
+
+  tags:
+    - matomo
+    - matomo_config
+    - matomo_settings
+...

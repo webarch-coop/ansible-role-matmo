@@ -31,12 +31,18 @@
 
     - name: Include variables checks
       ansible.builtin.include_tasks: check_variables.yml
+      tags:
+        - matomo_config
+        - matomo_settings
 
     - name: Include Matomo local facts tasks
       ansible.builtin.include_tasks: local_facts.yml
       when:
         - matomo_local_facts is defined
         - matomo_local_facts is defined
+      tags:
+        - matomo_config
+        - matomo_settings
 
     - name: Include apt role local fact tasks
       ansible.builtin.include_role:
@@ -92,6 +98,9 @@
 
     - name: Include settings tasks
       ansible.builtin.include_tasks: settings.yml
+      tags:
+        - matomo_config
+        - matomo_settings
 
     - name: Include cron tasks
       ansible.builtin.include_tasks: cron.yml

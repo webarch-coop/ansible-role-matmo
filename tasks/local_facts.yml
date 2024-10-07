@@ -22,4 +22,6 @@
   when: matomo_local_facts | bool
   tags:
     - matomo
+    - matomo_config
+    - matomo_settings
 ...

@@ -8,12 +8,16 @@
 #
 # You should have received a copy of the GNU General Public License along with the Webarchitects Matomo Ansible role. If not, see <https://www.gnu.org/licenses/>.
 ---
-# https://ansible-lint.readthedocs.io/rules/
-skip_list:
-  - command-instead-of-module
-  - jinja[spacing]
-  - key-order[task]
-  - name[template]
-var_naming_pattern: "^[matomo|molecule]_?[a-z0-9_]*$"
-# vim: syntax=yaml
+- name: Matomo config section settings
+  block:
+
+    - name: Debug matomo_config_section_setting
+      ansible.builtin.debug:
+        var: matomo_config_section_setting
+        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
+
+  tags:
+    - matomo
+    - matomo_config
+    - matomo_settings
 ...

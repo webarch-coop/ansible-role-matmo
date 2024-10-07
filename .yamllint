@@ -21,5 +21,10 @@ rules:
     level: error
   line-length: disable
   comments-indentation: disable
+  comments:
+    min-spaces-from-content: 1
+  octal-values:
+    forbid-implicit-octal: true
+    forbid-explicit-octal: true
 # vim: syntax=yaml
 ...

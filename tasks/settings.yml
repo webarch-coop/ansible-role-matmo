@@ -11,6 +11,32 @@
 - name: Apply Matomo settings
   block:
 
+    - name: Matomo config
+      block:
+
+        - name: Debug matomo_config
+          ansible.builtin.debug:
+            var: matomo_config
+            verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
+
+        - name: Debug matomo_config | ansible.builtin.dict2items
+          ansible.builtin.debug:
+            var: matomo_config | ansible.builtin.dict2items
+            verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
+
+        - name: Include Matomo config section tasks
+          ansible.builtin.include_tasks: config_section.yml
+          loop: "{{ matomo_config | ansible.builtin.dict2items }}"
+          loop_control:
+            loop_var: matomo_config_section
+            label: "{{ matomo_config_section.key }}"
+          when: matomo_config | ansible.builtin.dict2items | length > 0
+
+        # - name: Fail
+        #   fail:
+
+      when: matomo_config is defined
+
     # TODO Use a dictionary to define general config settings, for example:
     # matomo_config_general:
     #   force_ssl: 1
@@ -86,7 +112,7 @@
           # no_log: true
 
         - name: "Set salt for {{ matomo_user }}"
-          ansible.builtin.command: '{{ matomo_php }} console --no-ansi -n config:set --section="General" --key="salt" --value="{{ matomo_salt }}"'
+          ansible.builtin.command: "{{ matomo_php }} console --no-ansi -n config:set --section='General' --key='salt' --value='{{ matomo_salt }}'"
           args:
             chdir: "{{ matomo_html }}"
           changed_when: true
@@ -97,7 +123,7 @@
       when: ( matomo_get_salt.rc == 1 ) or ( matomo_get_salt.stdout == "Nothing found" )
 
     - name: "Check the Matomo database schema for {{ matomo_user }}"
-      ansible.builtin.command: "{{ matomo_php }} console --no-ansi -n config:get --section database --key schema"
+      ansible.builtin.command: "{{ matomo_php }} console --no-ansi -n config:get --section='database' --key='schema'"
       args:
         chdir: "{{ matomo_html }}"
       become: true
@@ -132,7 +158,7 @@
       when: matomo_database_schema != matomo_db_schema
 
     - name: "Check the Matomo database charset for {{ matomo_user }}"
-      ansible.builtin.command: "{{ matomo_php }} console --no-ansi -n config:get --section database --key charset"
+      ansible.builtin.command: "{{ matomo_php }} console --no-ansi -n config:get --section='database' --key='charset'"
       args:
         chdir: "{{ matomo_html }}"
       become: true
@@ -167,7 +193,7 @@
       when: matomo_database_charset != matomo_db_charset
 
     - name: "Check the Matomo database collation for {{ matomo_user }}"
-      ansible.builtin.command: "{{ matomo_php }} console --no-ansi -n config:get --section database --key collation"
+      ansible.builtin.command: "{{ matomo_php }} console --no-ansi -n config:get --section='database' --key='collation'"
       args:
         chdir: "{{ matomo_html }}"
       become: true
@@ -239,4 +265,6 @@
 
   tags:
     - matomo
+    - matomo_config
+    - matomo_settings
 ...

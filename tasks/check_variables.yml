@@ -272,4 +272,6 @@
 
   tags:
     - matomo
+    - matomo_config
+    - matomo_settings
 ...

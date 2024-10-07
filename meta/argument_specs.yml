@@ -84,6 +84,122 @@ argument_specs:
         type: bool
         required: true
         description: Configure cron for Matomo.
+      matomo_config:
+        type: dict
+        required: false
+        description: A YAML dictionary of settings for the Matomo config/config.ini.php file.
+        options:
+          database:
+            type: dict
+            required: false
+            description: Matomo config database settings.
+            options:
+              charset:
+                type: str
+                required: false
+                description: The Matomo database charset.
+              collation:
+                type: str
+                required: false
+                description: The Matomo database collation.
+              dbname:
+                type: str
+                required: false
+                description: The Matomo database dbname.
+              host:
+                type: str
+                required: false
+                description: The Matomo database host.
+              password:
+                type: str
+                required: false
+                description: The Matomo database password.
+              schema:
+                type: str
+                required: false
+                description: The Matomo database schema.
+              tables_prefix:
+                type: str
+                required: false
+                description: The Matomo database tables_prefix.
+              username:
+                type: str
+                required: false
+                description: The Matomo database username.
+          General:
+            type: dict
+            required: false
+            description: Matomo config General settings.
+          mail:
+            type: dict
+            required: false
+            description: Matomo config mail settings.
+            options:
+              encryption:
+                type: str
+                required: false
+                description: The Matomo mail encryption setting.
+                choices:
+                  - SSL
+                  - TLS
+                  - auto
+                  - none
+              host:
+                type: str
+                required: false
+                description: The Matomo mail host address.
+              password:
+                type: str
+                required: false
+                description: The Matomo mail SMTP password.
+              port:
+                type: int
+                required: false
+                description: The Matomo mail port number.
+              ssl_disallow_self_signed:
+                type: int
+                required: false
+                description: The Matomo mail ssl_disallow_self_signed setting.
+                choices:
+                  - 0
+                  - 1
+              ssl_verify_peer:
+                type: int
+                required: false
+                description: The Matomo mail ssl_verify_peer setting.
+                choices:
+                  - 0
+                  - 1
+              ssl_verify_peer_name:
+                type: int
+                required: false
+                description: The Matomo mail ssl_verify_peer_name setting.
+                choices:
+                  - 0
+                  - 1
+              transport:
+                type: str
+                required: false
+                description: The Matomo mail transport setting.
+                choices:
+                  - sendmail
+                  - smtp
+              type:
+                type: str
+                required: false
+                description: The Matomo mail SMTP authentication method.
+                choices:
+                  - Cram-md5
+                  - Login
+                  - Plain
+              username:
+                type: str
+                required: false
+                description: The Matomo mail SMTP username.
+          PluginsInstalled:
+            type: dict
+            required: false
+            description: Matomo config PluginsInstalled settings.
       matomo_db_adaptor:
         type: str
         required: true

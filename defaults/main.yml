@@ -17,6 +17,13 @@ matomo_autoupdate: false
 # set it to latest for the latest version or a semver
 # https://github.com/matomo-org/matomo/releases
 matomo_version: latest
+# Optional Matomo config to be converted into ini format and written to config/config.ini.php
+matomo_config:
+  mail:
+    transport: smtp
+    port: 25
+    host: localhost
+    encryption: none
 # The system user name for the account (for example www-data), matomo_user is
 # also used for the Matomo super user acount username
 matomo_user: stats
