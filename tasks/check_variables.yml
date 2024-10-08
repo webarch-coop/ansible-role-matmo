@@ -162,10 +162,12 @@
         - name: "Debug the contents of {{ matomo_db_config }}"
           ansible.builtin.debug:
             var: matomo_db_config_file
+            verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}1{% else %}2{% endif %}"
 
         - name: Debug the (matomo_db_config_file.keys() | list)[0]
           ansible.builtin.debug:
             var: (matomo_db_config_file.keys() | list)[0]
+            verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}1{% else %}2{% endif %}"
 
         - name: "Set a fact for the database password when not defined for DB user {{ matomo_db_username }}"
           ansible.builtin.set_fact:

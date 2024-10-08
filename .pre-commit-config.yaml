@@ -25,7 +25,7 @@ repos:
           - templates
   # https://github.com/jackdewinter/pymarkdown/releases
   - repo: https://github.com/jackdewinter/pymarkdown
-    rev: v0.9.23
+    rev: v0.9.24
     hooks:
       - id: pymarkdown
         name: Markdown Lint

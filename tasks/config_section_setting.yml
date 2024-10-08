@@ -14,7 +14,38 @@
     - name: Debug matomo_config_section_setting
       ansible.builtin.debug:
         var: matomo_config_section_setting
-        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
+        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}1{% else %}2{% endif %}"
+
+    - name: Set facts for the existing and proposed Matomo config settings
+      ansible.builtin.set_fact:
+        matomo_config_section_setting_existing: "{{ matomo_config_section_existing | community.general.json_query(matomo_config_section_setting.key) }}"
+        matomo_config_section_setting_proposed: "{{ matomo_config_section_setting['value'] }}"
+
+    - name: Debug matomo_config_section_setting_existing
+      ansible.builtin.debug:
+        var: matomo_config_section_setting_existing
+        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}1{% else %}2{% endif %}"
+
+    - name: Debug matomo_config_section_setting_proposed
+      ansible.builtin.debug:
+        var: matomo_config_section_setting_proposed
+        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}1{% else %}2{% endif %}"
+
+    - name: "Debug update Matomo config setting {{ matomo_config_section_setting.key }}"
+      ansible.builtin.debug:
+        msg:
+          - "If Ansible was not being run in check mode the folloing command would be run as the {{ matomo_user }} user from the {{ matomo_html }} directory."
+          - "{{ matomo_php }} console --no-ansi -n config:set --section='{{ matomo_config_section.key }}' --key='{{ matomo_config_section_setting.key }}' --value='{{ matomo_config_section_setting_proposed }}'"
+      when: ansible_check_mode | bool
+
+    - name: "Update Matomo config setting {{ matomo_config_section_setting.key }}"
+      ansible.builtin.command: "{{ matomo_php }} console --no-ansi -n config:set --section='{{ matomo_config_section.key }}' --key='{{ matomo_config_section_setting.key }}' --value='{{ matomo_config_section_setting_proposed }}'"
+      args:
+        chdir: "{{ matomo_html }}"
+      become: true
+      become_user: "{{ matomo_user }}"
+      changed_when: true
+      when: matomo_config_section_setting_proposed != matomo_config_section_setting_existing
 
   tags:
     - matomo

@@ -14,7 +14,7 @@
     - name: Debug matomo_config_section
       ansible.builtin.debug:
         var: matomo_config_section
-        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
+        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}1{% else %}2{% endif %}"
 
     - name: "Get the existing Matomo settings for the section {{ matomo_config_section.key }}"
       ansible.builtin.command: "{{ matomo_php }} console --no-ansi -n config:get --section='{{ matomo_config_section.key }}' --format='json'"
@@ -33,7 +33,7 @@
     - name: Debug matomo_config_section_existing
       ansible.builtin.debug:
         var: matomo_config_section_existing
-        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
+        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}1{% else %}2{% endif %}"
 
     - name: "Include Matomo config value setting tasks for section {{ matomo_config_section.key }}"
       ansible.builtin.include_tasks: config_section_setting.yml
@@ -42,11 +42,6 @@
         loop_var: matomo_config_section_setting
         label: "{{ matomo_config_section_setting.key }}"
       when: matomo_config_section.value | ansible.builtin.dict2items | length > 0
-
-    # - name: "Update Matomo setting for the section {{ matomo_config_section.key }}"
-    #   loop: "{{ matomo_config_section.value }}"
-    #   loop_control:
-    #     loop_var: matomo_config_section_item
 
   tags:
     - matomo
