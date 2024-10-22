@@ -27,8 +27,8 @@
 
     - name: Set a fact for the config file and site backup paths
       ansible.builtin.set_fact:
-        matomo_config_file_backup: "{{ matomo_private }}/config.ini.php.{{ ansible_date_time.date }}.{{ ansible_date_time.time }}.bak"
-        matomo_site_backup: "{{ matomo_private }}/matomo_site.{{ ansible_date_time.date }}.{{ ansible_date_time.time }}"
+        matomo_config_file_backup: "{{ matomo_private }}/config.ini.php.{{ ansible_facts.date_time.date }}.{{ ansible_facts.date_time.time }}.bak"
+        matomo_site_backup: "{{ matomo_private }}/matomo_site.{{ ansible_facts.date_time.date }}.{{ ansible_facts.date_time.time }}"
 
     - name: "Backup up the Matomo config file to {{ matomo_config_file_backup }}"
       ansible.builtin.copy:

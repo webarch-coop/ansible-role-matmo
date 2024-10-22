@@ -97,7 +97,7 @@
 
         - name: "Password notification email sent to {{ matomo_login_email }}"
           community.general.mail:
-            from: "{{ matomo_email_from | default('Webarchitects') | quote }} <root@{{ ansible_fqdn }}>"
+            from: "{{ matomo_email_from | default('Webarchitects') | quote }} <root@{{ ansible_facts.fqdn }}>"
             to: "{{ matomo_login_email }}"
             subject: "[{{ matomo_email_subject_tag | default('webarchitects') }}] Matomo {{ matomo_login }} account details for {{ matomo_url }}"
             headers: "{{ matomo_notify_headers }}"
