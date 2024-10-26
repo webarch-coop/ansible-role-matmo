@@ -25,7 +25,7 @@
     - name: "Fail if the {{ matomo_user }} user account doesn't exist"
       ansible.builtin.fail:
         msg: "The {{ matomo_user }} user account doesn't exist on {{ inventory_hostname }}"
-      when: matomo_user not in getent_passwd
+      when: matomo_user not in ansible_facts.getent_passwd
 
     - name: "Check that the required directory variables are defined for {{ matomo_user }}"
       ansible.builtin.assert:
