@@ -64,6 +64,14 @@ argument_specs:
         type: dict
         required: false
         description: The results from running wc -l on the Matomo accounts file.
+      matomo_add_site:
+        type: dict
+        required: false
+        description: The result from adding a Matomo site using the HTTP API.
+      matomo_add_site_json:
+        type: dict
+        required: false
+        description: The JSON data to be used by a HTTP POST to add a site using the API.
       matomo_api_get_user_login_from_user_email:
         type: dict
         required: false
@@ -166,6 +174,10 @@ argument_specs:
         type: dict
         required: false
         description: The result of logme POST to the Matomo API.
+      matomo_mariadb_sites_query:
+        type: dict
+        required: false
+        description: The result from runjing a MariaDB query to get the Matomo sites and users.
       matomo_my_cnf:
         type: dict
         required: false
@@ -200,6 +212,44 @@ argument_specs:
         type: int
         required: false
         description: The Matomo site ID.
+      matomo_site_required:
+        type: dict
+        required: fase
+        description: Dictionary of variables for the Matomo site required.
+        options:
+          name:
+            type: str
+            required: true
+            description: The name of the Matomo site to be added.
+          url:
+            type: str
+            required: true
+            description: The main URL of the Matomo site to be added.
+          urls:
+            type: str
+            required: false
+            description: The comma seperated list of additional URLs for the Matomo site to be added.
+          users:
+            type: str
+            required: true
+            description: The user for the Matomo site to be added.
+      matomo_site_status:
+        type: str
+        required: false
+        description: The Matomo site status.
+      matomo_site_status_all:
+        type: list
+        elements: str
+        required: false
+        description: A list of the status of all the site.
+      matomo_site_status_test:
+        type: str
+        required: false
+        descripton: Result(s) of the Matomo site staus test.
+      matomo_site_status_test_results:
+        type: str
+        required: false
+        descripton: Result(s) from setting the Matomo site staus test variable.
       matomo_super_user_access:
         type: bool
         required: false

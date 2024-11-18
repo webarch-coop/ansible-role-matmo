@@ -9,11 +9,21 @@
 # You should have received a copy of the GNU General Public License along with the Webarchitects Matomo Ansible role. If not, see <https://www.gnu.org/licenses/>.
 ---
 variables:
+  ANSIBLE_ANY_ERRORS_FATAL: "1"
   ANSIBLE_CALLBACK_RESULT_FORMAT: "yaml"
+  ANSIBLE_DEFAULT_VERBOSITY: "1"
+  ANSIBLE_DIFF_ALWAYS: "1"
   ANSIBLE_DISPLAY_SKIPPED_HOSTS: "0"
+  ANSIBLE_ERROR_ON_UNDEFINED_VARS: "1"
   ANSIBLE_FORCE_COLOR: "1"
+  ANSIBLE_INJECT_FACT_VARS: "0"
   ANSIBLE_NOCOWS: "1"
-  DEBIAN_FRONTEND: noninteractive
+  ANSIBLE_REMOTE_TMP: "/tmp"
+  ANSIBLE_SHELL_ALLOW_WORLD_READABLE_TEMP: "1"
+  DEBIAN_FRONTEND: "noninteractive"
+  DEFAULT_MANAGED_STR: "Ansible managed"
+  MOLECULE_VERBOSITY: "0"
+  PRE_COMMIT_COLOR: always
   PY_COLORS: "1"
 before_script:
   - whoami
@@ -28,7 +38,7 @@ before_script:
 stages:
   - lint
 lint:
-  image: registry.git.coop/webarch/containers/images/trixie:20240911
+  image: registry.git.coop/webarch/containers/images/trixie:20241107
   stage: lint
   script:
     - yamllint -f colored -c .yamllint .
