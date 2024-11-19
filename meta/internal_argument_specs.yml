@@ -219,11 +219,11 @@ argument_specs:
         options:
           name:
             type: str
-            required: true
+            required: false
             description: The name of the Matomo site to be added.
           url:
             type: str
-            required: true
+            required: false
             description: The main URL of the Matomo site to be added.
           urls:
             type: str
@@ -231,7 +231,7 @@ argument_specs:
             description: The comma seperated list of additional URLs for the Matomo site to be added.
           users:
             type: str
-            required: true
+            required: false
             description: The user for the Matomo site to be added.
       matomo_site_status:
         type: str
