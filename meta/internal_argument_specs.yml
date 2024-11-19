@@ -214,7 +214,7 @@ argument_specs:
         description: The Matomo site ID.
       matomo_site_required:
         type: dict
-        required: fase
+        required: false
         description: Dictionary of variables for the Matomo site required.
         options:
           name:
