@@ -246,10 +246,10 @@ argument_specs:
         type: str
         required: false
         descripton: Result(s) of the Matomo site staus test.
-      matomo_site_status_test_results:
+      matomo_site_status_test_result:
         type: str
         required: false
-        descripton: Result(s) from setting the Matomo site staus test variable.
+        descripton: Result from setting the Matomo site staus test variable.
       matomo_super_user_access:
         type: bool
         required: false
