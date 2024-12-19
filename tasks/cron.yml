@@ -15,8 +15,8 @@
     minute: "{{ 59 | random }}"
     job: >-
       cd {{ matomo_html }} &&
-      {{ matomo_php }} console core:archive --force-all-websites > {{ matomo_logs }}/matomo-archive.log &&
-      {{ matomo_php }} console core:run-scheduled-tasks > {{ matomo_logs }}/matomo-archive.log"
+      {{ matomo_php }} console core:archive --force-all-websites >> {{ matomo_logs }}/matomo-archive.log &&
+      {{ matomo_php }} console core:run-scheduled-tasks >> {{ matomo_logs }}/matomo-archive.log
   tags:
     - matomo
 ...
