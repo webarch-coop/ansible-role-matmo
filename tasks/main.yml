@@ -104,7 +104,11 @@
 
     - name: Include cron tasks
       ansible.builtin.include_tasks: cron.yml
-      when: ( matomo_cron is defined ) and ( matomo_cron | bool )
+      when:
+        - matomo_cron is defined
+        - matomo_cron | bool
+        - matomo_cron_job is defined
+        - matomo_cron_job | length > 0
 
     - name: Include completion tasks
       ansible.builtin.include_tasks: completion.yml

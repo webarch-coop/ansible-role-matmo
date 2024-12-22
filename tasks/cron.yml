@@ -8,15 +8,21 @@
 #
 # You should have received a copy of the GNU General Public License along with the Webarchitects Matomo Ansible role. If not, see <https://www.gnu.org/licenses/>.
 ---
-- name: "Archive cron job present for {{ matomo_user }}"
-  ansible.builtin.cron:
-    name: "Matomo Archiving"
-    user: "{{ matomo_user }}"
-    minute: "{{ 59 | random }}"
-    job: >-
-      cd {{ matomo_html }} &&
-      {{ matomo_php }} console core:archive --force-all-websites >> {{ matomo_logs }}/matomo-archive.log &&
-      {{ matomo_php }} console core:run-scheduled-tasks >> {{ matomo_logs }}/matomo-archive.log
+- name: Test and setup acrhiving crob job for Matomo
+  block:
+
+    - name: "Test archive cron job for {{ matomo_user }}"
+      ansible.builtin.command: "{{ matomo_cron_job }}"
+      become: "{{ matomo_user }}"
+      changed_when: true
+
+    - name: "Archive cron job present for {{ matomo_user }}"
+      ansible.builtin.cron:
+        name: "Matomo Archiving"
+        user: "{{ matomo_user }}"
+        minute: "{{ 59 | random }}"
+        job: "{{ matomo_cron_job }}"
+
   tags:
     - matomo
 ...

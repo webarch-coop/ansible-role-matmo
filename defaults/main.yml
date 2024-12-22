@@ -61,6 +61,11 @@ matomo_notify_headers:
   - "Reply-To={{ matomo_notify_reply_to }}"
 # Set matomo_cron to true to setup cron archiving
 matomo_cron: false
+# matomo_php is redefined in check_variables.yml
+matomo_cron_job: >-
+  cd {{ matomo_html }} &&
+  {{ matomo_php | default('/usr/bin/php') }} console core:archive --force-all-websites >> {{ matomo_logs }}/matomo-archive.log &&
+  {{ matomo_php | default('/usr/bin/php') }} console core:run-scheduled-tasks >> {{ matomo_logs }}/matomo-archive.log
 # Set matomo_diagnostics_fail to false to prevent a fail when warnings detected
 matomo_diagnostics_fail: true
 matomo_php_bin: "/usr/bin/php{{ matomo_php_version }}"

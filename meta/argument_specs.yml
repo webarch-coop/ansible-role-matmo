@@ -84,6 +84,10 @@ argument_specs:
         type: bool
         required: true
         description: Configure cron for Matomo.
+      matomo_cron_job:
+        type: str
+        required: false
+        description: The Matomo archiving cron job.
       matomo_config:
         type: dict
         required: false
