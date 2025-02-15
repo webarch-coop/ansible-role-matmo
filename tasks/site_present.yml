@@ -1,4 +1,4 @@
-# Copyright 2018-2024 Chris Croome
+# Copyright 2018-2025 Chris Croome
 #
 # This file is part of the Webarchitects Matomo Ansible role.
 #
@@ -42,6 +42,13 @@
         var: matomo_site_item
         verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}1{% else %}2{% endif %}"
       when: matomo_site_item is defined
+
+    - name: Debug matomo_mariadb_sites_query.query_result[0]
+      ansible.builtin.debug:
+        var: matomo_mariadb_sites_query.query_result[0]
+
+    - name: Debug fail
+      ansible.builtin.fail:
 
     - name: Debug the Matomo site name
       ansible.builtin.debug:
