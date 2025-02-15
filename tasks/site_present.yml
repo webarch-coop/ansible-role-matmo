@@ -17,7 +17,7 @@
           - ( matomo_url is defined ) and ( matomo_url | length > 0 )
           - ( matomo_token_auth is defined ) and ( matomo_token_auth | length > 0 )
           - ( matomo_site_name is defined ) and ( matomo_site_name | length > 0 )
-          - ( matomo_site_main_url is defined ) and ( matomo_site_main_url is regex("^http:\/\/.*$") )
+          - ( matomo_site_main_url is defined ) and ( matomo_site_main_url is ansible.builtin.regex("^http:\/\/.*$") )
         quiet: "{% if ansible_check_mode or ansible_verbosity >= 1 %}false{% else %}true{% endif %}"
 
     - name: Set a fact for the site that should be present and set site status to None
@@ -147,7 +147,7 @@
             ( matomo_mariadb_sites_query.query_result[0]
             | community.general.json_query('[].url')
             | map('ansible.builtin.type_debug')
-            | select('eg', 'list') ) == []
+            | select('eq', 'list') ) == []
         quiet: "{% if ansible_check_mode or ansible_verbosity >= 1 %}false{% else %}true{% endif %}"
 
     - name: The site urls should be a string or none and not a list
