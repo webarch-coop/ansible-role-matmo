@@ -83,7 +83,7 @@
     #     loop_var: matomo_site_item
     #     label: "{{ matomo_site_item.name }}"
 
-    - name: The site names should be a string
+    - name: The name for all sites should be strings
       ansible.builtin.assert:
         that: >-
           ( matomo_mariadb_sites_query.query_result[0]
@@ -109,8 +109,21 @@
         loop_var: matomo_site_item
         label: "{{ matomo_site_item.name }}"
 
-    - name: Debug fail
-      ansible.builtin.fail:
+    - name: The url for all sites should be strings
+      ansible.builtin.assert:
+        that: >-
+          ( matomo_mariadb_sites_query.query_result[0]
+          | community.general.json_query('[].url')
+          | map('ansible.builtin.type_debug')
+          | reject('eq', 'AnsibleUnsafeText') ) == []
+        fail_msg: >-
+          The Matomo site url(s)
+          {{ ( matomo_mariadb_sites_query.query_result[0]
+          | community.general.json_query('[].url')
+          | map('ansible.builtin.type_debug')
+          | select('ne', 'AnsibleUnsafeText') ) | join(', ') }}
+          Are not strings.
+        quiet: "{% if ansible_check_mode or ansible_verbosity >= 1 %}false{% else %}true{% endif %}"
 
     - name: The site url should be a string
       ansible.builtin.assert:
@@ -121,6 +134,21 @@
       loop_control:
         loop_var: matomo_site_item
         label: "{{ matomo_site_item.name }}"
+
+    - name: The urls for all sites should be strings or none and not lists
+      ansible.builtin.assert:
+        that:
+          - >-
+            ( matomo_mariadb_sites_query.query_result[0]
+            | community.general.json_query('[].url')
+            | map('ansible.builtin.type_debug')
+            | reject('ansible.builtin.regex', '^AnsibleUnsafeText|NoneType') ) == []
+          - >-
+            ( matomo_mariadb_sites_query.query_result[0]
+            | community.general.json_query('[].url')
+            | map('ansible.builtin.type_debug')
+            | select('eg', 'list') ) == []
+        quiet: "{% if ansible_check_mode or ansible_verbosity >= 1 %}false{% else %}true{% endif %}"
 
     - name: The site urls should be a string or none and not a list
       ansible.builtin.assert:
@@ -271,6 +299,9 @@
       ansible.builtin.debug:
         var: matomo_site_status_test_result
         verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}1{% else %}2{% endif %}"
+
+    - name: Debug fail
+      ansible.builtin.fail:
 
     - name: Set a fact for all the Matomo site status test results omitting nomatch
       ansible.builtin.set_fact:
