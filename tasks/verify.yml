@@ -11,6 +11,10 @@
 - name: Verify Matomo variables
   block:
 
+    - name: Debug matomo_sites
+      ansible.builtin.debug:
+        var: matomo_sites
+
     - name: Debug the hostvars variable names that start with matomo_
       ansible.builtin.debug:
         var: matomovarnames

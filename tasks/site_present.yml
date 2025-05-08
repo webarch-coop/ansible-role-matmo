@@ -45,7 +45,7 @@
 
     - name: Set a fact for the Matomo sites
       ansible.builtin.set_fact:
-        matomo_sites: matomo_mariadb_sites_query.query_result[0]
+        matomo_sites: "{{ matomo_mariadb_sites_query.query_result[0] }}"
 
     - name: Debug matomo_sites
       ansible.builtin.debug:
