@@ -208,6 +208,33 @@ argument_specs:
         type: str
         required: false
         description: Matomo database schema string for php console config:set.
+      matomo_sites:
+        type: list
+        required: false
+        description: List of Matomo sites from the matomo_sites.fact script
+        options:
+          id:
+            type: int
+            required: false
+            description: The matomo site ID.
+          main_url:
+            type: str
+            required: false
+            description: The main URL for the site.
+          name:
+            type: str
+            required: false
+            description: The name for the site.
+          urls:
+            type: list
+            elements: str
+            required: false
+            description: A list of site URLs.
+          users:
+            type: list
+            elements: str
+            required: false
+            description: A list of users.
       matomo_site_id:
         type: int
         required: false
