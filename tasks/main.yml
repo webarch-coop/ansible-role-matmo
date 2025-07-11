@@ -39,7 +39,7 @@
       ansible.builtin.include_tasks: local_facts.yml
       when:
         - matomo_local_facts is defined
-        - matomo_local_facts is defined
+        - matomo_local_facts | bool
       tags:
         - matomo_config
         - matomo_settings
