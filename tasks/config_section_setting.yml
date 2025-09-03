@@ -34,7 +34,7 @@
     - name: "Debug update Matomo config setting {{ matomo_config_section_setting.key }}"
       ansible.builtin.debug:
         msg:
-          - "If Ansible was not being run in check mode the folloing command would be run as the {{ matomo_user }} user from the {{ matomo_html }} directory."
+          - "If Ansible was not being run in check mode the following command would be run as the {{ matomo_user }} user from the {{ matomo_html }} directory."
           - "{{ matomo_php }} console --no-ansi -n config:set --section='{{ matomo_config_section.key }}' --key='{{ matomo_config_section_setting.key }}' --value='{{ matomo_config_section_setting_proposed }}'"
       when: ansible_check_mode | bool
 
