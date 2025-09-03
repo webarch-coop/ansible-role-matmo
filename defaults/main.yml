@@ -19,6 +19,11 @@ matomo_autoupdate: false
 matomo_version: latest
 # Optional Matomo config to be converted into ini format and written to config/config.ini.php
 matomo_config:
+  General:
+    # https://github.com/matomo-org/matomo/issues/23553
+    # auth_token_default_expiration_days: 7300
+    auth_token_expiration_notification_days: 0
+    auth_token_rotation_notification_days: 0
   mail:
     transport: smtp
     port: 25

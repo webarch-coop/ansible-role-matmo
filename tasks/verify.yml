@@ -14,6 +14,7 @@
     - name: Debug matomo_sites
       ansible.builtin.debug:
         var: matomo_sites
+      when: matomo_sites is defined
 
     - name: Debug the hostvars variable names that start with matomo_
       ansible.builtin.debug:

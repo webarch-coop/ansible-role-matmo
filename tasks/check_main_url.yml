@@ -44,10 +44,14 @@
 
     - name: Loop though the matomo_existing_main_urls and set matomo_existing_site_ids when defined
       ansible.builtin.set_fact:
-        matomo_existing_site_ids: "{{ matomo_existing_site_ids | default([]) + [ site.idsite ] | unique }}"
+        #  This was set to the following, this failed with Ansible 2.19, note unique is now missing...
+        #  matomo_existing_site_ids: "{{ matomo_existing_site_ids | default([]) + [ site.idsite ] | unique }}"
+        matomo_existing_site_ids: "{{ matomo_existing_site_ids | default([]) }} + [ '{{ site.idsite }}' ]"
       when:
         - matomo_proposed_url == url
         - matomo_existing_id not in matomo_existing_site_ids
+        # This was added for Ansible 2.19
+        - (site.idsite is defined) and (site.idsite not in matomo_existing_site_ids)
       loop: "{{ matomo_existing_main_urls }}"
       loop_control:
         loop_var: url
