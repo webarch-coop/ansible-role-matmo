@@ -17,7 +17,7 @@ matomo_autoupdate: false
 # set it to latest for the latest version or a semver
 # https://github.com/matomo-org/matomo/releases
 matomo_version: latest
-# Optional Matomo config to be converted into ini format and written to config/config.ini.php
+# Optional Matomo config to be converted into ini format and added to the existing config/config.ini.php
 matomo_config:
   General:
     # https://github.com/matomo-org/matomo/issues/23553
