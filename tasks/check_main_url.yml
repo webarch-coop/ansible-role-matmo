@@ -49,7 +49,7 @@
         matomo_existing_site_ids: "{{ matomo_existing_site_ids | default([]) }} + [ '{{ site.idsite }}' ]"
       when:
         - matomo_proposed_url == url
-        - matomo_existing_id not in matomo_existing_site_ids
+        - (matomo_existing_site_ids is defined) amd (matomo_existing_id not in matomo_existing_site_ids)
         # This was added for Ansible 2.19
         - (site.idsite is defined) and (site.idsite not in matomo_existing_site_ids)
       loop: "{{ matomo_existing_main_urls }}"
