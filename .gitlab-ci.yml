@@ -14,7 +14,6 @@ variables:
   ANSIBLE_DEFAULT_VERBOSITY: "1"
   ANSIBLE_DIFF_ALWAYS: "1"
   ANSIBLE_DISPLAY_SKIPPED_HOSTS: "0"
-  ANSIBLE_ERROR_ON_UNDEFINED_VARS: "1"
   ANSIBLE_FORCE_COLOR: "1"
   ANSIBLE_INJECT_FACT_VARS: "0"
   ANSIBLE_NOCOWS: "1"
@@ -22,7 +21,6 @@ variables:
   ANSIBLE_ROLES_PATH: "${CI_PROJECT_DIR}/..:~/.ansible/roles:/usr/share/ansible/roles:/etc/ansible/roles"
   ANSIBLE_SHELL_ALLOW_WORLD_READABLE_TEMP: "1"
   DEBIAN_FRONTEND: "noninteractive"
-  DEFAULT_MANAGED_STR: "Ansible managed"
   MOLECULE_VERBOSITY: "0"
   PRE_COMMIT_COLOR: always
   PY_COLORS: "1"
@@ -39,7 +37,7 @@ before_script:
 stages:
   - lint
 lint:
-  image: registry.git.coop/webarch/containers/images/trixie:20250821
+  image: registry.git.coop/webarch/containers/images/trixie:20250916
   stage: lint
   script:
     - yamllint -f colored -c .yamllint .
