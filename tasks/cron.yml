@@ -11,8 +11,8 @@
 - name: Test and setup acrhiving crob job for Matomo
   block:
 
-    - name: "Test archive cron job for {{ matomo_user }}"
-      ansible.builtin.command: "{{ matomo_cron_job }}"
+    - name: "Test archive cron job for {{ matomo_user }}"  # noqa command-instead-of-shell
+      ansible.builtin.shell: "{{ matomo_cron_job }}"
       become: true
       become_user: "{{ matomo_user }}"
       changed_when: true
