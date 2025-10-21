@@ -60,9 +60,17 @@
         var: matomo_api_set_super_user_access
         verbosity: 2
 
-    - name: Set variable based on result of superuser token_auth and password check
+    - name: Set matomo_super_user_access to false
       ansible.builtin.set_fact:
-        matomo_super_user_access: "{% if matomo_api_set_super_user_access.json.result is defined and matomo_api_set_super_user_access.json.result == 'success' %}True{% else %}False{% endif %}"
+        matomo_super_user_access: false
+      when: (matomo_api_set_super_user_access.json.result is not defined) or (matomo_api_set_super_user_access.json.result != "success")
+
+    - name: Set matomo_super_user_access to true
+      ansible.builtin.set_fact:
+        matomo_super_user_access: true
+      when:
+        - matomo_api_set_super_user_access.json.result is defined
+        - matomo_api_set_super_user_access.json.result == "success"
 
     - name: Matomo super user auth token and / or password variables check
       ansible.builtin.fail:
