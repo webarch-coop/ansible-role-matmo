@@ -99,7 +99,7 @@
           ( matomo_sites
           | community.general.json_query('[].name')
           | map('ansible.builtin.type_debug')
-          | reject('ansible.builtin.regex', '^AnsibleUnsafeText|AnsibleUnicode$') ) == []
+          | reject('ansible.builtin.regex', '^AnsibleUnsafeText|AnsibleUnicode|str$') ) == []
         fail_msg: >-
           One or more Matomo site name(s) are
           {{ ( matomo_sites
@@ -120,7 +120,7 @@
           ( matomo_sites
           | community.general.json_query('[].url')
           | map('ansible.builtin.type_debug')
-          | reject('ansible.builtin.regex', '^AnsibleUnsafeText|AnsibleUnicode$') ) == []
+          | reject('ansible.builtin.regex', '^AnsibleUnsafeText|AnsibleUnicode|str$') ) == []
         fail_msg: >-
           One or more Matomo site url(s) are
           {{ ( matomo_sites
@@ -142,7 +142,7 @@
             ( matomo_sites
             | community.general.json_query('[].urls')
             | map('ansible.builtin.type_debug')
-            | reject('ansible.builtin.regex', '^AnsibleUnicode|AnsibleUnsafeText|NoneType') ) == []
+            | reject('ansible.builtin.regex', '^AnsibleUnicode|AnsibleUnsafeText|str|NoneType') ) == []
           - >-
             ( matomo_sites
             | community.general.json_query('[].urls')
@@ -153,7 +153,7 @@
           {{ matomo_sites
           | community.general.json_query('[].urls')
           | map('ansible.builtin.type_debug')
-          | reject('ansible.builtin.regex', '^AnsibleUnicode|AnsibleUnsafeText|NoneType')
+          | reject('ansible.builtin.regex', '^AnsibleUnicode|AnsibleUnsafeText|str|NoneType')
           | join(', ') }}.
         quiet: "{% if ansible_check_mode or ansible_verbosity >= 1 %}false{% else %}true{% endif %}"
 
@@ -168,13 +168,13 @@
           ( matomo_sites
           | community.general.json_query('[].users')
           | map('ansible.builtin.type_debug')
-          | reject('ansible.builtin.regex', '^AnsibleUnicode|AnsibleUnsafeText|NoneType') ) == []
+          | reject('ansible.builtin.regex', '^AnsibleUnicode|AnsibleUnsafeText|str|NoneType') ) == []
         fail_msg:
           One or more Matomo site users are not strings or none
           {{ matomo_sites
           | community.general.json_query('[].users')
           | map('ansible.builtin.type_debug')
-          | reject('ansible.builtin.regex', '^AnsibleUnicode|AnsibleUnsafeText|NoneType')
+          | reject('ansible.builtin.regex', '^AnsibleUnicode|AnsibleUnsafeText|str|NoneType')
           | join(', ') }}.
         quiet: "{% if ansible_check_mode or ansible_verbosity >= 1 %}false{% else %}true{% endif %}"
 
