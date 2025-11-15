@@ -42,6 +42,7 @@
         loop_var: url
       when:
         - matomo_site_urls is defined
+        - matomo_site_urls != []
         - matomo_site_urls | ansible.builtin.type_debug == "list"
 
     - name: Set a fact for the add site POST data in JSON
