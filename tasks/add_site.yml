@@ -19,16 +19,30 @@
           - ( matomo_site_name is defined ) and ( matomo_site_name | length > 0 )
           - ( matomo_site_main_url is defined ) and ( matomo_site_main_url | length > 0 )
         quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
+        fail_msg: >-
+          The matomo_url is set to '{{ matomo_url }}'.
+          The matomo_token_auth is set to '{{ matomo_token_auth }}'.
+          The matomo_site_name is set to '{{ matomo_site_name }}'.
+          The matomo_site_main_url is set to '{{ matomo_site_main_url }}'.
+
+    - name: Debug matomo_site_urls
+      ansible.builtin.debug:
+        var: matomo_site_urls
+        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
+      when: matomo_site_urls is defined
 
     - name: Ensure that matomo_site_urls start with http(s)://
       ansible.builtin.assert:
         that:
           - ( url is regex("^http[s]*:\/\/.*$") )
         quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
+        fail_msg: "The matomo_site_urls is set to '{{ matomo_site_urls }}'."
       loop: "{{ matomo_site_urls }}"
       loop_control:
         loop_var: url
-      when: ( matomo_site_urls is defined ) and ( matomo_site_urls[0] is defined )
+      when:
+        - matomo_site_urls is defined
+        - matomo_site_urls | ansible.builtin.type_debug == "list"
 
     - name: Set a fact for the add site POST data in JSON
       ansible.builtin.set_fact:
