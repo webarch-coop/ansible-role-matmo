@@ -16,45 +16,57 @@
         var: matomo_url
         verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
       when: matomo_url is defined
+      tags:
+        - debug
 
     - name: Debug matomo_token_auth
       ansible.builtin.debug:
         var: matomo_token_auth
         verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
       when: matomo_token_auth is defined
+      tags:
+        - debug
 
     - name: Debug matomo_site_id
       ansible.builtin.debug:
         var: matomo_site_id
         verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
       when: matomo_site_id is defined
+      tags:
+        - debug
 
     - name: Debug matomo_site_name
       ansible.builtin.debug:
         var: matomo_site_name
         verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
       when: matomo_site_name is defined
+      tags:
+        - debug
 
     - name: Debug matomo_site_main_url
       ansible.builtin.debug:
         var: matomo_site_main_url
         verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
       when: matomo_site_main_url is defined
+      tags:
+        - debug
 
     - name: Debug matomo_url
       ansible.builtin.debug:
         var: matomo_url
         verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
       when: matomo_url is defined
+      tags:
+        - debug
 
     - name: Check that required variables are defined
       ansible.builtin.assert:
         that:
-          - ( matomo_url is defined ) and ( matomo_url | length > 0 ) and ( matomo_url is regex("^http[s]*:\/\/.*$") )
-          - ( matomo_token_auth is defined ) and ( matomo_token_auth | length > 0 )
-          - ( matomo_site_id is defined ) and ( matomo_site_id is regex("^[0-9]{1,9}$") )
-          - ( matomo_site_name is defined ) and ( matomo_site_name | length > 0 )
-          - ( matomo_site_main_url is defined ) and ( matomo_site_main_url | length > 0 )
+          - (matomo_url is defined) and (matomo_url | length > 0) and (matomo_url is regex("^http[s]*:\/\/.*$"))
+          - (matomo_token_auth is defined) and (matomo_token_auth | length > 0)
+          - (matomo_site_id is defined) and (matomo_site_id is regex("^[0-9]{1,9}$"))
+          - (matomo_site_name is defined) and (matomo_site_name | length > 0)
+          - (matomo_site_main_url is defined) and (matomo_site_main_url | length > 0)
         quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
         fail_msg: >-
           The matomo_url is set to '{{ matomo_url }}'.
@@ -68,6 +80,8 @@
         var: matomo_site_urls
         verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
       when: matomo_site_urls is defined
+      tags:
+        - debug
 
     - name: Ensure that matomo_site_urls start with http(s)://
       ansible.builtin.assert:
@@ -83,35 +97,64 @@
         - matomo_site_urls != []
         - matomo_site_urls | ansible.builtin.type_debug == "list"
 
-    - name: Set a fact for the update site POST data
+    - name: Set a fact for the update site POST data in JSON for Ansible less that 2.19
       ansible.builtin.set_fact:
         matomo_update_site_json: "{{ lookup('template', 'update_site.json.j2') }}"
+      when: ansible_version.full is version('2.19.0', '<')
+
+    - name: Set a fact for the update site POST data in JSON for Ansible greater than 2.19
+      ansible.builtin.set_fact:
+        matomo_update_site_json: "{{ lookup('template', 'update_site.json.j2') | ansible.builtin.from_json }}"
+      when: ansible_version.full is version('2.19.0', '>=')
 
     - name: Debug the update site POST data
       ansible.builtin.debug:
         var: matomo_update_site_json
         verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
+      tags:
+        - debug
 
-    - name: "Update Matomo site {{ matomo_site_name }} with main URL {{ matomo_site_main_url }}"
-      ansible.builtin.uri:
-        url: "{{ matomo_url }}"
-        method: POST
-        body_format: form-urlencoded
-        body: "{{ matomo_update_site_json }}"
-        status_code: 200
-        return_content: true
-        use_netrc: false
-      become: true
-      become_user: "{{ matomo_user }}"
-      delegate_to: "{{ inventory_hostname }}"
-      changed_when: true
-      register: matomo_update_site
-      failed_when: ( matomo_update_site.failed is defined and matomo_update_site.failed ) or ( matomo_update_site.json.result is defined and matomo_update_site.json.result != "success" )
+    - name: Update Matomo site in a block
+      block:
+
+        - name: "Update Matomo site {{ matomo_site_name }} with main URL {{ matomo_site_main_url }}"
+          ansible.builtin.uri:
+            url: "{{ matomo_url }}"
+            method: POST
+            body_format: form-urlencoded
+            body: "{{ matomo_update_site_json }}"
+            status_code: 200
+            return_content: true
+            use_netrc: false
+          become: true
+          become_user: "{{ matomo_user }}"
+          delegate_to: "{{ inventory_hostname }}"
+          changed_when: true
+          register: matomo_update_site
+          failed_when: >-
+            (matomo_update_site.failed is defined and matomo_update_site.failed) or
+            (matomo_update_site.json.result is defined and matomo_update_site.json.result != "success") or
+            (matomo_update_site.json is not defined)
+
+      rescue:
+
+        - name: Debug the update site POST data
+          ansible.builtin.debug:
+            var: matomo_update_site_json
+
+        - name: Debug matomo_update_site
+          ansible.builtin.debug:
+            var: matomo_update_site
+
+        - name: Updating a site failed
+          ansible.builtin.fail:
 
     - name: Debug matomo_update_site
       ansible.builtin.debug:
         var: matomo_update_site
-        verbosity: 2
+        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}1{% else %}2{% endif %}"
+      tags:
+        - debug
 
   tags:
     - matomo
