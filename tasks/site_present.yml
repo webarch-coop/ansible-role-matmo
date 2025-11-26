@@ -30,6 +30,8 @@
           urls joined: "{{ matomo_site_urls | join(',') }}"
           users: "{{ matomo_login }}"
         verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}1{% else %}2{% endif %}"
+      tags:
+        - debug
 
     - name: Set a fact for the site that should be present and set site status to None
       ansible.builtin.set_fact:
@@ -44,6 +46,8 @@
       ansible.builtin.debug:
         var: matomo_site_required
         verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}1{% else %}2{% endif %}"
+      tags:
+        - debug
 
     - name: Include Matomo sites tasks
       ansible.builtin.include_tasks: sites.yml
@@ -53,6 +57,8 @@
         var: matomo_site_item
         verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}1{% else %}2{% endif %}"
       when: matomo_site_item is defined
+      tags:
+        - debug
 
     - name: Set a fact for the Matomo sites
       ansible.builtin.set_fact:
@@ -62,6 +68,8 @@
       ansible.builtin.debug:
         var: matomo_sites
         verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}1{% else %}2{% endif %}"
+      tags:
+        - debug
 
     # - name: Debug the Matomo site name
     #   ansible.builtin.debug:
@@ -103,6 +111,8 @@
       ansible.builtin.debug:
         msg: "{{ matomo_sites | community.general.json_query('[].name') | map('ansible.builtin.type_debug') }}"
         verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}1{% else %}2{% endif %}"
+      tags:
+        - debug
 
     - name: The Ansible variable type for the name for all sites should be strings
       ansible.builtin.assert:
@@ -124,6 +134,8 @@
       ansible.builtin.debug:
         msg: "{{ matomo_sites | community.general.json_query('[].url') | map('ansible.builtin.type_debug') }}"
         verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}1{% else %}2{% endif %}"
+      tags:
+        - debug
 
     - name: The Ansible variable type for the url for all sites should be strings
       ansible.builtin.assert:
@@ -145,6 +157,8 @@
       ansible.builtin.debug:
         msg: "{{ matomo_sites | community.general.json_query('[].urls') | map('ansible.builtin.type_debug') }}"
         verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}1{% else %}2{% endif %}"
+      tags:
+        - debug
 
     - name: The Ansible variable type for site urls should be strings or none and not lists
       ansible.builtin.assert:
@@ -172,6 +186,8 @@
       ansible.builtin.debug:
         msg: "{{ matomo_sites | community.general.json_query('[].users') | map('ansible.builtin.type_debug') }}"
         verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}1{% else %}2{% endif %}"
+      tags:
+        - debug
 
     - name: The Ansible variable type for site users should be strings or none and not lists
       ansible.builtin.assert:
@@ -259,6 +275,8 @@
       loop_control:
         loop_var: matomo_site_item
         label: "{{ matomo_site_item.name }}"
+      tags:
+        - debug
 
     - name: Test the Matomo site status
       ansible.builtin.set_fact:
@@ -312,11 +330,15 @@
       ansible.builtin.debug:
         var: matomo_site_status_test
         verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}1{% else %}2{% endif %}"
+      tags:
+        - debug
 
     - name: Debug matomo_site_status_test_result
       ansible.builtin.debug:
         var: matomo_site_status_test_result
         verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}1{% else %}2{% endif %}"
+      tags:
+        - debug
 
     - name: Set a fact for all the Matomo site status test results omitting nomatch
       ansible.builtin.set_fact:
@@ -326,6 +348,8 @@
       ansible.builtin.debug:
         var: matomo_site_status_all
         verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}1{% else %}2{% endif %}"
+      tags:
+        - debug
 
     - name: If more than one site matches then manual intervention is required to adjust the Matomo sites
       ansible.builtin.assert:
@@ -350,12 +374,16 @@
       ansible.builtin.debug:
         var: matomo_site_status
         verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}1{% else %}2{% endif %}"
+      tags:
+        - debug
 
     - name: Debug matomo_site_id
       ansible.builtin.debug:
         var: matomo_site_id
         verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}1{% else %}2{% endif %}"
       when: matomo_site_id is defined
+      tags:
+        - debug
 
     - name: Include update Matomo site tasks when existing URLs don't match the proposed ones
       ansible.builtin.include_tasks: update_site.yml
@@ -402,6 +430,8 @@
           ansible.builtin.debug:
             var: matomo_api_get_user_login_from_user_email
             verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}1{% else %}2{% endif %}"
+          tags:
+            - debug
 
         - name: "Set the matomo_login_existing variable to {{ matomo_api_get_user_login_from_user_email.json.value }} as a Matomo account with a matching email address exists"
           ansible.builtin.set_fact:
@@ -439,6 +469,8 @@
               ansible.builtin.debug:
                 var: matomo_api_get_users_plus_role
                 verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}1{% else %}2{% endif %}"
+              tags:
+                - debug
 
             - name: "Set a variable for the role for Matomo login {{ matomo_login }}"
               ansible.builtin.set_fact:
@@ -477,6 +509,8 @@
               ansible.builtin.debug:
                 var: matomo_api_set_user_access
                 verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}1{% else %}2{% endif %}"
+              tags:
+                - debug
 
             #  when: matomo_existing_role != "admin"
 
