@@ -34,7 +34,7 @@ repos:
           - README.md
   # https://github.com/ansible/ansible-lint/releases
   - repo: https://github.com/ansible/ansible-lint.git
-    rev: v25.11.0
+    rev: v25.11.1
     hooks:
       - id: ansible-lint
         name: Ansible Lint
