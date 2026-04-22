@@ -1,4 +1,4 @@
-# Copyright 2018-2025 Chris Croome
+# Copyright 2018-2026 Chris Croome
 #
 # This file is part of the Webarchitects Matomo Ansible role.
 #
@@ -14,6 +14,7 @@ variables:
   ANSIBLE_DEFAULT_VERBOSITY: "1"
   ANSIBLE_DIFF_ALWAYS: "1"
   ANSIBLE_DISPLAY_SKIPPED_HOSTS: "0"
+  ANSIBLE_DISPLAY_TRACEBACK: error
   ANSIBLE_FORCE_COLOR: "1"
   ANSIBLE_INJECT_FACT_VARS: "0"
   ANSIBLE_NOCOWS: "1"
@@ -37,7 +38,7 @@ before_script:
 stages:
   - lint
 lint:
-  image: registry.git.coop/webarch/containers/images/trixie:20251125
+  image: registry.git.coop/webarch/containers/images/trixie:20260129
   stage: lint
   script:
     - yamllint -f colored -c .yamllint .

@@ -1,4 +1,4 @@
-# Copyright 2018-2025 Chris Croome
+# Copyright 2018-2026 Chris Croome
 #
 # This file is part of the Webarchitects Matomo Ansible role.
 #
@@ -30,7 +30,8 @@
         force: true
 
     - name: The Matomo < 4.8.0 GPG public key is imported
-      ansible.builtin.command: "gpg --no-tty --import '{{ matomo_private }}/matomo.pub'"
+      ansible.builtin.command:
+        cmd: "gpg --no-tty --import '{{ matomo_private }}/matomo.pub'"
       register: matomo_gpg_key_import
       changed_when: "'not changed' not in matomo_gpg_key_import.stderr"
       become: true
@@ -47,7 +48,8 @@
         force: true
 
     - name: The Matomo >= 4.8.0 GPG public key is imported
-      ansible.builtin.command: "gpg --no-tty --import '{{ matomo_private }}/matomo.asc'"
+      ansible.builtin.command:
+        cmd: "gpg --no-tty --import '{{ matomo_private }}/matomo.asc'"
       register: matomo_gpg_key_import
       changed_when: "'not changed' not in matomo_gpg_key_import.stderr"
       become: true
@@ -82,16 +84,17 @@
       register: matomo_tgz
 
     - name: Matomo GPG signature checked
-      ansible.builtin.command: >
-        gpg --no-tty --verify --logger-fd 1
-        "{{ matomo_private }}/matomo-{{ matomo_required }}.tar.gz.asc"
-        "{{ matomo_private }}/matomo-{{ matomo_required }}.tar.gz"
+      ansible.builtin.command:
+        cmd: >-
+          gpg --no-tty --verify --logger-fd 1
+          "{{ matomo_private }}/matomo-{{ matomo_required }}.tar.gz.asc"
+          "{{ matomo_private }}/matomo-{{ matomo_required }}.tar.gz"
       register: matomo_signature_check
       changed_when: false
       check_mode: false
-      failed_when: >
-        ( matomo_signature_check.rc != 0 ) or
-        ( "Good signature from" not in matomo_signature_check.stdout )
+      failed_when: >-
+        (matomo_signature_check.rc != 0) or
+        ("Good signature from" not in matomo_signature_check.stdout)
       when:
         - matomo_sig.stat.exists | bool
         - matomo_tgz.stat.exists | bool

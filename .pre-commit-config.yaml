@@ -1,4 +1,4 @@
-# Copyright 2018-2025 Chris Croome
+# Copyright 2018-2026 Chris Croome
 #
 # This file is part of the Webarchitects Matomo Ansible role.
 #
@@ -11,7 +11,7 @@
 repos:
   # https://github.com/adrienverge/yamllint/tags
   - repo: https://github.com/adrienverge/yamllint.git
-    rev: v1.37.1
+    rev: v1.38.0
     hooks:
       - id: yamllint
         name: YAML Lint
@@ -25,7 +25,7 @@ repos:
           - templates
   # https://github.com/jackdewinter/pymarkdown/releases
   - repo: https://github.com/jackdewinter/pymarkdown
-    rev: v0.9.33
+    rev: v0.9.36
     hooks:
       - id: pymarkdown
         name: Markdown Lint
@@ -34,11 +34,12 @@ repos:
           - README.md
   # https://github.com/ansible/ansible-lint/releases
   - repo: https://github.com/ansible/ansible-lint.git
-    rev: v25.11.1
+    rev: v26.4.0
     hooks:
       - id: ansible-lint
         name: Ansible Lint
         language: python
+        language_version: python3
         additional_dependencies:
           # https://github.com/kellyjonbrazil/jc/releases
           - jc==1.25.6

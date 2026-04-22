@@ -1,4 +1,4 @@
-# Copyright 2018-2025 Chris Croome
+# Copyright 2018-2026 Chris Croome
 #
 # This file is part of the Webarchitects Matomo Ansible role.
 #
@@ -10,6 +10,16 @@
 ---
 - name: Apply Matomo settings
   block:
+
+    - name: Apply outstanding Matomo upgrades
+      ansible.builtin.command:
+        cmd: "{{ matomo_php }} console --no-ansi -n core:update --yes"
+        chdir: "{{ matomo_html }}"
+      register: matomo_core_update
+      changed_when: ("Everything is already up to date." not in matomo_core_update.stdout_lines)
+      failed_when: ("Matomo has been successfully updated!" not in matomo_core_update.stdout_lines) and ("Everything is already up to date." not in matomo_core_update.stdout_lines)
+      become: true
+      become_user: "{{ matomo_user }}"
 
     - name: Matomo config
       block:
@@ -43,8 +53,8 @@
     #   login_allow_logme: 1
 
     - name: "Check the Matomo force_ssl setting for {{ matomo_user }}"
-      ansible.builtin.command: "{{ matomo_php }} console --no-ansi -n config:get --section='General' --key='force_ssl' --format='text'"
-      args:
+      ansible.builtin.command:
+        cmd: "{{ matomo_php }} console --no-ansi -n config:get --section='General' --key='force_ssl' --format='text'"
         chdir: "{{ matomo_html }}"
       changed_when: false
       check_mode: false
@@ -54,17 +64,17 @@
       become_user: "{{ matomo_user }}"
 
     - name: "Set force_ssl to true for {{ matomo_user }}"
-      ansible.builtin.command: "{{ matomo_php }} console --no-ansi -n config:set --section='General' --key='force_ssl' --value='1'"
-      args:
+      ansible.builtin.command:
+        cmd: "{{ matomo_php }} console --no-ansi -n config:set --section='General' --key='force_ssl' --value='1'"
         chdir: "{{ matomo_html }}"
       become: true
       become_user: "{{ matomo_user }}"
-      when: ( matomo_get_force_ssl.rc == 1 ) or ( matomo_get_force_ssl.stdout != "General.force_ssl = 1" )
+      when: (matomo_get_force_ssl.rc == 1) or (matomo_get_force_ssl.stdout != "General.force_ssl = 1")
       changed_when: true
 
     - name: "Check the Matomo login_allow_logme setting for {{ matomo_user }}"
-      ansible.builtin.command: "{{ matomo_php }} console --no-ansi -n config:get --section='General' --key='login_allow_logme' --format='text'"
-      args:
+      ansible.builtin.command:
+        cmd: "{{ matomo_php }} console --no-ansi -n config:get --section='General' --key='login_allow_logme' --format='text'"
         chdir: "{{ matomo_html }}"
       changed_when: false
       check_mode: false
@@ -74,17 +84,17 @@
       become_user: "{{ matomo_user }}"
 
     - name: "Set login_allow_logme to true for {{ matomo_user }}"
-      ansible.builtin.command: "{{ matomo_php }} console --no-ansi -n config:set --section='General' --key='login_allow_logme' --value='1'"
-      args:
+      ansible.builtin.command:
+        cmd: "{{ matomo_php }} console --no-ansi -n config:set --section='General' --key='login_allow_logme' --value='1'"
         chdir: "{{ matomo_html }}"
       become: true
       become_user: "{{ matomo_user }}"
-      when: ( matomo_get_login_allow_logme.rc == 1 ) or ( matomo_get_login_allow_logme.stdout != "General.login_allow_logme = 1" )
+      when: (matomo_get_login_allow_logme.rc == 1) or (matomo_get_login_allow_logme.stdout != "General.login_allow_logme = 1")
       changed_when: true
 
     - name: "Check the Matomo salt setting for {{ matomo_user }}"
-      ansible.builtin.command: "{{ matomo_php }} console --no-ansi -n config:get --section='General' --key='salt' --format='text'"
-      args:
+      ansible.builtin.command:
+        cmd: "{{ matomo_php }} console --no-ansi -n config:get --section='General' --key='salt' --format='text'"
         chdir: "{{ matomo_html }}"
       changed_when: false
       check_mode: false
@@ -100,7 +110,8 @@
         # https://docs.ansible.com/ansible/latest/collections/community/general/random_string_lookup.html
 
         - name: "Random string generated for Matomo salt for {{ matomo_user }}"
-          ansible.builtin.command: pwgen -n 33 1
+          ansible.builtin.command:
+            cmd: pwgen -n 33 1
           changed_when: false
           check_mode: false
           register: matomo_salt_pwgen
@@ -112,7 +123,8 @@
           # no_log: true
 
         - name: "Set salt for {{ matomo_user }}"
-          ansible.builtin.command: "{{ matomo_php }} console --no-ansi -n config:set --section='General' --key='salt' --value='{{ matomo_salt }}'"
+          ansible.builtin.command:
+            cmd: "{{ matomo_php }} console --no-ansi -n config:set --section='General' --key='salt' --value='{{ matomo_salt }}'"
           args:
             chdir: "{{ matomo_html }}"
           changed_when: true
@@ -120,11 +132,11 @@
           become_user: "{{ matomo_user }}"
           # no_log: true
 
-      when: ( matomo_get_salt.rc == 1 ) or ( matomo_get_salt.stdout == "Nothing found" )
+      when: (matomo_get_salt.rc == 1) or (matomo_get_salt.stdout == "Nothing found")
 
     - name: "Check the Matomo database schema for {{ matomo_user }}"
-      ansible.builtin.command: "{{ matomo_php }} console --no-ansi -n config:get --section='database' --key='schema'"
-      args:
+      ansible.builtin.command:
+        cmd: "{{ matomo_php }} console --no-ansi -n config:get --section='database' --key='schema'"
         chdir: "{{ matomo_html }}"
       become: true
       become_user: "{{ matomo_user }}"
@@ -147,8 +159,8 @@
         verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
 
     - name: "Update the Matomo database schema for {{ matomo_user }}"
-      ansible.builtin.command: "{{ matomo_php }} console --no-ansi -n config:set '{{ matomo_set_database_schema }}'"
-      args:
+      ansible.builtin.command:
+        cmd: "{{ matomo_php }} console --no-ansi -n config:set '{{ matomo_set_database_schema }}'"
         chdir: "{{ matomo_html }}"
       vars:
         matomo_set_database_schema: 'database.schema="{{ matomo_db_schema }}"'
@@ -158,8 +170,8 @@
       when: matomo_database_schema != matomo_db_schema
 
     - name: "Check the Matomo database charset for {{ matomo_user }}"
-      ansible.builtin.command: "{{ matomo_php }} console --no-ansi -n config:get --section='database' --key='charset'"
-      args:
+      ansible.builtin.command:
+        cmd: "{{ matomo_php }} console --no-ansi -n config:get --section='database' --key='charset'"
         chdir: "{{ matomo_html }}"
       become: true
       become_user: "{{ matomo_user }}"
@@ -182,8 +194,8 @@
         verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
 
     - name: "Update the Matomo database charset for {{ matomo_user }}"
-      ansible.builtin.command: "{{ matomo_php }} console --no-ansi -n config:set '{{ matomo_set_database_charset }}'"
-      args:
+      ansible.builtin.command:
+        cmd: "{{ matomo_php }} console --no-ansi -n config:set '{{ matomo_set_database_charset }}'"
         chdir: "{{ matomo_html }}"
       vars:
         matomo_set_database_charset: 'database.charset="{{ matomo_db_charset }}"'
@@ -193,8 +205,8 @@
       when: matomo_database_charset != matomo_db_charset
 
     - name: "Check the Matomo database collation for {{ matomo_user }}"
-      ansible.builtin.command: "{{ matomo_php }} console --no-ansi -n config:get --section='database' --key='collation'"
-      args:
+      ansible.builtin.command:
+        cmd: "{{ matomo_php }} console --no-ansi -n config:get --section='database' --key='collation'"
         chdir: "{{ matomo_html }}"
       become: true
       become_user: "{{ matomo_user }}"
@@ -217,8 +229,8 @@
         verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
 
     - name: "Update the Matomo database collation for {{ matomo_user }}"
-      ansible.builtin.command: "{{ matomo_php }} console --no-ansi -n config:set '{{ matomo_set_database_collation }}'"
-      args:
+      ansible.builtin.command:
+        cmd: "{{ matomo_php }} console --no-ansi -n config:set '{{ matomo_set_database_collation }}'"
         chdir: "{{ matomo_html }}"
       vars:
         matomo_set_database_collation: 'database.collation="{{ matomo_db_collation }}"'
@@ -228,28 +240,28 @@
       when: matomo_database_collation != matomo_db_collation
 
     - name: "Run php console core:create-security-files for {{ matomo_user }}"
-      ansible.builtin.command: "{{ matomo_php }} console --no-ansi -n core:create-security-files"
-      args:
+      ansible.builtin.command:
+        cmd: "{{ matomo_php }} console --no-ansi -n core:create-security-files"
         chdir: "{{ matomo_html }}"
       become: true
       become_user: "{{ matomo_user }}"
       changed_when: true
       register: matomo_core_create_security_files
-      failed_when: ( "Done" not in matomo_core_create_security_files.stdout )
+      failed_when: ("Done" not in matomo_core_create_security_files.stdout)
 
     - name: Run diagnostics
       block:
 
         - name: "Run php console diagnostics:run for {{ matomo_user }}"
-          ansible.builtin.command: "{{ matomo_php }} console --no-ansi -n diagnostics:run"
-          args:
+          ansible.builtin.command:
+            cmd: "{{ matomo_php }} console --no-ansi -n diagnostics:run"
             chdir: "{{ matomo_html }}"
           changed_when: false
           check_mode: false
           become: true
           become_user: "{{ matomo_user }}"
           register: matomo_diagnostics_run
-          failed_when: ( "There are no problems with your Matomo setup" not in matomo_diagnostics_run.stdout )
+          failed_when: ("There are no problems with your Matomo setup" not in matomo_diagnostics_run.stdout)
 
       rescue:
 
@@ -261,7 +273,7 @@
           ansible.builtin.fail:
           when:
             - matomo_diagnostics_fail | bool
-            - ( matomo_config_check is defined ) and ( not matomo_config_check.stat.exists | bool )
+            - (matomo_config_check is defined) and (not matomo_config_check.stat.exists | bool)
 
   tags:
     - matomo

@@ -1,4 +1,4 @@
-# Copyright 2018-2025 Chris Croome
+# Copyright 2018-2026 Chris Croome
 #
 # This file is part of the Webarchitects Matomo Ansible role.
 #
@@ -14,15 +14,15 @@
     - name: Check variables
       ansible.builtin.assert:
         that:
-          - ( matomo_url is defined )
-          - ( matomo_token_auth is defined )
-          - ( matomo_login is defined ) and ( matomo_login is regex("^[a-zA-Z0-9-]{2,14}$") )
-          - ( matomo_login_email is defined ) and ( matomo_login_email is regex("^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$") )
+          - (matomo_url is defined)
+          - (matomo_token_auth is defined)
+          - (matomo_login is defined) and (matomo_login is regex("^[a-zA-Z0-9-]{2,14}$"))
+          - (matomo_login_email is defined) and (matomo_login_email is regex("^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$"))
         quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
 
     - name: Unblock all blocked IPs since there is no CLI to all IPs to the whitelist or check which are blocked
-      ansible.builtin.command: "{{ matomo_php }} console --no-ansi -n login:unblock-blocked-ips"
-      args:
+      ansible.builtin.command:
+        cmd: "{{ matomo_php }} console --no-ansi -n login:unblock-blocked-ips"
         chdir: "{{ matomo_html }}"
       register: matomo_unblock_blocked_ips
       failed_when: matomo_unblock_blocked_ips.stdout != "Done"
@@ -51,7 +51,7 @@
       delegate_to: "{{ inventory_hostname }}"
       changed_when: false
       register: matomo_api_user_exists
-      failed_when: ( matomo_api_user_exists.json is not defined )
+      failed_when: (matomo_api_user_exists.json is not defined)
 
     - name: Debug matomo_api_user_exists
       ansible.builtin.debug:
@@ -69,16 +69,16 @@
             matomo_login_existing: "{{ matomo_login }}"
 
       when:
-        - ( matomo_api_user_exists.json is defined )
-        - ( matomo_api_user_exists.json.value is defined )
-        - ( matomo_api_user_exists.json.value )
+        - (matomo_api_user_exists.json is defined)
+        - (matomo_api_user_exists.json.value is defined)
+        - (matomo_api_user_exists.json.value)
 
     - name: Add a new user account when there is no match for the matomo_login or matomo_login_email address
       ansible.builtin.include_tasks: add_user.yml
       when:
-        - ( matomo_api_user_exists.json is defined )
-        - ( matomo_api_user_exists.json.value is defined )
-        - ( not matomo_api_user_exists.json.value )
+        - (matomo_api_user_exists.json is defined)
+        - (matomo_api_user_exists.json.value is defined)
+        - (not matomo_api_user_exists.json.value)
 
   tags:
     - matomo

@@ -1,4 +1,4 @@
-# Copyright 2018-2025 Chris Croome
+# Copyright 2018-2026 Chris Croome
 #
 # This file is part of the Webarchitects Matomo Ansible role.
 #
@@ -12,7 +12,8 @@
   block:
 
     - name: "Test archive cron job for {{ matomo_user }}"  # noqa command-instead-of-shell
-      ansible.builtin.shell: "{{ matomo_cron_job }}"
+      ansible.builtin.shell:
+        cmd: "{{ matomo_cron_job }}"
       become: true
       become_user: "{{ matomo_user }}"
       changed_when: true

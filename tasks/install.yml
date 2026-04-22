@@ -1,4 +1,4 @@
-# Copyright 2018-2025 Chris Croome
+# Copyright 2018-2026 Chris Croome
 #
 # This file is part of the Webarchitects Matomo Ansible role.
 #
@@ -15,14 +15,16 @@
       ansible.builtin.include_tasks: download.yml
 
     - name: Matomo files rsync'd into place  # noqa: command-instead-of-module
-      ansible.builtin.command: "rsync -aq {{ matomo_private }}/matomo/ {{ matomo_html }}/"
+      ansible.builtin.command:
+        cmd: "rsync -aq {{ matomo_private }}/matomo/ {{ matomo_html }}/"
       register: matomo_rsync_command
-      changed_when: ( "total size is 0" not in matomo_rsync_command.stdout_lines )
+      changed_when: ("total size is 0" not in matomo_rsync_command.stdout_lines)
       become: true
       become_user: "{{ matomo_user }}"
 
     - name: Random passwd for Matomo admin generated
-      ansible.builtin.command: "pwgen -n {{ 24 | random(14) }} 1"
+      ansible.builtin.command:
+        cmd: "pwgen -n {{ 24 | random(14) }} 1"
       changed_when: false
       check_mode: false
       no_log: true
@@ -31,21 +33,21 @@
     - name: Fact set for Matomo admin password
       ansible.builtin.set_fact:
         matomo_first_user_pass: "{{ matomo_first_user_pass_gen.stdout | trim | quote }}"
-      when: ( matomo_first_user_pass_gen is defined ) and ( matomo_first_user_pass_gen | length > 0 )
+      when: (matomo_first_user_pass_gen is defined) and (matomo_first_user_pass_gen | length > 0)
       no_log: true
 
     - name: Check that required variables are defined
       ansible.builtin.assert:
         that:
-          - ( matomo_db_host is defined ) and ( matomo_db_host | length > 0 )
-          - ( matomo_dbname is defined ) and ( matomo_dbname | length > 0 )
-          - ( matomo_db_username is defined ) and ( matomo_db_username | length > 0 )
-          - ( matomo_db_pass is defined ) and ( matomo_db_pass | length > 0 )
-          - ( matomo_first_site_name is defined ) and ( matomo_first_site_name | length > 0 )
-          - ( matomo_first_site_url is defined ) and ( matomo_first_site_url | length > 0 )
-          - ( matomo_first_user is defined ) and ( matomo_first_user | length > 0 )
-          - ( matomo_first_user_email is defined ) and ( matomo_first_user_email | length > 0 )
-          - ( matomo_first_user_pass is defined ) and ( matomo_first_user_pass | length > 0 )
+          - (matomo_db_host is defined) and (matomo_db_host | length > 0)
+          - (matomo_dbname is defined) and (matomo_dbname | length > 0)
+          - (matomo_db_username is defined) and (matomo_db_username | length > 0)
+          - (matomo_db_pass is defined) and (matomo_db_pass | length > 0)
+          - (matomo_first_site_name is defined) and (matomo_first_site_name | length > 0)
+          - (matomo_first_site_url is defined) and (matomo_first_site_url | length > 0)
+          - (matomo_first_user is defined) and (matomo_first_user | length > 0)
+          - (matomo_first_user_email is defined) and (matomo_first_user_email | length > 0)
+          - (matomo_first_user_pass is defined) and (matomo_first_user_pass | length > 0)
         quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
 
     - name: Include web install tasks
@@ -62,11 +64,11 @@
         host: localhost
         port: 25
         secure: never
-      when: ( matomo_notify_passwd is defined ) and ( matomo_notify_passwd )
+      when: (matomo_notify_passwd is defined) and (matomo_notify_passwd)
 
     - name: Get the installed Matomo version number
-      ansible.builtin.command: "{{ matomo_php }} console --no-ansi -n core:update --version"
-      args:
+      ansible.builtin.command:
+        cmd: "{{ matomo_php }} console --no-ansi -n core:update --version"
         chdir: "{{ matomo_html }}"
       changed_when: false
       check_mode: false

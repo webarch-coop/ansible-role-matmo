@@ -1,4 +1,4 @@
-# Copyright 2018-2025 Chris Croome
+# Copyright 2018-2026 Chris Croome
 #
 # This file is part of the Webarchitects Matomo Ansible role.
 #
@@ -21,13 +21,13 @@
       changed_when: false
 
     - name: Run the file deletion script
-      ansible.builtin.command: "bash ./{{ matomo_installed }}.sh"
-      args:
+      ansible.builtin.command:
+        cmd: "bash ./{{ matomo_installed }}.sh"
         chdir: "{{ matomo_html }}"
       become: true
       become_user: "{{ matomo_user }}"
       register: matomo_files_deleted
-      changed_when: ( "Deleting " in matomo_files_deleted.stdout )
+      changed_when: ("Deleting " in matomo_files_deleted.stdout)
 
     - name: Delete the file deletion script
       ansible.builtin.file:

@@ -1,4 +1,4 @@
-# Copyright 2018-2025 Chris Croome
+# Copyright 2018-2026 Chris Croome
 #
 # This file is part of the Webarchitects Matomo Ansible role.
 #
@@ -12,8 +12,8 @@
   block:
 
     - name: Generate completion
-      ansible.builtin.command: "{{ matomo_php }} console --no-ansi -n completion"
-      args:
+      ansible.builtin.command:
+        cmd: "{{ matomo_php }} console --no-ansi -n completion"
         chdir: "{{ matomo_html }}"
       changed_when: false
       check_mode: false

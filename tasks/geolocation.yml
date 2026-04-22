@@ -1,4 +1,4 @@
-# Copyright 2018-2025 Chris Croome
+# Copyright 2018-2026 Chris Croome
 #
 # This file is part of the Webarchitects Matomo Ansible role.
 #
@@ -49,8 +49,8 @@
           block:
 
             - name: DBIP City Lite database unarchived
-              ansible.builtin.command: "gunzip dbip-city-lite-{{ lookup('pipe','date +%Y-%m') }}.mmdb.gz"
-              args:
+              ansible.builtin.command:
+                cmd: "gunzip dbip-city-lite-{{ lookup('pipe','date +%Y-%m') }}.mmdb.gz"
                 chdir: "{{ matomo_private }}"
                 creates: "{{ matomo_private }}/dbip-city-lite-{{ lookup('pipe','date +%Y-%m') }}.mmdb"
               become: true
@@ -74,7 +74,7 @@
             - matomo_dbip_mmdb_gz.stat is defined
             - matomo_dbip_mmdb_gz.stat.exists | bool
 
-      when: ( not matomo_dbip_mmdb.stat.exists )
+      when: not matomo_dbip_mmdb.stat.exists | ansible.builtin.bool
 
     - name: Check if a current DBIP City Lite database exists
       ansible.builtin.stat:
