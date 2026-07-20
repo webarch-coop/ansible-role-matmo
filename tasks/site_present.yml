@@ -611,7 +611,7 @@
         - matomo_site_id is defined
         - matomo_site_id is not regex("^[0-9]{1,9}$")
 
-    - name: Grant site access to Matomo accout
+    - name: Grant site access to Matomo account
       block:
 
         # TODO Use the UsersManager.getUsers API call with userLogins set to matomo_login to check that the matomo_login_email
