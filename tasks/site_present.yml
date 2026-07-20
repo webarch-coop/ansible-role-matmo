@@ -27,11 +27,8 @@
           name: "{{ matomo_site_name }}"
           url: "{{ matomo_site_main_url }}"
           urls: "{{ matomo_site_urls | join(' ') }}"
-          urls joined: "{{ matomo_site_url_and_urls | join(',') }}"
           users: "{{ matomo_login }}"
         verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}1{% else %}2{% endif %}"
-      vars:
-        matomo_site_url_and_urls: "{{ [ matomo_site_main_url ] + matomo_site_urls }}"
       tags:
         - debug
 
@@ -40,12 +37,9 @@
         matomo_site_required:
           name: "{{ matomo_site_name }}"
           url: "{{ matomo_site_main_url }}"
-          # urls: "{{ matomo_site_urls | join(',') }}"
-          urls: "{{ matomo_site_url_and_urls | join(',') }}"
+          urls: "{{ matomo_site_urls | join(',') }}"
           users: "{{ matomo_login }}"
         matomo_site_status: None
-      vars:
-        matomo_site_url_and_urls: "{{ [ matomo_site_main_url ] + matomo_site_urls }}"
 
     - name: Debug matomo_site_required
       ansible.builtin.debug:
