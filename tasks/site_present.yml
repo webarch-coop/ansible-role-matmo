@@ -316,6 +316,20 @@
           {% if (matomo_site_item.urls | ansible.builtin.type_debug != "NoneType") and (matomo_site_item.urls | ansible.builtin.type_debug != "list") %}
           {{ (matomo_site_item.urls | string | ansible.builtin.split(',') | sort) }}
           {% endif %}.
+          The difference between the required urls and existing urls has the type of
+          {% if (matomo_site_required.urls | ansible.builtin.type_debug != "NoneType") and
+          (matomo_site_required.urls | ansible.builtin.type_debug != "list") and
+          (matomo_site_item.urls | ansible.builtin.type_debug != "NoneType") and
+          (matomo_site_item.urls | ansible.builtin.type_debug != "list") %}
+          {{ (matomo_site_required.urls
+          | string
+          | ansible.builtin.split(',')
+          | sort)
+          | ansible.builtin.difference(matomo_site_item.urls
+          | string
+          | ansible.builtin.split(',')
+          | sort) }}
+          {%- endif %}.
           The determined site status is
           {% if
           (matomo_site_required.name == matomo_site_item.name) and
