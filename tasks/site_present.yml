@@ -50,13 +50,6 @@
       tags:
         - debug
 
-    - name: Debug matomo_site_required
-      ansible.builtin.debug:
-        var: matomo_site_required
-        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}1{% else %}2{% endif %}"
-      tags:
-        - debug
-
     - name: Include Matomo sites tasks
       ansible.builtin.include_tasks: sites.yml
 
@@ -117,8 +110,11 @@
 
     - name: Debug the Ansible variable type for the name for all sites
       ansible.builtin.debug:
-        msg: "{{ matomo_sites | community.general.json_query('[].name') | map('ansible.builtin.type_debug') }}"
-        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}1{% else %}2{% endif %}"
+        msg: >-
+          {{ matomo_sites
+          | community.general.json_query('[].name')
+          | ansible.builtin.map('ansible.builtin.type_debug') }}
+        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}2{% else %}3{% endif %}"
       tags:
         - debug
 
@@ -127,21 +123,25 @@
         that: >-
           (matomo_sites
           | community.general.json_query('[].name')
-          | map('ansible.builtin.type_debug')
-          | reject('ansible.builtin.regex', '^AnsibleUnsafeText|AnsibleUnicode|str$')) == []
+          | ansible.builtin.map('ansible.builtin.type_debug')
+          | ansible.builtin.reject('ansible.builtin.regex', '^AnsibleUnsafeText|AnsibleUnicode|str$')) == []
         fail_msg: >-
           One or more Matomo site name(s) are
           {{ (matomo_sites
           | community.general.json_query('[].name')
-          | map('ansible.builtin.type_debug')
-          | reject('ansible.builtin.regex', '^AnsibleUnsafeText|AnsibleUnicode$')) | join(', ') }}
+          | ansible.builtin.map('ansible.builtin.type_debug')
+          | ansible.builtin.reject('ansible.builtin.regex', '^AnsibleUnsafeText|AnsibleUnicode$'))
+          | ansible.builtin.join(', ') }}
           not strings.
         quiet: "{% if ansible_check_mode or ansible_verbosity >= 1 %}false{% else %}true{% endif %}"
 
     - name: Debug the Ansible variable type for the url for all sites
       ansible.builtin.debug:
-        msg: "{{ matomo_sites | community.general.json_query('[].url') | map('ansible.builtin.type_debug') }}"
-        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}1{% else %}2{% endif %}"
+        msg: >-
+          {{ matomo_sites
+          | community.general.json_query('[].url')
+          | ansible.builtin.map('ansible.builtin.type_debug') }}
+        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}2{% else %}3{% endif %}"
       tags:
         - debug
 
@@ -150,14 +150,15 @@
         that: >-
           (matomo_sites
           | community.general.json_query('[].url')
-          | map('ansible.builtin.type_debug')
-          | reject('ansible.builtin.regex', '^AnsibleUnsafeText|AnsibleUnicode|str$')) == []
+          | ansible.builtin.map('ansible.builtin.type_debug')
+          | ansible.builtin.reject('ansible.builtin.regex', '^AnsibleUnsafeText|AnsibleUnicode|str$')) == []
         fail_msg: >-
           One or more Matomo site url(s) are
           {{ (matomo_sites
           | community.general.json_query('[].url')
-          | map('ansible.builtin.type_debug')
-          | reject('ansible.builtin.regex', '^AnsibleUnsafeText|AnsibleUnicode$')) | join(', ') }}
+          | ansible.builtin.map('ansible.builtin.type_debug')
+          | ansible.builtin.reject('ansible.builtin.regex', '^AnsibleUnsafeText|AnsibleUnicode$'))
+          | ansible.builtin.join(', ') }}
           not strings.
         quiet: "{% if ansible_check_mode or ansible_verbosity >= 1 %}false{% else %}true{% endif %}"
 
@@ -174,25 +175,28 @@
           - >-
             (matomo_sites
             | community.general.json_query('[].urls')
-            | map('ansible.builtin.type_debug')
-            | reject('ansible.builtin.regex', '^AnsibleUnicode|AnsibleUnsafeText|str|NoneType')) == []
+            | ansible.builtin.map('ansible.builtin.type_debug')
+            | ansible.builtin.reject('ansible.builtin.regex', '^AnsibleUnicode|AnsibleUnsafeText|str|NoneType')) == []
           - >-
             (matomo_sites
             | community.general.json_query('[].urls')
-            | map('ansible.builtin.type_debug')
-            | select('eq', 'list')) == []
+            | ansible.builtin.map('ansible.builtin.type_debug')
+            | ansible.builtin.select('eq', 'list')) == []
         fail_msg:
           One or more Matomo site urls are not strings or none
           {{ matomo_sites
           | community.general.json_query('[].urls')
-          | map('ansible.builtin.type_debug')
-          | reject('ansible.builtin.regex', '^AnsibleUnicode|AnsibleUnsafeText|str|NoneType')
-          | join(', ') }}.
+          | ansible.builtin.map('ansible.builtin.type_debug')
+          | ansible.builtin.reject('ansible.builtin.regex', '^AnsibleUnicode|AnsibleUnsafeText|str|NoneType')
+          | ansible.builtin.join(', ') }}.
         quiet: "{% if ansible_check_mode or ansible_verbosity >= 1 %}false{% else %}true{% endif %}"
 
     - name: Debug the Ansible variable type for the users for all sites
       ansible.builtin.debug:
-        msg: "{{ matomo_sites | community.general.json_query('[].users') | map('ansible.builtin.type_debug') }}"
+        msg: >-
+          {{ matomo_sites
+          | community.general.json_query('[].users')
+          | ansible.builtin.map('ansible.builtin.type_debug') }}
         verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}1{% else %}2{% endif %}"
       tags:
         - debug
@@ -202,15 +206,15 @@
         that: >-
           (matomo_sites
           | community.general.json_query('[].users')
-          | map('ansible.builtin.type_debug')
-          | reject('ansible.builtin.regex', '^AnsibleUnicode|AnsibleUnsafeText|str|NoneType')) == []
+          | ansible.builtin.map('ansible.builtin.type_debug')
+          | ansible.builtin.reject('ansible.builtin.regex', '^AnsibleUnicode|AnsibleUnsafeText|str|NoneType')) == []
         fail_msg:
           One or more Matomo site users are not strings or none
           {{ matomo_sites
           | community.general.json_query('[].users')
-          | map('ansible.builtin.type_debug')
-          | reject('ansible.builtin.regex', '^AnsibleUnicode|AnsibleUnsafeText|str|NoneType')
-          | join(', ') }}.
+          | ansible.builtin.map('ansible.builtin.type_debug')
+          | ansible.builtin.reject('ansible.builtin.regex', '^AnsibleUnicode|AnsibleUnsafeText|str|NoneType')
+          | ansible.builtin.join(', ') }}.
         quiet: "{% if ansible_check_mode or ansible_verbosity >= 1 %}false{% else %}true{% endif %}"
 
     # - name: Debug url and urls types
@@ -515,10 +519,11 @@
           %}name-and-url-and-urls-incorrect{%
           else %}nomatch{% endif -%}
       register: matomo_site_status_test_result
+      until: matomo_site_status_test == "correct"
       loop: "{{ matomo_mariadb_sites_query.query_result[0] }}"
       loop_control:
-        loop_var: matomo_site_item
         label: "{{ matomo_site_item.name }}"
+        loop_var: matomo_site_item
 
     - name: Debug matomo_site_status_test_result
       ansible.builtin.debug:
@@ -571,7 +576,12 @@
         that:
           - matomo_site_status_all | ansible.builtin.length <= 1
         quiet: "{% if ansible_check_mode or ansible_verbosity >= 1 %}false{% else %}true{% endif %}"
-        fail_msg: Please login to Matomo as an admin and manually adjust the sites as the site to be added appears to have attributes that match more than one existing site."
+        fail_msg: >-
+          Please login to Matomo as an admin and manually adjust the sites as the site to be added appears to have attributes
+          that match more than one existing site.
+          The required site has the name {{ matomo_site_required.name }} and the url {{ matomo_site_required.url }} and
+          the urls {{ matomo_site_required.name.urls | ansible.builtin.split(',') | ansible.builtin.join(', ') }} and
+          the users {{ matomo_site_required.users }}.
 
     - name: Set a fact for all the Matomo site status when the status was not determined
       ansible.builtin.set_fact:

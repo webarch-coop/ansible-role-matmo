@@ -192,7 +192,7 @@
         - matomo_db_config | length > 0
 
     - name: "Check the database version for the db user {{ matomo_db_username }}"
-      community.mysql.mysql_info:  # noqa: fqcn[canonical]
+      ansible.mariadb.mariadb_info:  # noqa: fqcn[canonical]
         login_user: "{{ matomo_db_username }}"
         login_password: "{{ matomo_db_pass }}"
         login_db: "{{ matomo_dbname }}"

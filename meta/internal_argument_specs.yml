@@ -185,7 +185,7 @@ argument_specs:
       matomo_mysql_info:
         type: dict
         required: false
-        description: The results from running the community.mysql.mysql_info module.
+        description: The results from running the ansible.mariadb.mariadb_info module.
       matomo_proposed_site_urls:
         type: list
         elements: str

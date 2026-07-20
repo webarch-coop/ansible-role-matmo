@@ -12,7 +12,7 @@
   block:
 
     - name: "Query Matomo database for sites and users using {{ matomo_db_config }}"
-      community.mysql.mysql_query:  # noqa: fqcn[canonical]
+      ansible.mariadb.mariadb_query:  # noqa: fqcn[canonical]
         config_file: "{{ matomo_db_config }}"
         login_db: "{{ matomo_dbname }}"
         login_user: "{{ matomo_db_username }}"
