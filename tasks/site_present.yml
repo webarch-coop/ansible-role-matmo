@@ -552,11 +552,13 @@
       ansible.builtin.set_fact:
         matomo_site_id: >-
           {{ matomo_site_status_test_result.results
-          | community.general.json_query("[?ansible_facts.matomo_site_status_test=='correct'].matomo_site_item[0].id") }})
+          | community.general.json_query(matomo_site_id_json_query) }})
         matomo_site_status: "correct"
+      vars:
+        matomo_site_id_json_query: '[?ansible_facts.matomo_site_status_test=="correct"].matomo_site_item[0].id'
       when:
         - matomo_site_status_test_result.results is defined
-        - matomo_site_status_test_result.results | community.general.json_query("[?ansible_facts.matomo_site_status_test=='correct'].matomo_site_item) | ansible.builtin.length == 1
+        - matomo_site_status_test_result.results | community.general.json_query(matomo_site_id_json_query) | ansible.builtin.length == 1
 
     #  - name: Set a fact for all the Matomo site status when the status was determined
     #   ansible.builtin.set_fact:
