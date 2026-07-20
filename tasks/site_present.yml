@@ -316,7 +316,7 @@
           {% if (matomo_site_item.urls | ansible.builtin.type_debug != "NoneType") and (matomo_site_item.urls | ansible.builtin.type_debug != "list") %}
           {{ (matomo_site_item.urls | string | ansible.builtin.split(',') | sort) }}
           {% endif %}.
-          The difference between the required urls and existing urls is {%- if (matomo_site_required.urls
+          The symmetric difference between the required urls and existing urls is {%- if (matomo_site_required.urls
           | ansible.builtin.type_debug != "NoneType") and
           (matomo_site_required.urls | ansible.builtin.type_debug != "list") and
           (matomo_site_item.urls | ansible.builtin.type_debug != "NoneType") and
@@ -325,24 +325,39 @@
           | ansible.builtin.string
           | ansible.builtin.split(',')
           | ansible.builtin.sort)
-          | ansible.builtin.difference(matomo_site_item.urls
+          | ansible.builtin.symmetric_difference(matomo_site_item.urls
           | ansible.builtin.string
           | ansible.builtin.split(',')
           | ansible.builtin.sort) }}
           {%- endif %}.
-          The variable type for the difference between the required urls and existing urls is {%- if (matomo_site_required.urls
+          The length of the symmetric difference between the required urls and existing urls is {%- if (matomo_site_required.urls
           | ansible.builtin.type_debug != "NoneType") and
           (matomo_site_required.urls | ansible.builtin.type_debug != "list") and
           (matomo_site_item.urls | ansible.builtin.type_debug != "NoneType") and
           (matomo_site_item.urls | ansible.builtin.type_debug != "list") %}
-          {{ (matomo_site_required.urls
+          {{ ((matomo_site_required.urls
           | ansible.builtin.string
           | ansible.builtin.split(',')
           | ansible.builtin.sort)
-          | ansible.builtin.difference(matomo_site_item.urls
+          | ansible.builtin.symmetric_difference(matomo_site_item.urls
+          | ansible.builtin.string
+          | ansible.builtin.split(',')
+          | ansible.builtin.sort))
+          | ansible.builtin.length }}
+          {%- endif %}.
+          The variable type for the symmetric difference between the required urls and existing urls is {%- if (matomo_site_required.urls
+          | ansible.builtin.type_debug != "NoneType") and
+          (matomo_site_required.urls | ansible.builtin.type_debug != "list") and
+          (matomo_site_item.urls | ansible.builtin.type_debug != "NoneType") and
+          (matomo_site_item.urls | ansible.builtin.type_debug != "list") %}
+          {{ ((matomo_site_required.urls
           | ansible.builtin.string
           | ansible.builtin.split(',')
           | ansible.builtin.sort)
+          | ansible.builtin.symmetric_difference(matomo_site_item.urls
+          | ansible.builtin.string
+          | ansible.builtin.split(',')
+          | ansible.builtin.sort))
           | ansible.builtin.type_debug }}
           {%- endif %}.
           The determined site status is
@@ -354,14 +369,15 @@
           (matomo_site_item.urls | ansible.builtin.type_debug != "NoneType") and
           (matomo_site_required.urls | ansible.builtin.type_debug != "list") and
           (matomo_site_item.urls | ansible.builtin.type_debug != "list") and
-          ((matomo_site_required.urls
+          (((matomo_site_required.urls
           | ansible.builtin.string
           | ansible.builtin.split(',')
           | ansible.builtin.sort)
-          | ansible.builtin.difference(matomo_site_item.urls
+          | ansible.builtin.symmetric_difference(matomo_site_item.urls
           | ansible.builtin.string
           | ansible.builtin.split(',')
-          | ansible.builtin.sort) == []) and
+          | ansible.builtin.sort))
+          | ansible.builtin.length == 0) and
           (matomo_site_required.users == matomo_site_item.users)
           %}correct{% elif
           (matomo_site_required.name != matomo_site_item.name) and
@@ -370,14 +386,15 @@
           (matomo_site_item.urls | ansible.builtin.type_debug != "NoneType") and
           (matomo_site_required.urls | ansible.builtin.type_debug != "list") and
           (matomo_site_item.urls | ansible.builtin.type_debug != "list") and
-          ((matomo_site_required.urls
+          (((matomo_site_required.urls
           | ansible.builtin.string
           | ansible.builtin.split(',')
           | ansible.builtin.sort)
-          | ansible.builtin.difference(matomo_site_item.urls
+          | ansible.builtin.symmetric_difference(matomo_site_item.urls
           | ansible.builtin.string
           | ansible.builtin.split(',')
-          | ansible.builtin.sort) == []) and
+          | ansible.builtin.sort))
+          | ansible.builtin.length == 0) and
           (matomo_site_required.users == matomo_site_item.users)
           %}name-incorrect{% elif
           (matomo_site_required.name == matomo_site_item.name) and
@@ -386,14 +403,15 @@
           (matomo_site_item.urls | ansible.builtin.type_debug != "NoneType") and
           (matomo_site_required.urls | ansible.builtin.type_debug != "list") and
           (matomo_site_item.urls | ansible.builtin.type_debug != "list") and
-          ((matomo_site_required.urls
+          (((matomo_site_required.urls
           | ansible.builtin.string
           | ansible.builtin.split(',')
           | ansible.builtin.sort)
-          | ansible.builtin.difference(matomo_site_item.urls
+          | ansible.builtin.symmetric_difference(matomo_site_item.urls
           | ansible.builtin.string
           | ansible.builtin.split(',')
-          | ansible.builtin.sort) == []) and
+          | ansible.builtin.sort))
+          | ansible.builtin.length == 0) and
           (matomo_site_required.users == matomo_site_item.users)
           %}url-incorrect{% elif
           (matomo_site_required.name == matomo_site_item.name) and
@@ -402,14 +420,15 @@
           (matomo_site_item.urls | ansible.builtin.type_debug != "NoneType") and
           (matomo_site_required.urls | ansible.builtin.type_debug != "list") and
           (matomo_site_item.urls | ansible.builtin.type_debug != "list") and
-          ((matomo_site_required.urls
+          (((matomo_site_required.urls
           | ansible.builtin.string
           | ansible.builtin.split(',')
           | ansible.builtin.sort)
-          | ansible.builtin.difference(matomo_site_item.urls
+          | ansible.builtin.symmetric_difference(matomo_site_item.urls
           | ansible.builtin.string
           | ansible.builtin.split(',')
-          | ansible.builtin.sort) != []) and
+          | ansible.builtin.sort))
+          | ansible.builtin.length > 0) and
           (matomo_site_required.users == matomo_site_item.users)
           %}urls-incorrect{% elif
           (matomo_site_required.name == matomo_site_item.name) and
@@ -418,14 +437,15 @@
           (matomo_site_item.urls | ansible.builtin.type_debug != "NoneType") and
           (matomo_site_required.urls | ansible.builtin.type_debug != "list") and
           (matomo_site_item.urls | ansible.builtin.type_debug != "list") and
-          ((matomo_site_required.urls
+          (((matomo_site_required.urls
           | ansible.builtin.string
           | ansible.builtin.split(',')
           | ansible.builtin.sort)
-          | ansible.builtin.difference(matomo_site_item.urls
+          | ansible.builtin.symmetric_difference(matomo_site_item.urls
           | ansible.builtin.string
           | ansible.builtin.split(',')
-          | ansible.builtin.sort) != []) and
+          | ansible.builtin.sort))
+          | ansible.builtin.length > 0) and
           (matomo_site_required.users == matomo_site_item.users)
           %}url-and-urls-incorrect{% elif
           (matomo_site_required.name != matomo_site_item.name) and
@@ -434,14 +454,15 @@
           (matomo_site_item.urls | ansible.builtin.type_debug != "NoneType") and
           (matomo_site_required.urls | ansible.builtin.type_debug != "list") and
           (matomo_site_item.urls | ansible.builtin.type_debug != "list") and
-          ((matomo_site_required.urls
+          (((matomo_site_required.urls
           | ansible.builtin.string
           | ansible.builtin.split(',')
           | ansible.builtin.sort)
-          | ansible.builtin.difference(matomo_site_item.urls
+          | ansible.builtin.symmetric_difference(matomo_site_item.urls
           | ansible.builtin.string
           | ansible.builtin.split(',')
-          | ansible.builtin.sort) != []) and
+          | ansible.builtin.sort))
+          | ansible.builtin.length > 0) and
           (matomo_site_required.users == matomo_site_item.users)
           %}name-and-url-and-urls-incorrect{%
           else %}nomatch{% endif -%}.
@@ -464,14 +485,15 @@
           (matomo_site_item.urls | ansible.builtin.type_debug != "NoneType") and
           (matomo_site_required.urls | ansible.builtin.type_debug != "list") and
           (matomo_site_item.urls | ansible.builtin.type_debug != "list") and
-          ((matomo_site_required.urls
+          (((matomo_site_required.urls
           | ansible.builtin.string
           | ansible.builtin.split(',')
           | ansible.builtin.sort)
-          | ansible.builtin.difference(matomo_site_item.urls
+          | ansible.builtin.symmetric_difference(matomo_site_item.urls
           | ansible.builtin.string
           | ansible.builtin.split(',')
-          | ansible.builtin.sort) == []) and
+          | ansible.builtin.sort))
+          | ansible.builtin.length == 0) and
           (matomo_site_required.users == matomo_site_item.users)
           %}correct{% elif
           (matomo_site_required.name != matomo_site_item.name) and
@@ -480,14 +502,15 @@
           (matomo_site_item.urls | ansible.builtin.type_debug != "NoneType") and
           (matomo_site_required.urls | ansible.builtin.type_debug != "list") and
           (matomo_site_item.urls | ansible.builtin.type_debug != "list") and
-          ((matomo_site_required.urls
+          (((matomo_site_required.urls
           | ansible.builtin.string
           | ansible.builtin.split(',')
           | ansible.builtin.sort)
-          | ansible.builtin.difference(matomo_site_item.urls
+          | ansible.builtin.symmetric_difference(matomo_site_item.urls
           | ansible.builtin.string
           | ansible.builtin.split(',')
-          | ansible.builtin.sort) == []) and
+          | ansible.builtin.sort))
+          | ansible.builtin.length == 0) and
           (matomo_site_required.users == matomo_site_item.users)
           %}name-incorrect{% elif
           (matomo_site_required.name == matomo_site_item.name) and
@@ -496,14 +519,15 @@
           (matomo_site_item.urls | ansible.builtin.type_debug != "NoneType") and
           (matomo_site_required.urls | ansible.builtin.type_debug != "list") and
           (matomo_site_item.urls | ansible.builtin.type_debug != "list") and
-          ((matomo_site_required.urls
+          (((matomo_site_required.urls
           | ansible.builtin.string
           | ansible.builtin.split(',')
           | ansible.builtin.sort)
-          | ansible.builtin.difference(matomo_site_item.urls
+          | ansible.builtin.symmetric_difference(matomo_site_item.urls
           | ansible.builtin.string
           | ansible.builtin.split(',')
-          | ansible.builtin.sort) == []) and
+          | ansible.builtin.sort))
+          | ansible.builtin.length == 0) and
           (matomo_site_required.users == matomo_site_item.users)
           %}url-incorrect{% elif
           (matomo_site_required.name == matomo_site_item.name) and
@@ -512,14 +536,15 @@
           (matomo_site_item.urls | ansible.builtin.type_debug != "NoneType") and
           (matomo_site_required.urls | ansible.builtin.type_debug != "list") and
           (matomo_site_item.urls | ansible.builtin.type_debug != "list") and
-          ((matomo_site_required.urls
+          (((matomo_site_required.urls
           | ansible.builtin.string
           | ansible.builtin.split(',')
           | ansible.builtin.sort)
-          | ansible.builtin.difference(matomo_site_item.urls
+          | ansible.builtin.symmetric_difference(matomo_site_item.urls
           | ansible.builtin.string
           | ansible.builtin.split(',')
-          | ansible.builtin.sort) != []) and
+          | ansible.builtin.sort))
+          | ansible.builtin.length > 0) and
           (matomo_site_required.users == matomo_site_item.users)
           %}urls-incorrect{% elif
           (matomo_site_required.name == matomo_site_item.name) and
@@ -528,14 +553,15 @@
           (matomo_site_item.urls | ansible.builtin.type_debug != "NoneType") and
           (matomo_site_required.urls | ansible.builtin.type_debug != "list") and
           (matomo_site_item.urls | ansible.builtin.type_debug != "list") and
-          ((matomo_site_required.urls
+          (((matomo_site_required.urls
           | ansible.builtin.string
           | ansible.builtin.split(',')
           | ansible.builtin.sort)
-          | ansible.builtin.difference(matomo_site_item.urls
+          | ansible.builtin.symmetric_difference(matomo_site_item.urls
           | ansible.builtin.string
           | ansible.builtin.split(',')
-          | ansible.builtin.sort) != []) and
+          | ansible.builtin.sort))
+          | ansible.builtin.length > 0) and
           (matomo_site_required.users == matomo_site_item.users)
           %}url-and-urls-incorrect{% elif
           (matomo_site_required.name != matomo_site_item.name) and
@@ -544,14 +570,15 @@
           (matomo_site_item.urls | ansible.builtin.type_debug != "NoneType") and
           (matomo_site_required.urls | ansible.builtin.type_debug != "list") and
           (matomo_site_item.urls | ansible.builtin.type_debug != "list") and
-          ((matomo_site_required.urls
+          (((matomo_site_required.urls
           | ansible.builtin.string
           | ansible.builtin.split(',')
           | ansible.builtin.sort)
-          | ansible.builtin.difference(matomo_site_item.urls
+          | ansible.builtin.symmetric_difference(matomo_site_item.urls
           | ansible.builtin.string
           | ansible.builtin.split(',')
-          | ansible.builtin.sort) != []) and
+          | ansible.builtin.sort))
+          | ansible.builtin.length > 0) and
           (matomo_site_required.users == matomo_site_item.users)
           %}name-and-url-and-urls-incorrect{%
           else %}nomatch{% endif -%}
