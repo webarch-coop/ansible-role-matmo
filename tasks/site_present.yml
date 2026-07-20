@@ -364,7 +364,6 @@
           {% if
           (matomo_site_required.name == matomo_site_item.name) and
           (matomo_site_required.url == matomo_site_item.url) and
-          (matomo_site_required.urls == matomo_site_item.urls) and
           (matomo_site_required.urls | ansible.builtin.type_debug != "NoneType") and
           (matomo_site_item.urls | ansible.builtin.type_debug != "NoneType") and
           (matomo_site_required.urls | ansible.builtin.type_debug != "list") and
@@ -480,7 +479,6 @@
           {%- if
           (matomo_site_required.name == matomo_site_item.name) and
           (matomo_site_required.url == matomo_site_item.url) and
-          (matomo_site_required.urls == matomo_site_item.urls) and
           (matomo_site_required.urls | ansible.builtin.type_debug != "NoneType") and
           (matomo_site_item.urls | ansible.builtin.type_debug != "NoneType") and
           (matomo_site_required.urls | ansible.builtin.type_debug != "list") and
