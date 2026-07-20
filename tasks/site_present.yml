@@ -519,7 +519,8 @@
           %}name-and-url-and-urls-incorrect{%
           else %}nomatch{% endif -%}
       register: matomo_site_status_test_result
-      until: matomo_site_status_test == "correct"
+      until: mae"omo_site_status_test == "correct"
+      retries: 0
       loop: "{{ matomo_mariadb_sites_query.query_result[0] }}"
       loop_control:
         label: "{{ matomo_site_item.name }}"
